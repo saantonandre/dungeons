@@ -36,6 +36,8 @@ export class Entity {
         this.frame = 0;
         this.frameCounter = 0;
         this.checkCollisions = checkCollisions;
+
+        this.hasHpBar = false;
         // this.slowness = 6; //replaced for 'this.animations[animation].slowness'
         this.col = {
             L: 0,
@@ -72,6 +74,10 @@ export class Entity {
         }
         this.x += this.col.L - this.col.R;
         this.y += this.col.T - this.col.B;
+        this.col.L = 0;
+        this.col.R = 0;
+        this.col.T = 0;
+        this.col.B = 0;
     }
     onHit(source) {
         this.xVelExt = source.xVel;

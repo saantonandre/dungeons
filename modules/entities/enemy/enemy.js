@@ -21,9 +21,6 @@ export class Enemy extends Entity {
         //this.hpBar = new HpBar(this);
         //this.displayName = new DisplayName(this);
     }
-    enemyClassRenders(context, tilesize, ratio, camera) {
-        this.hpBar.render(context, tilesize, ratio, camera);
-    }
     onHit(source) {
         this.state = "damaged";
         this.damaged = source.attackID;

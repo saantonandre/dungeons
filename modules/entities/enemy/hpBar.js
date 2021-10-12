@@ -8,8 +8,7 @@ export class HpBar {
             [0, 0, 0]
         ];
         this.source = source;
-        this.x = this.source.x;
-        this.y = this.source.y;
+        this.source.hasHpBar = true;
         this.w = 1;
         this.h = 1;
         this.wRatio = 1;
@@ -34,8 +33,8 @@ export class HpBar {
             this.spriteY[0][2] * tilesize,
             this.w * tilesize * this.prevRatio,
             this.h * tilesize,
-            (this.x + camera.x) * tilesize * ratio,
-            (this.y + camera.y) * tilesize * ratio,
+            (this.source.x + camera.x) * tilesize * ratio,
+            (this.source.y - this.h / 2 + camera.y) * tilesize * ratio,
             this.w * tilesize * ratio * this.prevRatio,
             this.h * tilesize * ratio
         );

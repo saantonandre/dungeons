@@ -1,10 +1,12 @@
 import * as Physics from "./physics.js";
 export function checkCollisions(obj, entities, returnColliders = false, simpleCol = true) {
     let col = "none";
+    /* 
     obj.col.L = 0;
     obj.col.R = 0;
     obj.col.T = 0;
-    obj.col.B = 0;
+    obj.col.B = 0; 
+    */
     let collidersChunk = [];
     for (let entity of entities) {
         //isOutOfScreen(entity) || entity.notSolid
@@ -20,11 +22,9 @@ export function checkCollisions(obj, entities, returnColliders = false, simpleCo
             }
             if (obj.onCollision) {
                 obj.onCollision(entity);
-                obj.resolveCollisions();
             }
             if (entity.onCollision) {
                 entity.onCollision(obj);
-                entity.resolveCollisions();
             }
         }
     }

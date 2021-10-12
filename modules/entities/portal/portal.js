@@ -1,8 +1,4 @@
 import { Entity } from "../../entity/entity.js";
-// import { gameDirector } from "../../gameDirector/gameDirector.js";
-// import { player } from "../player/player.js";
-// import { collided } from "../../physics/physics.js"
-// import { meta } from "../../meta/meta.js"
 export class Portal extends Entity {
     // A portal which takes you to another room
     constructor(x, y, dir, id) {
@@ -10,8 +6,8 @@ export class Portal extends Entity {
         this.dir = dir;
         this.id = id;
         this.solid = false;
-        this.type = "bg";
-
+        this.type = "portal";
+        this.background = true;
         this.spriteW = 3;
         this.spriteH = 1;
         this.hitbox = false;

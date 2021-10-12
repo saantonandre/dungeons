@@ -46,6 +46,14 @@ class GameDirector {
         for (let entity of this.level.entities) {
             entity.compute(meta.deltaTime, this.level.entities);
         }
+        for (let entity of this.level.entities) {
+            entity.resolveCollisions(meta.deltaTime, this.level.entities);
+        }
+        for (let entity of this.level.entities) {
+            if (entity.hasHpBar) {
+                entity.hpBar.compute(meta.deltaTime);
+            }
+        }
         this.camera.compute(meta, this.level);
     }
 
@@ -59,6 +67,11 @@ class GameDirector {
         }
         for (let entity of this.level.entities) {
             entity.render(context, tilesize, ratio, this.camera);
+        }
+        for (let entity of this.level.entities) {
+            if (entity.hasHpBar) {
+                entity.hpBar.render(context, tilesize, ratio, this.camera);
+            }
         }
     }
 

@@ -16,7 +16,7 @@ export class Player extends Entity {
         /** Side which the player is facing */
         this.facing = "r";
 
-        this.baseSpeed = 0.1;
+        this.baseSpeed = 0.08;
         this.speed = this.baseSpeed;
 
         this.shadow = true;
@@ -39,7 +39,7 @@ export class Player extends Entity {
         this.resolveInput();
         this.updatePosition(deltaTime);
         this.updateHitbox();
-        this.checkCollisions(this, environment)
+        this.checkCollisions(this, environment, false, false)
     }
     render(context, tilesize, ratio, camera) {
         this.renderSprite(context, tilesize, ratio, camera);
