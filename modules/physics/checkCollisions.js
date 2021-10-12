@@ -1,5 +1,5 @@
 import * as Physics from "./physics.js";
-export function checkCollisions(obj, entities, returnColliders, simpleCol = false) {
+export function checkCollisions(obj, entities, returnColliders = false, simpleCol = true) {
     let col = "none";
     obj.col.L = 0;
     obj.col.R = 0;
@@ -8,13 +8,7 @@ export function checkCollisions(obj, entities, returnColliders, simpleCol = fals
     let collidersChunk = [];
     for (let entity of entities) {
         //isOutOfScreen(entity) || entity.notSolid
-        if (entity.notSolid) {
-            continue;
-        }
-        if (entity.removed) {
-            continue;
-        }
-        if (obj === entity) {
+        if (!entity.solid || entity.removed || obj === entity) {
             continue;
         }
         if (Physics.collided(obj, entity)) {
@@ -26,9 +20,11 @@ export function checkCollisions(obj, entities, returnColliders, simpleCol = fals
             }
             if (obj.onCollision) {
                 obj.onCollision(entity);
+                obj.resolveCollisions();
             }
             if (entity.onCollision) {
                 entity.onCollision(obj);
+                entity.resolveCollisions();
             }
         }
     }
@@ -39,13 +35,13 @@ export function checkCollisions(obj, entities, returnColliders, simpleCol = fals
     for (let i = 0; i < collidersChunk.length; i++) {
         col = Physics.colCheck(obj, collidersChunk[i]);
     }
-
-    if (obj.col.R - obj.col.L !== 0) {
-        obj.x -= obj.col.R - obj.col.L;
-    }
-    if (obj.col.B - obj.col.T !== 0) {
-        obj.y -= obj.col.B - obj.col.T;
-    }
+    /* 
+        if (obj.col.R - obj.col.L !== 0) {
+            obj.x -= obj.col.R - obj.col.L;
+        }
+        if (obj.col.B - obj.col.T !== 0) {
+            obj.y -= obj.col.B - obj.col.T;
+        } */
     if (returnColliders) {
         return collidersChunk;
     }

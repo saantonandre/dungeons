@@ -14,8 +14,7 @@ class GameDirector {
         this.currentFloor = 1;
         /** The current level Object, contains info about the level entities and tiles */
         this.level;
-
-        this.player = new Player(7.5, 7.5, this);
+        this.player;
         this.camera = new Camera();
         this.camera.focus = this.player;
 
@@ -30,9 +29,12 @@ class GameDirector {
         gameMap.generate();
         this.currentLevel = gameMap.findStart();
         this.loadCurrentLevel(meta.tilesWidth, meta.tilesHeight);
-        this.level.entities.push(this.player)
+
+        let player = new Player(7.5, 7.5, this);
+        this.player = player;
         this.player.x = this.level.levelW / 2;
         this.player.y = this.level.levelH / 2;
+        this.level.entities.push(player)
     }
     /** 
      * - Computes every entity
@@ -42,15 +44,19 @@ class GameDirector {
     compute(meta) {
 
         for (let entity of this.level.entities) {
-            entity.compute(meta.deltaTime);
+            entity.compute(meta.deltaTime, this.level.entities);
         }
         this.camera.compute(meta, this.level);
-        this.sortEntities();
     }
 
     render(context, tilesize, ratio) {
+        this.sortEntities();
         this.renderFloor(context, tilesize, ratio);
+
         //(context, tilesize, ratio, offsetX, offsetY)
+        for (let entity of this.level.entities) {
+            entity.renderShadow(context, tilesize, ratio, this.camera);
+        }
         for (let entity of this.level.entities) {
             entity.render(context, tilesize, ratio, this.camera);
         }
@@ -60,11 +66,6 @@ class GameDirector {
         this.level = gameMap.levels[this.currentLevel[0]][this.currentLevel[1]];
         this.level.levelX = (tilesWidth - this.level.levelW) / 2;
         this.level.levelY = (tilesHeight - this.level.levelH) / 2;
-        // this.player.environment = this.level.entities;
-        // this.level.entities.push(this.player);
-        // let testSlime = new Slime(18, 14)
-        // testSlime.environment = this.level.entities;
-        //this.level.entities.push(testSlime);
     }
     changeLevel(dir, meta) {
         // !!! PROVISIONAL !!!
@@ -74,7 +75,7 @@ class GameDirector {
     }
     sortEntities() {
         this.level.entities.sort(function(a, b) {
-            if (b.type == "bg") {
+            if (b.background) {
                 return 0;
             }
             return (a.y + a.h) - (b.y + b.h);

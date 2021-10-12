@@ -83,31 +83,6 @@ export function colCheck(shapeA, shapeB) {
         var oX = hWidths - Math.abs(vX),
             oY = hHeights - Math.abs(vY);
         if (oX >= oY) {
-
-            /* 
-                        if (vY > 0) {
-                            colDir = 't';
-                            if (shapeA.col.T < oY && !shapeB.xVel) {
-                                shapeA.col.T += oY;
-                            }
-                        } else {
-                            colDir = 'b';
-                            if (shapeA.col.B < oY) {
-                                shapeA.col.B = oY;
-                            }
-                            if (shapeB.xVel) {
-                                shapeA.xVelExt = shapeB.xVel;
-                            }
-                            if (shapeB.xVel) {
-                                if (shapeB.yVel < 0) {
-                                    shapeA.yVelExt = shapeB.yVel;
-                                }
-                                if (shapeB.yVel > 0) {
-                                    shapeA.yVelExt = shapeB.yVel;
-                                }
-                            }
-                        } 
-                        */
             if (vY > 0) {
                 colDir = 't';
                 if (shapeA.col.T < oY) {

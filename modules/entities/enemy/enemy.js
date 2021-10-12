@@ -1,4 +1,5 @@
 import { Entity } from "../../entity/entity.js";
+import { HpBar } from "./hpBar.js";
 import * as Physics from "../../physics/physics.js"
 export class Enemy extends Entity {
     constructor(x, y) {
@@ -13,11 +14,15 @@ export class Enemy extends Entity {
         this.lv = 1;
         this.expValue = 1;
 
-
+        this.hpBar = new HpBar(this);
         this.Physics = Physics;
         this.prey = false;
+        this.immovable = true;
         //this.hpBar = new HpBar(this);
         //this.displayName = new DisplayName(this);
+    }
+    enemyClassRenders(context, tilesize, ratio, camera) {
+        this.hpBar.render(context, tilesize, ratio, camera);
     }
     onHit(source) {
         this.state = "damaged";

@@ -10,13 +10,16 @@ export class Entity {
         this.yVel = 0;
 
         // The scope in which this entity is enclosed to
-        this.environment = [];
+        // this.environment = []; deprecated
 
         this.xVelExt = 0;
         this.yVelExt = 0;
         this.friction = 0.8;
         this.type = "entity";
         this.state = "idle";
+
+        /** Last in rendering order? */
+        this.background = false;
 
         this.damaged = false;
         this.shadow = false;
@@ -62,6 +65,13 @@ export class Entity {
     }
     onCollision(source) {
 
+    }
+    resolveCollisions() {
+        if (this.immovable) {
+            return;
+        }
+        this.x += this.col.L - this.col.R;
+        this.y += this.col.T - this.col.B;
     }
     onHit(source) {
         this.xVelExt = source.xVel;
@@ -132,10 +142,6 @@ export class Entity {
             // If the entity is removed, don't bother rendering
             return;
         }
-        if (this.shadow) {
-            this.renderShadow(context, tilesize, ratio, camera);
-            // If the entity is removed, don't bother rendering
-        }
         context.drawImage(
             this.sheet, // source of the sprite
             this.animations[this.animation].keyframesX[this.left][this.frame] * tilesize, // x pos of the sprite
@@ -150,6 +156,9 @@ export class Entity {
     }
 
     renderShadow(context, tilesize, ratio, camera) {
+        if (!this.shadow || this.removed) {
+            return;
+        }
         // Canon Shadow rendering (PROVISIONAL)
         context.fillStyle = "#14182e";
         context.globalAlpha = 0.6;

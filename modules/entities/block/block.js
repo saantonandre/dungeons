@@ -3,10 +3,11 @@ export class Block extends Entity {
     // A normal, collidable block
     constructor(x, y, sprite) {
         super(x, y);
-        this.type = "bg";
+        this.type = sprite;
         this.which = sprite;
         this.immovable = false;
         this.tile = 0;
+        this.background = true;
     }
     render(context, tilesize, ratio, camera) {
         context.drawImage(

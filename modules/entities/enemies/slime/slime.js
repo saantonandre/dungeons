@@ -19,6 +19,10 @@ export class Slime extends Enemy {
         this.fleeing = 0;
         this.state = "idle";
         this.animation = "idle";
+
+        this.immovable = true;
+
+
         let leftSprite = 1;
         //this.setAnimation("idle", [0], [15])
         //this.setAnimation("idle", [1], [15], leftSprite)
@@ -41,23 +45,23 @@ export class Slime extends Enemy {
         this.hitboxOffset.y = 0.3;
 
     }
-    searchPrey() {
+    searchPrey(environment) {
         if (this.prey) {
             return;
         }
-        for (let entity of this.environment) {
+        for (let entity of environment) {
             if (entity.type === "player") {
                 this.prey = entity;
                 return;
             }
         }
     }
-    compute(deltaTime) {
-        this.searchPrey();
+    compute(deltaTime, environment) {
+        this.searchPrey(environment);
         this.computeState(deltaTime);
         this.updatePosition(deltaTime);
         this.updateHitbox();
-        this.checkCollisions(this, this.environment)
+        this.checkCollisions(this, environment)
         this.updateSprite(deltaTime);
     }
     render(context, tilesize, ratio, camera) {

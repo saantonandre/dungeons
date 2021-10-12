@@ -20,8 +20,7 @@ export class Player extends Entity {
         this.speed = this.baseSpeed;
 
         this.shadow = true;
-
-        this.immovable = true;
+        this.immovable = false;
         this.animation = "idle";
         this.setAnimation("idle", [0, 0, 0, 0], [6, 7, 8, 9]);
         this.setAnimation("idle", [1, 1, 1, 1], [6, 7, 8, 9], 1);
@@ -35,39 +34,39 @@ export class Player extends Entity {
         this.hitboxOffset.w = -0.6;
         this.hitboxOffset.h = -0.3;
     }
-    compute(deltaTime) {
+    compute(deltaTime, environment) {
         this.updateSprite(deltaTime);
         this.resolveInput();
         this.updatePosition(deltaTime);
         this.updateHitbox();
-        this.checkCollisions(this, this.environment)
+        this.checkCollisions(this, environment)
     }
     render(context, tilesize, ratio, camera) {
         this.renderSprite(context, tilesize, ratio, camera);
     }
     resolveInput() {
         // Moves
-        if (controls.left && !controls.right) {
+        if (controls.left && !controls.right && !this.col.L) {
             this.facing = "l";
             this.xVel = -this.speed;
             this.left = 1;
         } else if (this.xVel < 0) {
             this.xVel = 0;
         }
-        if (controls.right && !controls.left) {
+        if (controls.right && !controls.left && !this.col.R) {
             this.facing = "r";
             this.xVel = this.speed;
             this.left = 0;
         } else if (this.xVel > 0) {
             this.xVel = 0;
         }
-        if (controls.up && !controls.down) {
+        if (controls.up && !controls.down && !this.col.B) {
             this.facing = "t";
             this.yVel = -this.speed;
         } else if (this.yVel < 0) {
             this.yVel = 0;
         }
-        if (controls.down && !controls.up) {
+        if (controls.down && !controls.up && !this.col.T) {
             this.facing = "b";
             this.yVel = this.speed;
         } else if (this.yVel > 0) {
