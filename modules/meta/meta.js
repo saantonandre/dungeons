@@ -43,6 +43,7 @@ class Meta {
             let fpsSpan = document.createElement("span");
 
             fpsSpan.style.position = "absolute";
+            fpsSpan.style.color = "white";
             fpsSpan.style.left = "5px";
             fpsSpan.style.top = "5px";
             document.body.appendChild(fpsSpan);

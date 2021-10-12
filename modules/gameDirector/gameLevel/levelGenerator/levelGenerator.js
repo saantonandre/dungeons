@@ -118,7 +118,7 @@ export class LevelGenerator {
         } else {
             this.importTemplate(0);
         }
-        this.assignTiles();
+        //this.assignTiles();
         //this.makeEnemies(type);
         //this.consoleRender();
         return this.level;
@@ -127,7 +127,7 @@ export class LevelGenerator {
         for (let i = 0; i < this.h; i++) {
             for (let j = 0; j < this.w; j++) {
                 if (this.level[j][i].type !== 1) {
-                    if (this.level[j][i].type == 3) {
+                    if (this.level[j][i].type == 3 || this.level[j][i].type == 1) {
                         tileSetter(this.level, j, i);
                     }
                     continue;
@@ -328,60 +328,6 @@ export class LevelGenerator {
   // 12 - 13 - 14 holes VER
   // 15 holes SINGLE
 */
-function tileSetter(array, xIndex, yIndex) {
-    let sameType = array[xIndex][yIndex].type;
-
-    let left = +(array[xIndex - 1][yIndex].type === sameType),
-        right = +(array[xIndex + 1][yIndex].type === sameType),
-        up = +(array[xIndex][yIndex - 1].type === sameType),
-        down = +(array[xIndex][yIndex + 1].type === sameType);
-
-
-    let binary = "" + left + up + right + down;
-    let rawTile = parseInt(binary, 2);
-    array[xIndex][yIndex].tile = adjustTile(rawTile);
-
-}
-/** Adjusts the tile id based on the standard tile placement of the spritesheet */
-function adjustTile(tile) {
-    switch (tile) {
-        case 0:
-            return 15;
-        case 1:
-            return 12;
-        case 2:
-            return 9;
-        case 3:
-            return 0;
-        case 4:
-            return 14;
-        case 5:
-            return 13;
-        case 6:
-            return 6;
-        case 7:
-            return 3;
-        case 8:
-            return 11;
-        case 9:
-            return 2;
-        case 10:
-            return 10;
-        case 11:
-            return 1;
-        case 12:
-            return 8;
-        case 13:
-            return 5;
-        case 14:
-            return 7;
-        case 15:
-            return 4;
-        default:
-            throw new Error("Tile error !!!");
-    }
-
-}
 let levelTemplates = [
     [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -393,12 +339,12 @@ let levelTemplates = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ],

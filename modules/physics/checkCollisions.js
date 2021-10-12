@@ -1,5 +1,8 @@
 import * as Physics from "./physics.js";
 export function checkCollisions(obj, entities, returnColliders = false, simpleCol = true) {
+    if (!obj.solid) {
+        return false;
+    }
     let col = "none";
     /* 
     obj.col.L = 0;

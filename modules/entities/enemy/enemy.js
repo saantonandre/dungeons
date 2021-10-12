@@ -21,6 +21,17 @@ export class Enemy extends Entity {
         //this.hpBar = new HpBar(this);
         //this.displayName = new DisplayName(this);
     }
+    searchPrey(environment) {
+        if (this.prey) {
+            return;
+        }
+        for (let entity of environment) {
+            if (entity.type === "player") {
+                this.prey = entity;
+                return;
+            }
+        }
+    }
     onHit(source) {
         this.state = "damaged";
         this.damaged = source.attackID;

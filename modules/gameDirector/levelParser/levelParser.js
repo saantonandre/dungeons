@@ -28,8 +28,8 @@ export class LevelParser {
                         // Free block
                         break;
                     case 1:
-                        entity = new Entities.Block(x, y, "wall");
-                        entity.tile = rawLevel[x][y].tile;
+                        entity = new Entities.Block(x, y, "wall", rawLevel);
+                        //entity.tile = rawLevel[x][y].tile;
                         entity.environment = entities;
                         entities.push(entity);
                         break;
@@ -39,8 +39,8 @@ export class LevelParser {
                         entities.push(entity);
                         break;
                     case 3:
-                        entity = new Entities.Block(x, y, "hole");
-                        entity.tile = rawLevel[x][y].tile;
+                        entity = new Entities.Block(x, y, "hole", rawLevel);
+                        //entity.tile = rawLevel[x][y].tile;
                         entity.environment = entities;
                         entities.push(entity);
                         break;
@@ -49,6 +49,11 @@ export class LevelParser {
                         break;
                     case 10:
                         entity = new Entities.Slime(x, y);
+                        entity.environment = entities;
+                        entities.push(entity);
+                        break;
+                    case 11:
+                        entity = new Entities.Bat(x, y);
                         entity.environment = entities;
                         entities.push(entity);
                         break;

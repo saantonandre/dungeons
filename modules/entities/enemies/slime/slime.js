@@ -12,7 +12,6 @@ export class Slime extends Enemy {
         //Stats
         this.atk = 5;
         this.expValue = 2;
-        this.slowness = 8;
         this.aggroRange = 10;
         this.targetRot = 0;
         this.dashSpeed = 4;
@@ -21,6 +20,8 @@ export class Slime extends Enemy {
         this.animation = "idle";
 
         this.immovable = true;
+
+        this.solid = true;
 
 
         let leftSprite = 1;
@@ -45,24 +46,14 @@ export class Slime extends Enemy {
         this.hitboxOffset.y = 0.3;
 
     }
-    searchPrey(environment) {
-        if (this.prey) {
-            return;
-        }
-        for (let entity of environment) {
-            if (entity.type === "player") {
-                this.prey = entity;
-                return;
-            }
-        }
-    }
     compute(deltaTime, environment) {
         this.searchPrey(environment);
         this.computeState(deltaTime);
         this.updatePosition(deltaTime);
         this.updateHitbox();
-        this.checkCollisions(this, environment)
+        this.checkCollisions(this, environment);
         this.updateSprite(deltaTime);
+        console.log(this)
     }
     render(context, tilesize, ratio, camera) {
         this.renderSprite(context, tilesize, ratio, camera)
@@ -155,7 +146,10 @@ export class Slime extends Enemy {
     }
     onCollision(collidedEntity) {
         if (collidedEntity === this.prey && this.state === "attack") {
-            this.prey.onHit(this);
+
+            collidedEntity.onHit(this);
+            collidedEntity.xVelExt = this.xVel;
+            collidedEntity.yVelExt = this.yVel;
             this.fleeing = 120;
             this.state = "flee";
         }
