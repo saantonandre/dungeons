@@ -1,12 +1,13 @@
 import { gameMap } from "./gameMap/gameMap.js";
 import { Camera } from "./camera/camera.js";
 
-import { player } from "../player/player.js";
+import { Player } from "../player/player.js";
+
 class GameDirector {
 
     constructor() {
 
-        /**  Defines the player position in the bidimensional map array [y, x] */
+        /**  Defines the this.player position in the bidimensional map array [y, x] */
         this.currentLevel = [0, 0]
 
         /** Defines the current floor */
@@ -14,25 +15,24 @@ class GameDirector {
         /** The current level Object, contains info about the level entities and tiles */
         this.level;
 
-
+        this.player = new Player(7.5, 7.5, this);
         this.camera = new Camera();
-        this.camera.focus = player;
+        this.camera.focus = this.player;
 
     }
     /** !!! PROVISIONAL !!!
      * - Generates the map
      * - Sets the current level
      * - Loads the entities of the level
-     * - Places the player at the center of the map
+     * - Places the this.player at the center of the map
      */
     initialize(meta) {
         gameMap.generate();
         this.currentLevel = gameMap.findStart();
         this.loadCurrentLevel(meta.tilesWidth, meta.tilesHeight);
-        this.level.entities.push(player)
-        player.x = this.level.levelW / 2;
-        player.y = this.level.levelH / 2;
-        console.log(player)
+        this.level.entities.push(this.player)
+        this.player.x = this.level.levelW / 2;
+        this.player.y = this.level.levelH / 2;
     }
     /** 
      * - Computes every entity
@@ -60,8 +60,8 @@ class GameDirector {
         this.level = gameMap.levels[this.currentLevel[0]][this.currentLevel[1]];
         this.level.levelX = (tilesWidth - this.level.levelW) / 2;
         this.level.levelY = (tilesHeight - this.level.levelH) / 2;
-        // player.environment = this.level.entities;
-        // this.level.entities.push(player);
+        // this.player.environment = this.level.entities;
+        // this.level.entities.push(this.player);
         // let testSlime = new Slime(18, 14)
         // testSlime.environment = this.level.entities;
         //this.level.entities.push(testSlime);

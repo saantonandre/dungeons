@@ -1,18 +1,34 @@
 import { controls } from "../controls/controls.js";
 import { Entity } from "../entity/entity.js";
-class Player extends Entity {
-    constructor(x = 7.5, y = 7.5) {
+import { EquipmentManager } from "./equipmentManager/equipmentManager.js";
+import { InventoryManager } from "./inventoryManager/inventoryManager.js";
+export class Player extends Entity {
+    constructor(x = 7.5, y = 7.5, director) {
         super(x, y);
         this.type = "player";
 
+        /** A reference to the game director. 
+         * Needed for:
+         * - Changing levels
+         */
+        this.director = director;
+
+        /** Side which the player is facing */
         this.facing = "r";
+
         this.baseSpeed = 0.1;
         this.speed = this.baseSpeed;
+
         this.shadow = true;
+
         this.immovable = true;
         this.animation = "idle";
         this.setAnimation("idle", [0, 0, 0, 0], [6, 7, 8, 9]);
         this.setAnimation("idle", [1, 1, 1, 1], [6, 7, 8, 9], 1);
+
+
+        this.equipment = new EquipmentManager(this);
+        this.inventory = new InventoryManager(this);
 
         this.hitboxOffset.x = 0.35;
         this.hitboxOffset.y = 0.3;
@@ -67,4 +83,3 @@ class Player extends Entity {
         }
     }
 }
-export const player = new Player();
