@@ -2,6 +2,8 @@ import { controls } from "../controls/controls.js";
 import { Entity } from "../entity/entity.js";
 import { EquipmentManager } from "./equipmentManager/equipmentManager.js";
 import { InventoryManager } from "./inventoryManager/inventoryManager.js";
+import { UserInterface } from "./userInterface/userInterface.js";
+
 export class Player extends Entity {
     constructor(x = 7.5, y = 7.5, director) {
         super(x, y);
@@ -16,6 +18,17 @@ export class Player extends Entity {
         /** Side which the player is facing */
         this.facing = "r";
 
+        /* STATS */
+        this.maxHp = 10;
+        this.hp = this.maxHp;
+
+        this.maxMana = 10;
+        this.mana = this.maxMana;
+
+        this.maxExp = 10;
+        this.exp = 0;
+        this.lv = 1;
+
         this.baseSpeed = 0.08;
         this.speed = this.baseSpeed;
 
@@ -28,6 +41,7 @@ export class Player extends Entity {
 
         this.equipment = new EquipmentManager(this);
         this.inventory = new InventoryManager(this);
+        this.userInterface = new UserInterface(this);
 
         this.hitboxOffset.x = 0.35;
         this.hitboxOffset.y = 0.3;
@@ -43,6 +57,9 @@ export class Player extends Entity {
     }
     render(context, tilesize, ratio, camera) {
         this.renderSprite(context, tilesize, ratio, camera);
+    }
+    onHit(source) {
+        this.hp -= source.atk;
     }
     resolveInput() {
         // Moves

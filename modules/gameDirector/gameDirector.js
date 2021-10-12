@@ -38,8 +38,10 @@ class GameDirector {
     }
     /** 
      * - Computes every entity
+     * - Resolves collisions 
+     * - Computes hp bars 
      * - Updates the camera
-     * - Sorts the entities based on their y pos
+     * - Computes the UI
      */
     compute(meta) {
 
@@ -55,8 +57,17 @@ class GameDirector {
             }
         }
         this.camera.compute(meta, this.level);
+        this.player.userInterface.compute(meta.deltaTime);
     }
 
+    /** 
+     * - Sorts the entities based on their y pos
+     * - Renders the floor tiles
+     * - Renders the shadows
+     * - Renders the entities
+     * - Renders the hp bars
+     * - Renders the UI
+     */
     render(context, tilesize, ratio) {
         this.sortEntities();
         this.renderFloor(context, tilesize, ratio);
@@ -73,6 +84,7 @@ class GameDirector {
                 entity.hpBar.render(context, tilesize, ratio, this.camera);
             }
         }
+        this.player.userInterface.render(context, tilesize, 2);
     }
 
     loadCurrentLevel(tilesWidth, tilesHeight) {
@@ -86,6 +98,7 @@ class GameDirector {
         this.currentLevel[1] += dir[1];
         this.loadCurrentLevel(meta.tilesWidth, meta.tilesHeight);
     }
+    /** Sorts entities on ascending vertical position, background elements goes first */
     sortEntities() {
         this.level.entities.sort(function(a, b) {
             if (b.background) {
@@ -94,6 +107,7 @@ class GameDirector {
             return (a.y + a.h) - (b.y + b.h);
         })
     }
+    /** Renders the floor (ground level) tiles */
     renderFloor(context, tilesize, ratio) {
         //(context, tilesize, ratio, offsetX, offsetY)
         for (let tile of this.level.floor) {

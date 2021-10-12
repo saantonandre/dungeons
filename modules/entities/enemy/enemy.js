@@ -7,8 +7,8 @@ export class Enemy extends Entity {
         this.type = "enemy";
         this.shadow = true;
         this.maxHp = 10;
-        this.atk = 1;
         this.hp = this.maxHp;
+        this.atk = 1;
         this.dmgFrames = 0;
         this.dead = false;
         this.lv = 1;

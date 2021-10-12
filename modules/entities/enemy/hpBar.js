@@ -18,6 +18,8 @@ export class HpBar {
         this.x = this.source.x + this.source.w / 2 - this.w / 2;
         this.y = this.source.y - this.h / 2;
         this.wRatio = this.source.hp / this.source.maxHp;
+        if (this.wRatio < 0) { this.wRatio = 0; }
+        if (this.wRatio > 1) { this.wRatio = 1; }
         if (this.prevRatio > this.wRatio) {
             this.prevRatio -= deltaTime / 50;
         }
