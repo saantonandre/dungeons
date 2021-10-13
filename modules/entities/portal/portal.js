@@ -48,7 +48,7 @@ export class Portal extends Entity {
     computeAction(entities) {
         let enemiesAlive = false;
         for (let entity of entities) {
-            if (entity.removed) {
+            if (entity.removed || entity.dead) {
                 continue;
             }
             if (entity.type == "enemy") {
@@ -68,13 +68,14 @@ export class Portal extends Entity {
             this.solid = true;
         }
     }
-    /** portal computing */
+    /** Portal computing, returns true if changeLevel is called */
     computePortal(meta, gameDirector) {
         //
         this.computeAction(gameDirector.level.entities);
         if (!this.solid && this.Physics.collided(this, gameDirector.player)) {
             // Move player to the linked level
             gameDirector.changeLevel(this.dir, meta);
+            return true;
         }
     }
     /** Entity computing */

@@ -62,6 +62,7 @@ class GameDirector {
      */
     compute(meta) {
         let garbage = [];
+        let loadLevelCall = false;
         for (let entity of this.level.entities) {
             if (entity.removed) {
                 garbage.push(this.level.entities.indexOf(entity));
@@ -81,10 +82,15 @@ class GameDirector {
         }
         /** Portal specific computing, need comms with this, the map and the player */
         for (let portal of this.level.portals) {
-            portal.computePortal(meta, this);
+            loadLevelCall = portal.computePortal(meta, this);
         }
         this.camera.compute(meta, this.level);
         this.player.userInterface.compute(meta.deltaTime);
+
+        // Reiterates the computation if the level is recreated
+        if (loadLevelCall) {
+            this.compute(meta)
+        }
     }
 
     /** 

@@ -110,6 +110,8 @@ export class SwordPrototype extends Item {
                 if (entity.type == "enemy") {
                     if (entity.damaged !== this.attackID) {
                         entity.onHit(this)
+                        entity.xVelExt = (this.targetX - this.offsetX) / 10;
+                        entity.yVelExt = (this.targetY - this.offsetY) / 10;
                     }
                 }
             }
