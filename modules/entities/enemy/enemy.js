@@ -1,6 +1,5 @@
 import { Entity } from "../../entity/entity.js";
 import { HpBar } from "./hpBar.js";
-import * as Physics from "../../physics/physics.js"
 export class Enemy extends Entity {
     constructor(x, y) {
         super(x, y);
@@ -15,7 +14,6 @@ export class Enemy extends Entity {
         this.expValue = 1;
 
         this.hpBar = new HpBar(this);
-        this.Physics = Physics;
         this.prey = false;
         this.immovable = true;
         //this.hpBar = new HpBar(this);

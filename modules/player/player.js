@@ -43,10 +43,10 @@ export class Player extends Entity {
         this.inventory = new InventoryManager(this);
         this.userInterface = new UserInterface(this);
 
-        this.hitboxOffset.x = 0.35;
-        this.hitboxOffset.y = 0.3;
-        this.hitboxOffset.w = -0.6;
-        this.hitboxOffset.h = -0.3;
+        this.hitboxOffset.x = 0.2;
+        this.hitboxOffset.y = 0.4;
+        this.hitboxOffset.w = -0.4;
+        this.hitboxOffset.h = -0.4;
     }
     compute(deltaTime, environment) {
         this.updateSprite(deltaTime);

@@ -1,5 +1,6 @@
 import { spritesheet } from "../resourceManager.js";
 import { checkCollisions } from "../physics/checkCollisions.js"
+import * as Physics from "../physics/physics.js"
 export class Entity {
     constructor(x, y) {
         this.x = x;
@@ -36,10 +37,12 @@ export class Entity {
         this.sheet = spritesheet;
         this.animation = "idle";
         this.animations = [];
-        this.setAnimation("idle", [0], [0]);
         this.frame = 0;
         this.frameCounter = 0;
+        this.setAnimation("idle", [0], [0]);
+
         this.checkCollisions = checkCollisions;
+        this.Physics = Physics;
 
         this.hasHpBar = false;
         // this.slowness = 6; //replaced for 'this.animations[animation].slowness'
@@ -143,8 +146,21 @@ export class Entity {
         }
         if (this.frame >= this.animations[this.animation].keyframesX[this.left].length) {
             this.frame = 0;
+            this.frameCounter = 0;
             this.onAnimationEnd();
         }
+    }
+    renderHitbox(context, tilesize, ratio, camera) {
+        context.strokeStyle = "red";
+        context.beginPath();
+        context.strokeRect(
+            (this.hitbox.x + camera.x) * tilesize * ratio,
+            (this.hitbox.y + camera.y) * tilesize * ratio,
+            this.hitbox.w * tilesize * ratio,
+            this.hitbox.h * tilesize * ratio
+        )
+        context.closePath();
+        context.stroke();
     }
     renderSprite(context, tilesize, ratio, camera) {
 
@@ -172,6 +188,7 @@ export class Entity {
         // Canon Shadow rendering (PROVISIONAL)
         context.fillStyle = "#14182e";
         context.globalAlpha = 0.6;
+        context.strokeStyle = "#ffffff";
         context.beginPath();
         context.ellipse(
             (this.x + camera.x + this.w / 2) * tilesize * ratio,
@@ -181,6 +198,7 @@ export class Entity {
             0,
             0,
             2 * Math.PI);
+        context.closePath();
         context.fill();
         context.globalAlpha = 1;
     }

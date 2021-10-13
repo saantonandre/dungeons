@@ -44,6 +44,7 @@ export class Slime extends Enemy {
         this.setAnimation("attack", [1], [20], leftSprite)
 
         this.hitboxOffset.y = 0.3;
+        this.hitboxOffset.h = -0.4;
 
     }
     compute(deltaTime, environment) {

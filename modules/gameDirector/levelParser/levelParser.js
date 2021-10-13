@@ -19,7 +19,8 @@ export class LevelParser {
      */
     parse(rawLevel) {
         let entities = [],
-            floor = [];
+            floor = [],
+            portals = [];
         let entity;
         for (let x = 0; x < rawLevel.length; x++) {
             for (let y = 0; y < rawLevel[x].length; y++) {
@@ -62,7 +63,14 @@ export class LevelParser {
                 floor.push(new Entities.Floor(x, y));
             }
         }
-        return { entities: this.mergeSameIdEntities(entities), floor: floor };
+        entities = this.mergeSameIdEntities(entities);
+        floor = floor;
+        for (let entity of entities) {
+            if (entity.type === "portal") {
+                portals.push(entity);
+            }
+        }
+        return { entities: this.mergeSameIdEntities(entities), floor: floor, portals: portals };
     }
     /** Merges toghether the entities with the same ID, like Portals */
     mergeSameIdEntities(entities) {
