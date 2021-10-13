@@ -1,5 +1,5 @@
 // Controls class
-class Controls {
+export class Controls {
     constructor() {
         this.up = false;
         this.down = false;
@@ -19,7 +19,6 @@ class Controls {
         this.lastDir = 0;
         this.initListeners(this);
     }
-    // Event Listeners (to change controls' values)
     initListeners(x) {
         document.addEventListener('mousedown', function(evt) {
             switch (evt.button) {
@@ -33,6 +32,8 @@ class Controls {
                     x.rClickDown = true;
                     break;
             }
+            x.mouseX = evt.clientX;
+            x.mouseY = evt.clientY;
         });
         document.addEventListener('mouseup', function(evt) {
             switch (evt.button) {
@@ -46,6 +47,8 @@ class Controls {
                     x.rClickDown = false;
                     break;
             }
+            x.mouseX = evt.clientX;
+            x.mouseY = evt.clientY;
         });
         document.addEventListener('keydown', function(evt) {
             // 38, 40, 37, 39
@@ -227,4 +230,3 @@ class Controls {
           //*/
     }
 }
-export const controls = new Controls();

@@ -1,6 +1,7 @@
 // should have NO EXPORTS
 import { meta } from "./meta/meta.js";
-import { c } from "./canvas/canvas.js";
+import { c, canvas } from "./canvas/canvas.js";
+import { Mouse } from "./mouse/mouse.js";
 import { gameDirector } from "./gameDirector/gameDirector.js";
 
 class Game {
@@ -8,6 +9,7 @@ class Game {
     initialize() {
 
         gameDirector.initialize(meta);
+        gameDirector.mouse = new Mouse(canvas, meta);
         this.update();
     }
     /** Steps:

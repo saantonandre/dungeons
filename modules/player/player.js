@@ -1,9 +1,8 @@
-import { controls } from "../controls/controls.js";
 import { Entity } from "../entity/entity.js";
+
 import { EquipmentManager } from "./equipmentManager/equipmentManager.js";
 import { InventoryManager } from "./inventoryManager/inventoryManager.js";
 import { UserInterface } from "./userInterface/userInterface.js";
-
 export class Player extends Entity {
     constructor(x = 7.5, y = 7.5, director) {
         super(x, y);
@@ -24,13 +23,15 @@ export class Player extends Entity {
 
         this.maxMana = 10;
         this.mana = this.maxMana;
-
+        this.controls = director.controls;
         this.maxExp = 10;
         this.exp = 0;
         this.lv = 1;
 
         this.baseSpeed = 0.08;
         this.speed = this.baseSpeed;
+
+        this.attacking = false;
 
         this.shadow = true;
         this.immovable = false;
@@ -54,9 +55,18 @@ export class Player extends Entity {
         this.updatePosition(deltaTime);
         this.updateHitbox();
         this.checkCollisions(this, environment, false, false)
+        this.equipment.compute(deltaTime, environment);
     }
     render(context, tilesize, ratio, camera) {
         this.renderSprite(context, tilesize, ratio, camera);
+        this.equipment.render(context, tilesize, ratio, camera);
+    }
+    attack() {
+        if (this.attacking) {
+            return;
+        }
+        this.attacking = true;
+        this.equipment.weapon.attack(this.director.mouse)
     }
     onHit(source) {
         this.hp -= source.atk;
@@ -66,39 +76,40 @@ export class Player extends Entity {
     }
     resolveInput() {
         // Moves
-        if (controls.left && !controls.right && !this.col.L) {
+        if (this.controls.left && !this.controls.right && !this.col.L) {
             this.facing = "l";
             this.xVel = -this.speed;
             this.left = 1;
         } else if (this.xVel < 0) {
             this.xVel = 0;
         }
-        if (controls.right && !controls.left && !this.col.R) {
+        if (this.controls.right && !this.controls.left && !this.col.R) {
             this.facing = "r";
             this.xVel = this.speed;
             this.left = 0;
         } else if (this.xVel > 0) {
             this.xVel = 0;
         }
-        if (controls.up && !controls.down && !this.col.B) {
+        if (this.controls.up && !this.controls.down && !this.col.B) {
             this.facing = "t";
             this.yVel = -this.speed;
         } else if (this.yVel < 0) {
             this.yVel = 0;
         }
-        if (controls.down && !controls.up && !this.col.T) {
+        if (this.controls.down && !this.controls.up && !this.col.T) {
             this.facing = "b";
             this.yVel = this.speed;
         } else if (this.yVel > 0) {
             this.yVel = 0;
         }
-        if (!controls.left && !controls.right && !controls.up && !controls.down) {
+        if (!this.controls.left && !this.controls.right && !this.controls.up && !this.controls.down) {
             this.xVel = 0;
             this.yVel = 0;
         }
-        if (controls.left + controls.right + controls.up + controls.down > 1) {
+        if (this.controls.left + this.controls.right + this.controls.up + this.controls.down > 1) {
             this.xVel /= 1.42;
             this.yVel /= 1.42;
         }
+
     }
 }

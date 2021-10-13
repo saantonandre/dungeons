@@ -3,6 +3,8 @@ import { Camera } from "./camera/camera.js";
 
 import { Player } from "../player/player.js";
 
+import { Controls } from "../controls/controls.js";
+
 class GameDirector {
 
     constructor() {
@@ -10,11 +12,16 @@ class GameDirector {
         /**  Defines the this.player position in the bidimensional map array [y, x] */
         this.currentLevel = [0, 0]
 
+        this.controls = new Controls();
         /** Defines the current floor */
         this.currentFloor = 1;
         /** The current level Object, contains info about the level entities and tiles */
         this.level;
         this.player;
+        this.mouse = {
+            x: 0,
+            y: 0
+        };
         this.camera = new Camera();
         this.camera.focus = this.player;
         this.map = gameMap;
@@ -89,7 +96,7 @@ class GameDirector {
         for (let entity of this.level.entities) {
             entity.render(context, tilesize, ratio, this.camera);
             /** Hitbox rendering */
-            entity.renderHitbox(context, tilesize, ratio, this.camera)
+            //entity.renderHitbox(context, tilesize, ratio, this.camera)
         }
         for (let entity of this.level.entities) {
             if (entity.hasHpBar) {

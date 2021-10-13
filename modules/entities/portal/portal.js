@@ -56,14 +56,12 @@ export class Portal extends Entity {
                 break;
             }
         }
-        /* 
-                if (this.animation == "closed" && !enemiesAlive) {
-                    this.animation = "opening";
-                }
-                if (this.animation == "open" && enemiesAlive) {
-                    this.animation = "closing";
-                }
-                 */
+        if (this.animation == "closed" && !enemiesAlive) {
+            this.animation = "opening";
+        }
+        if (this.animation == "open" && enemiesAlive) {
+            this.animation = "closing";
+        }
         if (this.animation == "open" || this.animation == "opening") {
             this.solid = false;
         } else {
