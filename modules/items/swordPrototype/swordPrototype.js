@@ -44,12 +44,18 @@ export class SwordPrototype extends Item {
         /** The speed of the sword during the attack */
         this.attackSpeed = 1;
         this.reloadSpeed = 5;
-        this.attackRange = 2;
+        this.attackRange = 1.5;
         this.attackDuration = 160;
         this.attackCounter = 0;
+
+        /** define if this is detached from the owner */
+        this.detached = false;
+
+        this.specialSpeed = 0.6;
+        this.friction = 0.98;
     }
     get atk() {
-        return (this.owner.atk + this.weaponAtk);
+        return this.state == "special" ? (this.owner.atk + this.weaponAtk) * 2 : (this.owner.atk + this.weaponAtk);
     }
     get centerX() {
         return (this.owner.x + this.owner.w / 2);
@@ -57,11 +63,18 @@ export class SwordPrototype extends Item {
     get centerY() {
         return (this.owner.y + this.owner.h / 2);
     }
-    /**
-     * - Change to the attack state
-     * - Change the rotation according to the mouse pos
-     * - Get accelleration based on the rotation
-     */
+    special(mousePos) {
+        if (this.state !== 'idle') {
+            return;
+        }
+        this.state = "special";
+        this.animation = 'attack';
+        this.attackID = Math.random();
+        let mousePlayerRot = this.Physics.getAngle(mousePos.x, mousePos.y, this.centerX, this.centerY)
+        this.rot = this.baseRot + mousePlayerRot;
+        this.xVel = -Math.cos(this.rot - this.baseRot) * this.specialSpeed;
+        this.yVel = -Math.sin(this.rot - this.baseRot) * this.specialSpeed;
+    }
     attack(mousePos) {
         if (this.state !== 'idle') {
             return;
@@ -87,6 +100,14 @@ export class SwordPrototype extends Item {
                 this.computeReturn(deltaTime);
                 this.animation = 'idle';
                 break;
+            case 'special':
+                this.computeSpecial(deltaTime, environment);
+                this.animation = 'attack';
+                break;
+            case 'impaled':
+                this.computeImpaled();
+                this.animation = "idle";
+                break;
         }
     }
     /** Updates the line collider */
@@ -96,8 +117,7 @@ export class SwordPrototype extends Item {
         this.lineHitbox.x2 = this.centerX + this.offsetX - this.w / 2 * Math.cos(this.rot - this.baseRot);
         this.lineHitbox.y2 = this.centerY + this.offsetY - this.h / 2 * Math.sin(this.rot - this.baseRot);
     }
-    checkLineCollisions(environment) {
-        this.updateLineHitbox();
+    checkLineCollisions(environment, square = false) {
         for (let entity of environment) {
             if (entity.removed) {
                 continue;
@@ -114,9 +134,59 @@ export class SwordPrototype extends Item {
                         entity.yVelExt = (this.targetY - this.offsetY) / 10;
                     }
                 }
+                if (this.state == "special") {
+                    if (entity.solid && !entity.grounded && !(entity.type == "enemy")) {
+
+                        this.impale();
+                    }
+                }
             }
         }
 
+    }
+    unequip() {
+        this.owner.equipment.weapon = this.owner.equipment.noWeapon;
+        this.owner.director.level.entities.push(this);
+    }
+    equip() {
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.owner.equipment.weapon = this;
+        this.owner.director.level.entities.splice(this.owner.director.level.entities.indexOf(this), 1);
+    }
+    impale() {
+        this.unequip();
+        this.xVel = 0;
+        this.yVel = 0;
+        this.detached = true;
+        this.state = 'impaled';
+        this.lineHitbox.x1 = this.x + this.w / 2 + (this.w / 2 * Math.cos(this.rot - this.baseRot));
+        this.lineHitbox.y1 = this.y + this.h / 2 + (this.h / 2 * Math.sin(this.rot - this.baseRot));
+    }
+    computeImpaled() {
+        if (this.Physics.lineSquareCol(this.lineHitbox, this.owner)) {
+            this.state = "idle";
+            this.detached = false;
+            this.equip();
+        }
+    }
+    computeSpecial(deltaTime, environment) {
+        this.detached = true;
+        this.xVel *= Math.pow(this.friction, deltaTime);
+        this.yVel *= Math.pow(this.friction, deltaTime);
+        if (Math.abs(this.xVel) + Math.abs(this.yVel) < 0.1) {
+            this.impale();
+        }
+        this.x += this.xVel * deltaTime;
+        this.y += this.yVel * deltaTime;
+
+        //this.lineHitbox.x1 = this.x + this.w / 2 + (this.w / 2 * Math.cos(this.rot - this.baseRot));
+        //this.lineHitbox.y1 = this.y + this.h / 2 + (this.h / 2 * Math.sin(this.rot - this.baseRot));
+        this.lineHitbox.x1 = this.centerX;
+        this.lineHitbox.y1 = this.centerY;
+        this.lineHitbox.x2 = this.x + this.w / 2 - (this.w / 2 * Math.cos(this.rot - this.baseRot));
+        this.lineHitbox.y2 = this.y + this.h / 2 - (this.h / 2 * Math.sin(this.rot - this.baseRot));
+        this.checkLineCollisions(environment);
     }
     computeAttack(deltaTime, environment) {
         if (this.attackCounter === this.attackDuration) {
@@ -129,6 +199,7 @@ export class SwordPrototype extends Item {
         this.offsetX = (this.targetX / this.attackDuration) * this.attackCounter;
         this.offsetY = (this.targetY / this.attackDuration) * this.attackCounter;
 
+        this.updateLineHitbox();
         this.checkLineCollisions(environment);
     }
     /** Compute the returning to the owner */
@@ -155,12 +226,14 @@ export class SwordPrototype extends Item {
             this.left = 0;
         }
         // Computes offsets (when attacking)
-
-        this.x = this.owner.x + this.offsetX;
-        this.y = this.owner.y + this.offsetY;
+        if (!this.detached) {
+            this.x = this.owner.x + this.offsetX;
+            this.y = this.owner.y + this.offsetY;
+        }
     }
     render(context, tilesize, ratio, camera) {
         this.renderSprite(context, tilesize, ratio, camera, this.rot);
+        /* 
         context.fillRect(
             (this.centerX - 0.1 + camera.x) * tilesize * ratio,
             (this.centerY - 0.1 + camera.y) * tilesize * ratio,
@@ -172,6 +245,6 @@ export class SwordPrototype extends Item {
             (this.owner.director.mouse.y + camera.y) * tilesize * ratio,
             0.2 * tilesize * ratio,
             0.2 * tilesize * ratio,
-        )
+        ) */
     }
 }

@@ -10,6 +10,7 @@ export class Camera {
         this.zoom = false;
         this.x = 0;
         this.y = 0;
+        this.shake = 0;
     }
     compute(meta, level) {
         // Compute the ratio
@@ -60,6 +61,11 @@ export class Camera {
             if (-this.y > level.levelY + level.levelH - meta.tilesHeight) {
                 this.y = -(level.levelY + level.levelH - meta.tilesHeight);
             }
+        }
+        if (this.shake > 0) {
+            this.x += Math.random() / 2 - 0.25;
+            this.y += Math.random() / 2 - 0.25;
+            this.shake -= meta.deltaTime;
         }
     }
 }

@@ -5,17 +5,27 @@ export class EquipmentManager {
     constructor(source) {
         this.owner = source;
 
+        this.noWeapon = new Weapon();
         this.weapon = new SwordPrototype(this.owner);
-        this.helmet = new Helmet();
-        this.vest = new Vest();
+
+
+        this.noHelmet = new Helmet();
+        this.helmet = this.noHelmet;
+
+        this.noVest = new Vest();
+        this.vest = this.noVest;
     }
     compute(deltaTime, environment) {
-        this.weapon.compute(deltaTime, environment);
+        if (this.weapon) {
+            this.weapon.compute(deltaTime, environment);
+        }
         this.helmet.compute(deltaTime, environment);
         this.vest.compute(deltaTime, environment);
     }
     render(context, tilesize, ratio, camera) {
-        this.weapon.render(context, tilesize, ratio, camera);
+        if (this.weapon) {
+            this.weapon.render(context, tilesize, ratio, camera);
+        }
         this.helmet.render(context, tilesize, ratio, camera);
         this.vest.render(context, tilesize, ratio, camera);
     }
@@ -26,6 +36,9 @@ class Weapon {
         // ATTACK type and DMG
     }
     attack() {
+
+    }
+    special() {
 
     }
     compute() {

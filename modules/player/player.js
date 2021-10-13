@@ -35,6 +35,9 @@ export class Player extends Entity {
 
         this.attacking = false;
 
+        /** Invincibility frames amount */
+        this.damaged = 0;
+
         this.shadow = true;
         this.immovable = false;
         this.animation = "idle";
@@ -58,20 +61,36 @@ export class Player extends Entity {
         this.updateHitbox();
         this.checkCollisions(this, environment, false, false)
         this.equipment.compute(deltaTime, environment);
+
+        if (this.damaged > 0) {
+            this.damaged -= deltaTime;
+        }
     }
     render(context, tilesize, ratio, camera) {
+        if (this.damaged > 0 && (this.damaged | 0) % 2) {
+            return;
+        }
         this.renderSprite(context, tilesize, ratio, camera);
         this.equipment.render(context, tilesize, ratio, camera);
     }
-    attack() {
+    attack(special = false) {
         /* 
                 if (this.attacking) {
                     return;
                 } */
         this.attacking = true;
-        this.equipment.weapon.attack(this.director.mouse)
+        if (special) {
+            this.equipment.weapon.special(this.director.mouse)
+        } else {
+            this.equipment.weapon.attack(this.director.mouse)
+        }
     }
     onHit(source) {
+        if (this.damaged > 0) {
+            return;
+        }
+        this.damaged = 10;
+        this.director.camera.shake = 10;
         this.hp -= source.atk;
         if (this.hp < 0) {
             this.hp = 0;
@@ -116,6 +135,10 @@ export class Player extends Entity {
 
         if (this.controls.lClickDown) {
             this.attack();
+        }
+
+        if (this.controls.rClickDown) {
+            this.attack(true);
         }
     }
 }

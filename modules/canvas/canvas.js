@@ -2,7 +2,7 @@ export const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
 canvas.width = 800;
 canvas.height = 600;
-canvas.oncontextmenu = function(event) {
+window.oncontextmenu = function(event) {
     event.preventDefault();
 }
 
