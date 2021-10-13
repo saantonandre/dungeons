@@ -28,6 +28,8 @@ export class Player extends Entity {
         this.exp = 0;
         this.lv = 1;
 
+        this.atk = 1;
+
         this.baseSpeed = 0.08;
         this.speed = this.baseSpeed;
 
@@ -62,9 +64,10 @@ export class Player extends Entity {
         this.equipment.render(context, tilesize, ratio, camera);
     }
     attack() {
-        if (this.attacking) {
-            return;
-        }
+        /* 
+                if (this.attacking) {
+                    return;
+                } */
         this.attacking = true;
         this.equipment.weapon.attack(this.director.mouse)
     }
@@ -111,5 +114,8 @@ export class Player extends Entity {
             this.yVel /= 1.42;
         }
 
+        if (this.controls.lClickDown) {
+            this.attack();
+        }
     }
 }

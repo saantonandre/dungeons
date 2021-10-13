@@ -162,23 +162,45 @@ export class Entity {
         context.closePath();
         context.stroke();
     }
-    renderSprite(context, tilesize, ratio, camera) {
+    renderSprite(context, tilesize, ratio, camera, rot = false) {
 
         if (this.removed) {
             // If the entity is removed, don't bother rendering
             return;
         }
-        context.drawImage(
-            this.sheet, // source of the sprite
-            this.animations[this.animation].keyframesX[this.left][this.frame] * tilesize, // x pos of the sprite
-            this.animations[this.animation].keyframesY[this.left][this.frame] * tilesize, // y pos of the sprite
-            this.w * tilesize, // width of the sprite
-            this.h * tilesize, // height of the sprite
-            (this.x + camera.x) * tilesize * ratio, // x of the entity
-            (this.y + camera.y) * tilesize * ratio, // y of the entity
-            this.w * tilesize * ratio, // width of the entity
-            this.h * tilesize * ratio // height of the entity
-        );
+        if (rot) {
+            context.save();
+            context.translate(
+                (this.x + this.w / 2 + camera.x) * tilesize * ratio,
+                (this.y + this.h / 2 + camera.y) * tilesize * ratio
+            )
+            //
+            context.rotate(rot);
+            context.drawImage(
+                this.sheet, // source of the sprite
+                this.animations[this.animation].keyframesX[this.left][this.frame] * tilesize, // x pos of the sprite
+                this.animations[this.animation].keyframesY[this.left][this.frame] * tilesize, // y pos of the sprite
+                this.w * tilesize, // width of the sprite
+                this.h * tilesize, // height of the sprite
+                (-this.w / 2) * tilesize * ratio, // x of the entity
+                (-this.h / 2) * tilesize * ratio, // y of the entity
+                this.w * tilesize * ratio, // width of the entity
+                this.h * tilesize * ratio // height of the entity
+            );
+            context.restore();
+        } else {
+            context.drawImage(
+                this.sheet, // source of the sprite
+                this.animations[this.animation].keyframesX[this.left][this.frame] * tilesize, // x pos of the sprite
+                this.animations[this.animation].keyframesY[this.left][this.frame] * tilesize, // y pos of the sprite
+                this.w * tilesize, // width of the sprite
+                this.h * tilesize, // height of the sprite
+                (this.x + camera.x) * tilesize * ratio, // x of the entity
+                (this.y + camera.y) * tilesize * ratio, // y of the entity
+                this.w * tilesize * ratio, // width of the entity
+                this.h * tilesize * ratio // height of the entity
+            );
+        }
     }
 
     renderShadow(context, tilesize, ratio, camera) {

@@ -4,6 +4,7 @@ import { Camera } from "./camera/camera.js";
 import { Player } from "../player/player.js";
 
 import { Controls } from "../controls/controls.js";
+import { Mouse } from "../mouse/mouse.js";
 
 class GameDirector {
 
@@ -18,10 +19,7 @@ class GameDirector {
         /** The current level Object, contains info about the level entities and tiles */
         this.level;
         this.player;
-        this.mouse = {
-            x: 0,
-            y: 0
-        };
+        this.mouse;
         this.camera = new Camera();
         this.camera.focus = this.player;
         this.map = gameMap;
@@ -33,7 +31,8 @@ class GameDirector {
      * - Loads the entities of the level
      * - Places the this.player at the center of the map
      */
-    initialize(meta) {
+    initialize(meta, canvas) {
+        this.mouse = new Mouse(canvas, meta, this.camera);
         this.map.generate();
         this.currentLevel = this.map.findStart();
         this.loadCurrentLevel(meta.tilesWidth, meta.tilesHeight);
@@ -47,6 +46,12 @@ class GameDirector {
         this.player.y = this.level.levelH / 2;
         this.level.entities.push(this.player)
     }
+    /** Deletes removed entities */
+    garbageCleaner(garbage) {
+        for (let i = garbage.length - 1; i >= 0; i--) {
+            this.level.entities.splice(garbage[i], 1);
+        }
+    }
     /** 
      * - Computes every entity
      * - Resolves collisions 
@@ -56,11 +61,16 @@ class GameDirector {
      * - Computes the UI
      */
     compute(meta) {
-
+        let garbage = [];
         for (let entity of this.level.entities) {
+            if (entity.removed) {
+                garbage.push(this.level.entities.indexOf(entity));
+                continue;
+            }
             entity.compute(meta.deltaTime, this.level.entities);
-
         }
+        this.garbageCleaner(garbage);
+
         for (let entity of this.level.entities) {
             entity.resolveCollisions(meta.deltaTime, this.level.entities);
         }

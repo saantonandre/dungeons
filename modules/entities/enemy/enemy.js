@@ -36,12 +36,12 @@ export class Enemy extends Entity {
         this.dmgFrames = 5;
         this.hp -= source.atk;
         // atk text
-        vfxsManager.create("DmgText", this, source.atk | 0);
-        vfxsManager.create("DmgVfx", this);
+        //vfxsManager.create("DmgText", this, source.atk | 0);
+        //vfxsManager.create("DmgVfx", this);
         if (this.hp <= 0) {
             this.onDeath(source)
-            let recipient = source.owner || source;
-            recipient.expManager.update(this);
+            //let recipient = source.owner || source;
+            //recipient.expManager.update(this);
         }
     }
     onDeath() {
