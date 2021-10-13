@@ -12,8 +12,12 @@ export function checkCollisions(obj, entities, returnColliders = false, simpleCo
     */
     let collidersChunk = [];
     for (let entity of entities) {
+
         //isOutOfScreen(entity) || entity.notSolid
         if (!entity.solid || entity.removed || obj === entity) {
+            continue;
+        }
+        if ((obj.flying && entity.grounded) || (entity.flying && obj.grounded)) {
             continue;
         }
         if (Physics.collided(obj, entity)) {

@@ -20,6 +20,10 @@ export class Entity {
 
         /** Last in rendering order? */
         this.background = false;
+        /** Is it part of the ground? can flying objects collide with this?*/
+        this.grounded = false;
+        /** Is it this a flying entity? can it avoid grounded obstacles?*/
+        this.flying = false;
 
         this.damaged = false;
         this.shadow = false;

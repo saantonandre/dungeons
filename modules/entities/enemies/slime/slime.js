@@ -19,7 +19,7 @@ export class Slime extends Enemy {
         this.state = "idle";
         this.animation = "idle";
 
-        this.immovable = true;
+        this.immovable = false;
 
         this.solid = true;
 
@@ -53,7 +53,6 @@ export class Slime extends Enemy {
         this.updateHitbox();
         this.checkCollisions(this, environment);
         this.updateSprite(deltaTime);
-        console.log(this)
     }
     render(context, tilesize, ratio, camera) {
         this.renderSprite(context, tilesize, ratio, camera)

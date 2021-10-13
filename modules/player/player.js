@@ -60,6 +60,9 @@ export class Player extends Entity {
     }
     onHit(source) {
         this.hp -= source.atk;
+        if (this.hp < 0) {
+            this.hp = 0;
+        }
     }
     resolveInput() {
         // Moves

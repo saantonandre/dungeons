@@ -9,6 +9,11 @@ export class Block extends Entity {
         this.tile = tileSetter(rawLevel, x, y);
         this.background = true;
         this.solid = true;
+        switch (type) {
+            case 'hole':
+                this.grounded = true;
+                break;
+        }
     }
     render(context, tilesize, ratio, camera) {
         context.drawImage(
