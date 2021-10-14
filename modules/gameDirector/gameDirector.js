@@ -49,6 +49,9 @@ class GameDirector {
     /** Deletes removed entities */
     garbageCleaner(garbage) {
         for (let i = garbage.length - 1; i >= 0; i--) {
+            for (let drop of this.level.entities[garbage[i]].drops) {
+                drop.dispatch(this.level.entities);
+            }
             this.level.entities.splice(garbage[i], 1);
         }
     }
@@ -61,6 +64,9 @@ class GameDirector {
      * - Computes the UI
      */
     compute(meta) {
+        if (this.controls.mClickDown) {
+            console.log(this.level.entities)
+        }
         let garbage = [];
         let loadLevelCall = false;
         for (let entity of this.level.entities) {

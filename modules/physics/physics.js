@@ -148,6 +148,9 @@ export function assembleChunk(chunk, obj) {
             }
         }
     }
+    if (brokenChunk.length == 0) {
+        return [];
+    }
     let firstBlock = {
         x: brokenChunk[0].x,
         y: brokenChunk[0].y,

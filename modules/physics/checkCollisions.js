@@ -1,5 +1,5 @@
 import * as Physics from "./physics.js";
-export function checkCollisions(obj, entities, returnColliders = false, simpleCol = true) {
+export function checkCollisions(obj, entities, returnColliders = false, simpleCol = false) {
     if (!obj.solid) {
         return false;
     }

@@ -15,7 +15,7 @@ export class Entity {
 
         this.xVelExt = 0;
         this.yVelExt = 0;
-        this.friction = 0.8;
+        this.friction = 0.85;
         this.type = "entity";
         this.state = "idle";
 
@@ -32,6 +32,12 @@ export class Entity {
         this.removed = false;
         this.left = 0;
 
+        /** A list containing this entity's drops. 
+         * When this entity will get removed by the garbage cleaner  
+         * the drop will dispatch, and go to the entities array.
+         */
+        this.drops = [];
+
         this.stats = new Stats(this);
 
         this.sheet = spritesheet;
@@ -40,6 +46,10 @@ export class Entity {
         this.frame = 0;
         this.frameCounter = 0;
         this.setAnimation("idle", [0], [0]);
+
+        // Offsets from the shadow;
+        this.offsetX = 0;
+        this.offsetY = 0;
 
         this.checkCollisions = checkCollisions;
         this.Physics = Physics;
@@ -110,19 +120,7 @@ export class Entity {
     }
     setAnimation(label, keyframesX, keyframesY, left = 0) {
         if (!this.animations[label]) {
-            this.animations[label] = {
-                keyframesX: [
-                    [],
-                    []
-                ],
-                keyframesY: [
-                    [],
-                    []
-                ],
-                slowness: 6,
-                w: this.w,
-                h: this.h
-            }
+            this.animations[label] = new Animation(this);
         }
         if (left) {
             this.animations[label].keyframesX[1] = keyframesX;
@@ -137,6 +135,9 @@ export class Entity {
 
     }
     compute(deltaTime) {}
+    render(context, tilesize, ratio, camera) {
+        this.renderSprite(context, tilesize, ratio, camera);
+    }
     onAnimationEnd() {
         // What happens after the current animation ends
     }
@@ -172,13 +173,11 @@ export class Entity {
         }
 
         // Offset given by the difference of the animation relative to the actual width/height of the entity
-        let animationOffsetX = (this.w - this.animations[this.animation].w) / 2;
-        let animationOffsetY = (this.h - this.animations[this.animation].h) / 2
         if (rot) {
             context.save();
             context.translate(
-                (this.x + animationOffsetX + this.w / 2 + camera.x) * tilesize * ratio,
-                (this.y + animationOffsetY + this.h / 2 + camera.y) * tilesize * ratio
+                (this.x + this.animations[this.animation].offsetX + this.w / 2 + camera.x) * tilesize * ratio,
+                (this.y + this.animations[this.animation].offsetY + this.h / 2 + camera.y) * tilesize * ratio
             )
             //
             context.rotate(rot);
@@ -201,8 +200,8 @@ export class Entity {
                 this.animations[this.animation].keyframesY[this.left][this.frame] * tilesize, // y pos of the sprite
                 this.animations[this.animation].w * tilesize, // width of the sprite
                 this.animations[this.animation].h * tilesize, // height of the sprite
-                (this.x + animationOffsetX + camera.x) * tilesize * ratio, // x of the entity
-                (this.y + animationOffsetY + camera.y) * tilesize * ratio, // y of the entity
+                (this.x + this.animations[this.animation].offsetX + camera.x) * tilesize * ratio, // x of the entity
+                (this.y + this.animations[this.animation].offsetY + camera.y) * tilesize * ratio, // y of the entity
                 this.animations[this.animation].w * tilesize * ratio, // width of the entity
                 this.animations[this.animation].h * tilesize * ratio // height of the entity
             );
@@ -242,5 +241,22 @@ class Stats {
         this.maxMana = 15;
         this.mana = this.maxMana;
         this.atk = 1;
+    }
+}
+class Animation {
+    constructor(entity) {
+        this.keyframesX = [
+                [],
+                []
+            ],
+            this.keyframesY = [
+                [],
+                []
+            ],
+            this.slowness = 6,
+            this.w = entity.w,
+            this.h = entity.h,
+            this.offsetX = (entity.w - this.w) / 2,
+            this.offsetY = (entity.h - this.h) / 2
     }
 }

@@ -1,4 +1,5 @@
 import { Enemy } from "../../enemy/enemy.js";
+import { Goo } from "../../../items/items.js"
 export class Slime extends Enemy {
     constructor(x, y) {
         super(x, y);
@@ -9,6 +10,9 @@ export class Slime extends Enemy {
         this.speed = this.baseSpeed;
         this.name = "slime";
 
+        // Drops
+        //if(Math.random()*2|0){ }; 50 % chance
+        this.drops.push(new Goo(this));
         //Stats
         this.atk = 5;
         this.expValue = 2;
