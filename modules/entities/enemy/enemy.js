@@ -16,6 +16,7 @@ export class Enemy extends Entity {
         this.hpBar = new HpBar(this);
         this.prey = false;
         this.immovable = true;
+
         //this.hpBar = new HpBar(this);
         //this.displayName = new DisplayName(this);
     }
@@ -45,7 +46,7 @@ export class Enemy extends Entity {
         }
     }
     onDeath() {
-        this.dead = true;
-        this.removed = true;
+        this.state = "dead";
+        this.solid = false;
     }
 }

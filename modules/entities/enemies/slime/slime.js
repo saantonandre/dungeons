@@ -43,6 +43,11 @@ export class Slime extends Enemy {
         this.setAnimation("attack", [0], [20])
         this.setAnimation("attack", [1], [20], leftSprite)
 
+        this.setAnimation("death", [0, 0, 0, 0], [21, 23, 25, 27])
+        this.animations["death"].slowness = 8;
+        this.animations["death"].h = 2;
+
+
         this.hitboxOffset.y = 0.3;
         this.hitboxOffset.h = -0.4;
 
@@ -141,6 +146,17 @@ export class Slime extends Enemy {
                     this.state = "idle";
                     this.speed = this.baseSpeed;
                 }
+                break;
+            case "dead":
+                this.animation = "death";
+                break;
+        }
+    }
+    onAnimationEnd() {
+        // What happens after the current animation ends
+        switch (this.animation) {
+            case "death":
+                this.removed = true;
                 break;
         }
     }

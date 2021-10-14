@@ -119,7 +119,9 @@ export class Entity {
                     [],
                     []
                 ],
-                slowness: 6
+                slowness: 6,
+                w: this.w,
+                h: this.h
             }
         }
         if (left) {
@@ -168,11 +170,15 @@ export class Entity {
             // If the entity is removed, don't bother rendering
             return;
         }
+
+        // Offset given by the difference of the animation relative to the actual width/height of the entity
+        let animationOffsetX = (this.w - this.animations[this.animation].w) / 2;
+        let animationOffsetY = (this.h - this.animations[this.animation].h) / 2
         if (rot) {
             context.save();
             context.translate(
-                (this.x + this.w / 2 + camera.x) * tilesize * ratio,
-                (this.y + this.h / 2 + camera.y) * tilesize * ratio
+                (this.x + animationOffsetX + this.w / 2 + camera.x) * tilesize * ratio,
+                (this.y + animationOffsetY + this.h / 2 + camera.y) * tilesize * ratio
             )
             //
             context.rotate(rot);
@@ -180,12 +186,12 @@ export class Entity {
                 this.sheet, // source of the sprite
                 this.animations[this.animation].keyframesX[this.left][this.frame] * tilesize, // x pos of the sprite
                 this.animations[this.animation].keyframesY[this.left][this.frame] * tilesize, // y pos of the sprite
-                this.w * tilesize, // width of the sprite
-                this.h * tilesize, // height of the sprite
+                this.animations[this.animation].w * tilesize, // width of the sprite
+                this.animations[this.animation].h * tilesize, // height of the sprite
                 (-this.w / 2) * tilesize * ratio, // x of the entity
                 (-this.h / 2) * tilesize * ratio, // y of the entity
-                this.w * tilesize * ratio, // width of the entity
-                this.h * tilesize * ratio // height of the entity
+                this.animations[this.animation].w * tilesize * ratio, // width of the entity
+                this.animations[this.animation].h * tilesize * ratio // height of the entity
             );
             context.restore();
         } else {
@@ -193,12 +199,12 @@ export class Entity {
                 this.sheet, // source of the sprite
                 this.animations[this.animation].keyframesX[this.left][this.frame] * tilesize, // x pos of the sprite
                 this.animations[this.animation].keyframesY[this.left][this.frame] * tilesize, // y pos of the sprite
-                this.w * tilesize, // width of the sprite
-                this.h * tilesize, // height of the sprite
-                (this.x + camera.x) * tilesize * ratio, // x of the entity
-                (this.y + camera.y) * tilesize * ratio, // y of the entity
-                this.w * tilesize * ratio, // width of the entity
-                this.h * tilesize * ratio // height of the entity
+                this.animations[this.animation].w * tilesize, // width of the sprite
+                this.animations[this.animation].h * tilesize, // height of the sprite
+                (this.x + animationOffsetX + camera.x) * tilesize * ratio, // x of the entity
+                (this.y + animationOffsetY + camera.y) * tilesize * ratio, // y of the entity
+                this.animations[this.animation].w * tilesize * ratio, // width of the entity
+                this.animations[this.animation].h * tilesize * ratio // height of the entity
             );
         }
     }

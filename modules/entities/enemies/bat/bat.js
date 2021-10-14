@@ -75,6 +75,9 @@ export class Bat extends Enemy {
                     this.state = "idle";
                 }
                 break;
+            case "dead":
+                this.removed = true;
+                break;
         }
     }
     compute(deltaTime, environment) {
