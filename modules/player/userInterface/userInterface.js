@@ -17,17 +17,32 @@ export class UserInterface {
         this.hpComponent = new HpComponent(this.source, 1.5, 0.5);
         this.manaComponent = new ManaComponent(this.source, 5.5, 0.5);
         this.expComponent = new ExpComponent(this.source, 10, 0.5);
+        this.floorComponent = new FloorComponent(this.source, 17, 0.5);
+        this.equipmentComponent = new EquipmentComponent(this.source, 20.5, 0.3);
+        this.inventoryComponent = new InventoryComponent(this.source, 22, 0.3);
+        this.settingsComponent = new SettingsComponent(this.source, 23.5, 0.3);
     }
     compute(deltaTime) {
         this.hpComponent.compute(deltaTime)
         this.manaComponent.compute(deltaTime)
         this.expComponent.compute(deltaTime)
+        this.floorComponent.compute(deltaTime)
+
+        this.equipmentComponent.compute(deltaTime)
+        this.inventoryComponent.compute(deltaTime)
+        this.settingsComponent.compute(deltaTime)
 
     }
     render(context, tilesize, baseRatio) {
         this.hpComponent.render(context, tilesize, baseRatio);
         this.manaComponent.render(context, tilesize, baseRatio);
         this.expComponent.render(context, tilesize, baseRatio);
+        this.floorComponent.render(context, tilesize, baseRatio);
+        this.floorComponent.render(context, tilesize, baseRatio);
+
+        this.equipmentComponent.render(context, tilesize, baseRatio);
+        this.inventoryComponent.render(context, tilesize, baseRatio);
+        this.settingsComponent.render(context, tilesize, baseRatio);
     }
 }
 class InterfaceComponent {
@@ -69,6 +84,14 @@ class InterfaceComponent {
         context.fillStyle = text.color;
         context.font = 'bold ' + Math.round(text.fontSize * ratio) + 'px ' + text.font;
         context.fillText(
+            text.content,
+            text.x * tilesize * ratio,
+            text.y * tilesize * ratio
+        );
+        context.strokeStyle = text.strokeColor;
+        context.lineWidth = text.strokeWidth * ratio;
+        context.font = 'bold ' + Math.round(text.fontSize * ratio) + 'px ' + text.font;
+        context.strokeText(
             text.content,
             text.x * tilesize * ratio,
             text.y * tilesize * ratio
@@ -189,6 +212,78 @@ class ExpComponent extends InterfaceComponent {
         this.renderText(context, tilesize, baseRatio, this.levelText);
     }
 }
+class FloorComponent extends InterfaceComponent {
+    constructor(source, x, y) {
+        super(source, x, y);
+        this.ratio = 1;
+        this.prevRatio = 1;
+        this.w = 2;
+        this.h = 1;
+        this.color = '#fef3c0';
+        this.icon = new SpriteComponent(12, 14, this.x, this.y - 0.5, this.w, 1);
+        this.text = new TextComponent(this.x + this.w / 2, this.y + 0.5, this.color);
+    }
+    compute(deltaTime) {
+        this.text.content = `${this.source.director.floor}`;
+    }
+    /** 
+     * - Render the contour
+     * - Render the damaged bar according to prevRatio
+     * - Render the actual bar according to the ratio
+     */
+    render(context, tilesize, baseRatio) {
+        this.renderSprite(context, tilesize, baseRatio, this.icon);
+        this.renderText(context, tilesize, baseRatio, this.text);
+    }
+}
+class EquipmentComponent extends InterfaceComponent {
+    constructor(source, x, y) {
+        super(source, x, y);
+        this.ratio = 1;
+        this.prevRatio = 1;
+        this.w = 1;
+        this.h = 1;
+        this.color = '#fef3c0';
+        /** Active: 5, 9 */
+        this.icon = new SpriteComponent(5, 8, this.x, this.y, this.w, 1);
+    }
+    compute(deltaTime) {}
+    render(context, tilesize, baseRatio) {
+        this.renderSprite(context, tilesize, baseRatio, this.icon);
+    }
+}
+class InventoryComponent extends InterfaceComponent {
+    constructor(source, x, y) {
+        super(source, x, y);
+        this.ratio = 1;
+        this.prevRatio = 1;
+        this.w = 1;
+        this.h = 1;
+        this.color = '#fef3c0';
+        /** Active: 6, 9 */
+        this.icon = new SpriteComponent(6, 8, this.x, this.y, this.w, 1);
+    }
+    compute(deltaTime) {}
+    render(context, tilesize, baseRatio) {
+        this.renderSprite(context, tilesize, baseRatio, this.icon);
+    }
+}
+class SettingsComponent extends InterfaceComponent {
+    constructor(source, x, y) {
+        super(source, x, y);
+        this.ratio = 1;
+        this.prevRatio = 1;
+        this.w = 1;
+        this.h = 1;
+        this.color = '#fef3c0';
+        /** Active: 7, 9 */
+        this.icon = new SpriteComponent(7, 8, this.x, this.y, this.w, 1);
+    }
+    compute(deltaTime) {}
+    render(context, tilesize, baseRatio) {
+        this.renderSprite(context, tilesize, baseRatio, this.icon);
+    }
+}
 
 /**
  * - **SpriteX**: X position in the spritesheet
@@ -218,6 +313,8 @@ class TextComponent {
         this.baseline = baseline;
         this.fontSize = 7;
         this.font = 'Consolas, monaco, monospace';
+        this.strokeColor = '#2c354d';
+        this.strokeWidth = 0.3;
 
     }
 }

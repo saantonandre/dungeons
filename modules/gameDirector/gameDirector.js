@@ -15,7 +15,7 @@ class GameDirector {
 
         this.controls = new Controls();
         /** Defines the current floor */
-        this.currentFloor = 1;
+        this.floor = 1;
         /** The current level Object, contains info about the level entities and tiles */
         this.level;
         this.player;
