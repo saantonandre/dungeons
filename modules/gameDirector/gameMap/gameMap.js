@@ -6,7 +6,7 @@ class GameMap {
         this.mapGenerator = new MapGenerator();
         this.width = 10;
         this.height = 10;
-        this.levelsAmount = 10;
+        this.levelsAmount = 4;
         this.rawLevels = []; // Levels provided by the generator
         this.levels = []; // Levels parsed
     }

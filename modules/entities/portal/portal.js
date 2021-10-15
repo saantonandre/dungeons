@@ -25,7 +25,10 @@ export class Portal extends Entity {
         this.setAnimation("open", [15], [27])
         this.setAnimation("closing", [15, 15, 15, 15, 15, 15, 15, 15, 15], [27, 26, 25, 24, 23, 22, 21, 20, 19])
 
-
+        for (let animation in this.animations) {
+            this.animations[animation].w = this.spriteW;
+            this.animations[animation].h = this.spriteH;
+        }
         this.rot = 0;
         if (this.dir[0]) {
             if (this.dir[0] == 1) {
@@ -96,27 +99,57 @@ export class Portal extends Entity {
         }
     }
     render(context, tilesize, ratio, camera) {
-        if (this.removed) {
-            // If the entity is removed, don't bother rendering
-            return;
+        this.renderSprite(context, tilesize, ratio, camera, (this.rot * Math.PI) / 180)
+    }
+}
+export class FloorPortal extends Portal {
+    constructor(x, y, dir, id) {
+        super(x, y, dir, id);
+        this.stairs = new Stairs(this);
+    }
+    /** Portal computing, returns true if changeLevel is called */
+    computePortal(meta, gameDirector) {
+        //
+        this.computeAction(gameDirector.level.entities);
+        if (!this.solid && this.Physics.collided(this, gameDirector.player)) {
+            // Move player to the linked level
+            gameDirector.changeFloor(meta);
+            return true;
         }
-        context.save();
-        context.translate(
-            (this.x + this.w / 2 + camera.x) * tilesize * ratio,
-            (this.y + this.h / 2 + camera.y) * tilesize * ratio
-        );
-        context.rotate((this.rot * Math.PI) / 180);
-        context.drawImage(
-            this.sheet, // source of the sprite
-            this.animations[this.animation].keyframesX[this.left][this.frame] * tilesize, // x pos of the sprite
-            this.animations[this.animation].keyframesY[this.left][this.frame] * tilesize, // y pos of the sprite
-            this.spriteW * tilesize, // width of the sprite
-            this.spriteH * tilesize, // height of the sprite
-            (-this.spriteW / 2) * tilesize * ratio, // x of the entity
-            (-this.spriteH / 2) * tilesize * ratio, // y of the entity
-            this.spriteW * tilesize * ratio, // width of the entity
-            this.spriteH * tilesize * ratio // height of the entity
-        );
-        context.restore();
+    }
+    render(context, tilesize, ratio, camera) {
+        this.stairs.render(context, tilesize, ratio, camera)
+        this.renderSprite(context, tilesize, ratio, camera, (this.rot * Math.PI) / 180)
+    }
+}
+/** Visual component of the FloorPortal */
+class Stairs extends Entity {
+    constructor(source) {
+        super(source.x, source.y);
+        this.background = true;
+        this.source = source;
+        this.setAnimation("idle", [18], [19]);
+        this.w = this.source.w == 1 ? 2 : 3;
+        this.h = this.source.w == 1 ? 3 : 2;
+        this.animations["idle"].w = 3;
+        this.animations["idle"].h = 2;
+        //Adjusting the sprite pos
+        switch (this.source.rot) {
+            case 90:
+                this.x -= 1;
+                break;
+            case -90:
+
+                break;
+            case 180:
+                this.x += 0.5;
+                this.y -= 1.5;
+                break;
+            default:
+
+        }
+    }
+    render(context, tilesize, ratio, camera) {
+        this.renderSprite(context, tilesize, ratio, camera, (this.source.rot * Math.PI) / 180);
     }
 }

@@ -15,7 +15,7 @@ class GameDirector {
 
         this.controls = new Controls();
         /** Defines the current floor */
-        this.floor = 1;
+        this.floor = 0;
         /** The current level Object, contains info about the level entities and tiles */
         this.level;
         this.player;
@@ -33,12 +33,16 @@ class GameDirector {
      */
     initialize(meta, canvas) {
         this.mouse = new Mouse(canvas, meta, this.camera);
+        let player = new Player(7.5, 7.5, this);
+        this.player = player;
+        this.changeFloor(meta)
+    }
+    changeFloor(meta) {
+        this.floor += 1;
         this.map.generate();
         this.currentLevel = this.map.findStart();
         this.loadCurrentLevel(meta.tilesWidth, meta.tilesHeight);
 
-        let player = new Player(7.5, 7.5, this);
-        this.player = player;
         this.movePlayerToCurrentLevel();
     }
     movePlayerToCurrentLevel() {

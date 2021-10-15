@@ -14,6 +14,7 @@ export class LevelParser {
      * - 2: Portal 
      * - 3: Holes 
      * - 4: Spawn point 
+     * - 5: Floor portal 
      * - 10: Slime
      * - 11: Bat
      */
@@ -47,6 +48,11 @@ export class LevelParser {
                         break;
                     case 4:
                         // SpawnPoint
+                        break;
+                    case 5:
+                        entity = new Entities.FloorPortal(x, y, rawLevel[x][y].dir, rawLevel[x][y].id);
+                        entity.environment = entities;
+                        entities.push(entity);
                         break;
                     case 10:
                         entity = new Entities.Slime(x, y);

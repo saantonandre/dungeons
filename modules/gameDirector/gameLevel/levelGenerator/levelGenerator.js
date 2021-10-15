@@ -21,42 +21,6 @@ class Cell {
         this.id = id >= 0 ? id : "none";
     }
 }
-
-var tiles = [
-    [1, 1], // 0 - tile
-    [0, 0],
-    [1, 0],
-    [2, 0], // 1 - 2 - 3 upper walls
-    [0, 1],
-    [2, 1], // 4 - 5 side walls
-    [0, 2],
-    [1, 2],
-    [2, 2], // 6 - 7 - 8 down walls
-    [3, 0],
-    [4, 0], // 9 - 10 right/left breaks (up)
-    [3, 1],
-    [4, 1], // 11 - 12  right/left breaks (down)
-    [3, 2],
-    [3, 3], // 13 - 14  up/down breaks (left)
-    [4, 2],
-    [4, 3], // 15 - 16  up/down breaks (right)
-    [5, 0],
-    [6, 0],
-    [7, 0], // 17 - 18 - 19 holes UP
-    [5, 1],
-    [6, 1],
-    [7, 1], // 20 - 21 - 22 holes MID
-    [5, 2],
-    [6, 2],
-    [7, 2], // 23 - 24 - 25 holes DOWN
-    [5, 3],
-    [6, 3],
-    [7, 3], // 26 - 27 - 28 holes HOR
-    [8, 0],
-    [8, 1],
-    [8, 2], // 29 - 30 - 31 holes VER
-    [8, 3], // 32 holes SINGLE
-];
 export class LevelGenerator {
     constructor(links) {
         this.level = []; // Bi-dimensional array of numbers, representing this level
@@ -80,12 +44,11 @@ export class LevelGenerator {
         ];
     }
 
-
     /**
      * @param {*} w width of the level, expressed in tiles
      * @param {*} h height of the level, expressed in tiles
      * @param {*} links (vectors) rooms/levels linked to this
-     * @param {*} type expresses this room's type
+     * @param {*} type - 0 = Normal - 1 = Start - 2 = Treasure - 3 = Boss
      * @returns 
      * bi-dimensional array corresponding to the level, 
        each space constitutes either of Cell or 0
@@ -113,10 +76,14 @@ export class LevelGenerator {
         this.makeWalls();
         this.makePortals();
 
-        if (type !== 1) {
-            this.importTemplate((Math.random() * levelTemplates.length) | 0);
+        // If this is the start room load the start room template
+        if (type === 1) {
+            this.importTemplate(startTemplate);
         } else {
-            this.importTemplate(0);
+            this.importTemplate(levelTemplates[(Math.random() * levelTemplates.length) | 0]);
+        }
+        if (type === 3) {
+            this.makeFloorPortal();
         }
         //this.assignTiles();
         //this.makeEnemies(type);
@@ -215,8 +182,7 @@ export class LevelGenerator {
             this.level[x].splice(i, 1, cell);
         }
     }
-    importTemplate(which) {
-        let template = levelTemplates[which];
+    importTemplate(template) {
         let cell;
         for (let i = 0; i < this.level.length; i++) {
             for (let j = 0; j < this.level[i].length; j++) {
@@ -257,6 +223,55 @@ export class LevelGenerator {
             this.level[x].splice(y, 1, new Cell(x, y, doorType, i, this.links[i]));
 
         }
+    }
+    makeFloorPortal() {
+        let halfW = (this.w / 2) | 0;
+        let halfH = (this.h / 2) | 0;
+        let hor = false;
+        let x = 0;
+        let y = 0;
+        let floorPortalType = 5;
+        let floorPortalId = Math.random();
+        if (this.links.length > 3) {
+            throw new Error("Cannot generate a floor portal, too many links!")
+        }
+        let possibleLinks = [
+            [1, 0],
+            [0, 1],
+            [-1, 0],
+            [0, -1]
+        ]
+        for (let i = possibleLinks.length - 1; i >= 0; i--) {
+            for (let j = 0; j < this.links.length; j++) {
+                if (possibleLinks[i] == this.links[j]) {
+                    possibleLinks.splice(i, 1);
+                    break;
+                }
+            }
+        }
+        let chosenSide = possibleLinks[Math.random() * possibleLinks.length | 0];
+
+        if (chosenSide[0] == 0) {
+            // Vertical
+            hor = false;
+            x = halfW;
+            chosenSide[1] > 0 ? (y = this.h - 1) : (y = 0);
+        } else {
+            // Horizontal
+            hor = true;
+            y = halfH;
+            chosenSide[0] > 0 ? (x = this.w - 1) : (x = 0);
+        }
+        // Removes the cell at the center and replaces it with a doorType cell
+        this.level[x].splice(y, 1, new Cell(x, y, floorPortalType, floorPortalId, chosenSide));
+        hor ? y++ : x++;
+        // creates the 2nd part of the door (down or right of center)
+        this.level[x].splice(y, 1, new Cell(x, y, floorPortalType, floorPortalId, chosenSide));
+
+        // creates the 3rd part of the door (up or left of center) if wall length is odd
+        hor ? (y -= 2) : (x -= 2);
+        this.level[x].splice(y, 1, new Cell(x, y, floorPortalType, floorPortalId, chosenSide));
+
     }
     makeEnemies(type) {
         if (type == 1) {
@@ -328,26 +343,26 @@ export class LevelGenerator {
   // 12 - 13 - 14 holes VER
   // 15 holes SINGLE
 */
+let startTemplate = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+];
 let levelTemplates = [
-    [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    ],
     [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],

@@ -5,10 +5,7 @@ import { spritesheet } from "../../resourceManager.js";
 /** Needs some rework */
 export class UserInterface {
     constructor(source) {
-        /*
-            TODO:
-            gradual damaged bar
-        */
+        this.mouse = source.director.mouse.absolute;
         this.fontSize = 7;
         this.source = source;
         this.mouse = this.source.director.mouse.absolute;

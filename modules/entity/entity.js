@@ -42,7 +42,7 @@ export class Entity {
 
         this.sheet = spritesheet;
         this.animation = "idle";
-        this.animations = [];
+        this.animations = {};
         this.frame = 0;
         this.frameCounter = 0;
         this.setAnimation("idle", [0], [0]);
@@ -187,8 +187,8 @@ export class Entity {
                 this.animations[this.animation].keyframesY[this.left][this.frame] * tilesize, // y pos of the sprite
                 this.animations[this.animation].w * tilesize, // width of the sprite
                 this.animations[this.animation].h * tilesize, // height of the sprite
-                (-this.w / 2) * tilesize * ratio, // x of the entity
-                (-this.h / 2) * tilesize * ratio, // y of the entity
+                (-this.animations[this.animation].w / 2) * tilesize * ratio, // x of the entity
+                (-this.animations[this.animation].h / 2) * tilesize * ratio, // y of the entity
                 this.animations[this.animation].w * tilesize * ratio, // width of the entity
                 this.animations[this.animation].h * tilesize * ratio // height of the entity
             );
