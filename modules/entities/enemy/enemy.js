@@ -1,5 +1,5 @@
 import { Entity } from "../../entity/entity.js";
-import { HpBar } from "./hpBar.js";
+import { EnemyHpBar } from "./enemyHpBar.js";
 export class Enemy extends Entity {
     constructor(x, y) {
         super(x, y);
@@ -13,7 +13,7 @@ export class Enemy extends Entity {
         this.lv = 1;
         this.expValue = 1;
 
-        this.hpBar = new HpBar(this);
+        this.hpBar = new EnemyHpBar(this);
         this.prey = false;
         this.immovable = true;
 
@@ -48,5 +48,9 @@ export class Enemy extends Entity {
     onDeath() {
         this.state = "dead";
         this.solid = false;
+        this.xVel = 0;
+        this.yVel = 0;
+        this.xVel = 0;
+        this.yVel = 0;
     }
 }

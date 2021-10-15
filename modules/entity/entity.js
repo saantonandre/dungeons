@@ -118,6 +118,21 @@ export class Entity {
         this.x += (this.xVel + this.xVelExt) * deltaTime;
         this.y += (this.yVel + this.yVelExt) * deltaTime;
     }
+    onAnimationEnd() {
+        // What happens after the current animation ends
+    }
+    updateSprite(deltaTime) {
+        this.frameCounter += deltaTime;
+        if (this.frameCounter >= this.animations[this.animation].slowness) {
+            this.frame++;
+            this.frameCounter = 0;
+        }
+        if (this.frame >= this.animations[this.animation].keyframesX[this.left].length) {
+            this.frame = 0;
+            this.frameCounter = 0;
+            this.onAnimationEnd();
+        }
+    }
     setAnimation(label, keyframesX, keyframesY, left = 0) {
         if (!this.animations[label]) {
             this.animations[label] = new Animation(this);
@@ -137,21 +152,6 @@ export class Entity {
     compute(deltaTime) {}
     render(context, tilesize, ratio, camera) {
         this.renderSprite(context, tilesize, ratio, camera);
-    }
-    onAnimationEnd() {
-        // What happens after the current animation ends
-    }
-    updateSprite(deltaTime) {
-        this.frameCounter += deltaTime;
-        if (this.frameCounter >= this.animations[this.animation].slowness) {
-            this.frame++;
-            this.frameCounter = 0;
-        }
-        if (this.frame >= this.animations[this.animation].keyframesX[this.left].length) {
-            this.frame = 0;
-            this.frameCounter = 0;
-            this.onAnimationEnd();
-        }
     }
     renderHitbox(context, tilesize, ratio, camera) {
         context.strokeStyle = "red";

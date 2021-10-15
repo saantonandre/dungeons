@@ -11,473 +11,213 @@ export class UserInterface {
         */
         this.fontSize = 7;
         this.source = source;
-        this.hpIcon = {
-            spriteX: [
-                [5]
-            ],
-            spriteY: [
-                [11]
-            ],
-            x: 0.5,
-            y: 0.5,
-            w: 1,
-            h: 1,
-        };
-        this.hpBar = {
-            spriteX: [
-                [6],
-                [9]
-            ],
-            spriteY: [
-                [11],
-                [11]
-            ],
-            x: 1.5,
-            y: 0.5,
-            w: 3,
-            h: 1,
-            prevRatio: 0
-        };
-
-        this.manaIcon = {
-            spriteX: [
-                [5]
-            ],
-            spriteY: [
-                [12]
-            ],
-            x: 4.5,
-            y: 0.5,
-            w: 1,
-            h: 1,
-        };
-        this.manaBar = {
-            spriteX: [
-                [6],
-                [9]
-            ],
-            spriteY: [
-                [12],
-                [12]
-            ],
-            x: 5.5,
-            y: 0.5,
-            w: 3,
-            h: 1,
-            prevRatio: 0
-        };
-
-        this.damagedBar = {
-            spriteX: [
-                [9],
-            ],
-            spriteY: [
-                [13],
-            ]
-        };
-
-        this.expIcon = {
-            spriteX: [
-                [12],
-            ],
-            spriteY: [
-                [11]
-            ],
-            x: 9,
-            y: 0.5,
-            w: 1,
-            h: 1,
-        };
-        this.expBar = {
-            spriteX: [
-                [13],
-                [13]
-            ],
-            spriteY: [
-                [11],
-                [12]
-            ],
-            x: 10,
-            y: 0.5,
-            w: 5,
-            h: 1,
-        };
-        this.floorIcon = {
-            spriteX: [
-                [12],
-            ],
-            spriteY: [
-                [14]
-            ],
-            x: 17,
-            y: 0.4,
-            w: 2,
-            h: 1,
-        };
-        this.lvlIcon = {
-            spriteX: [
-                [12],
-            ],
-            spriteY: [
-                [12]
-            ],
-            x: 15,
-            y: 0.15,
-            w: 1,
-            h: 1,
-        };
-
-        this.settingsIcon = {
-            action: 0,
-            spriteX: [
-                [7],
-                [7]
-            ],
-            spriteY: [
-                [8],
-                [9]
-            ],
-            x: 23.5,
-            y: 0.5,
-            w: 1,
-            h: 1,
-        };
-
-        this.inventoryIcon = {
-            action: 0,
-            spriteX: [
-                [6],
-                [6]
-            ],
-            spriteY: [
-                [8],
-                [9]
-            ],
-            x: 22,
-            y: 0.5,
-            w: 1,
-            h: 1,
-        };
-
-        this.equipmentIcon = {
-            action: 0,
-            spriteX: [
-                [5],
-                [5]
-            ],
-            spriteY: [
-                [8],
-                [9]
-            ],
-            x: 20.5,
-            y: 0.5,
-            w: 1,
-            h: 1,
-        };
+        this.mouse = this.source.director.mouse.absolute;
+        this.Physics = this.source.Physics;
         this.sheet = spritesheet;
-        this.hpRatio = this.source.hp / this.source.maxHp;
-        this.manaRatio = this.source.mana / this.source.maxMana;
-        this.expRatio = this.source.exp / this.source.maxExp;
-        this.font = 'Consolas, monaco, monospace';
-
-        this.hpBar.prevRatio = this.hpRatio;
-        this.manaBar.prevRatio = this.manaRatio;
+        this.hpComponent = new HpComponent(this.source, 1.5, 0.5);
+        this.manaComponent = new ManaComponent(this.source, 5.5, 0.5);
+        this.expComponent = new ExpComponent(this.source, 10, 0.5);
     }
     compute(deltaTime) {
-
-        this.hpRatio = this.source.hp / this.source.maxHp;
-        this.manaRatio = this.source.mana / this.source.maxMana;
-        this.expRatio = this.source.exp / this.source.maxExp;
-        // Computes the white damage gradual decrease
-        if (this.hpBar.prevRatio > this.hpRatio) {
-            this.hpBar.prevRatio -= deltaTime / 400;
-        }
-        if (this.hpBar.prevRatio < this.hpRatio) {
-            this.hpBar.prevRatio = this.hpRatio;
-        }
-
-        if (this.manaBar.prevRatio > this.manaRatio) {
-            this.manaBar.prevRatio -= deltaTime / 400;
-        }
-        if (this.manaBar.prevRatio < this.manaRatio) {
-            this.manaBar.prevRatio = this.manaRatio;
-        }
+        this.hpComponent.compute(deltaTime)
+        this.manaComponent.compute(deltaTime)
+        this.expComponent.compute(deltaTime)
 
     }
     render(context, tilesize, baseRatio) {
-        this.renderHpBar(context, tilesize, baseRatio);
-        this.renderManaBar(context, tilesize, baseRatio);
-        this.renderExpBar(context, tilesize, baseRatio);
-        this.renderSettingsIcon(context, tilesize, baseRatio);
-        this.renderInventoryIcon(context, tilesize, baseRatio);
-        this.renderEquipmentIcon(context, tilesize, baseRatio);
-        //this.renderFloorIcon(context, tilesize, baseRatio);
+        this.hpComponent.render(context, tilesize, baseRatio);
+        this.manaComponent.render(context, tilesize, baseRatio);
+        this.expComponent.render(context, tilesize, baseRatio);
     }
-    renderSettingsIcon(context, tilesize, baseRatio) {
-        //this.settingsIcon.action = pointSquareCol(mouse, this.settingsIcon) ? 1 : 0;
-        // renders icon
-        context.drawImage(
-            this.sheet,
-            this.settingsIcon.spriteX[this.settingsIcon.action][0] * tilesize,
-            this.settingsIcon.spriteY[this.settingsIcon.action][0] * tilesize,
-            this.settingsIcon.w * tilesize,
-            this.settingsIcon.h * tilesize,
-            this.settingsIcon.x * tilesize * baseRatio,
-            this.settingsIcon.y * tilesize * baseRatio,
-            this.settingsIcon.w * tilesize * baseRatio,
-            this.settingsIcon.h * tilesize * baseRatio
-        );
-    }
-    renderInventoryIcon(context, tilesize, baseRatio) {
+}
+class InterfaceComponent {
+    constructor(source, x, y) {
+        this.source = source;
+        this.sheet = source.sheet;
+        this.x = x;
+        this.y = y;
+        this.w = 1;
+        this.h = 1;
 
-        //this.inventoryIcon.action = pointSquareCol(mouse, this.inventoryIcon) ? 1 : 0;
-        // renders icon
+        this.progressText = {
+            content: '',
+            x: this.x,
+            y: this.y,
+            align: 'center',
+            baseline: 'middle',
+            color: '#ad2f45',
+            font: this.font
+        }
+    }
+    renderSprite(context, tilesize, ratio, item, widthRatio = 1) {
         context.drawImage(
             this.sheet,
-            this.inventoryIcon.spriteX[this.inventoryIcon.action][0] * tilesize,
-            this.inventoryIcon.spriteY[this.inventoryIcon.action][0] * tilesize,
-            this.inventoryIcon.w * tilesize,
-            this.inventoryIcon.h * tilesize,
-            this.inventoryIcon.x * tilesize * baseRatio,
-            this.inventoryIcon.y * tilesize * baseRatio,
-            this.inventoryIcon.w * tilesize * baseRatio,
-            this.inventoryIcon.h * tilesize * baseRatio
-        );
-    }
-    renderEquipmentIcon(context, tilesize, baseRatio) {
-        //this.equipmentIcon.action = pointSquareCol(mouse, this.equipmentIcon) ? 1 : 0;
-        // renders icon
-        context.drawImage(
-            this.sheet,
-            this.equipmentIcon.spriteX[this.equipmentIcon.action][0] * tilesize,
-            this.equipmentIcon.spriteY[this.equipmentIcon.action][0] * tilesize,
-            this.equipmentIcon.w * tilesize,
-            this.equipmentIcon.h * tilesize,
-            this.equipmentIcon.x * tilesize * baseRatio,
-            this.equipmentIcon.y * tilesize * baseRatio,
-            this.equipmentIcon.w * tilesize * baseRatio,
-            this.equipmentIcon.h * tilesize * baseRatio
-        );
-    }
-    renderHpBar(context, tilesize, baseRatio) {
-        // variables
+            item.spriteX * tilesize,
+            item.spriteY * tilesize,
+            item.w * tilesize * widthRatio,
+            item.h * tilesize,
+            item.x * tilesize * ratio,
+            item.y * tilesize * ratio,
+            item.w * tilesize * ratio * widthRatio,
+            item.h * tilesize * ratio,
 
-        // renders icon
-        context.drawImage(
-            this.sheet,
-            this.hpIcon.spriteX[0][0] * tilesize,
-            this.hpIcon.spriteY[0][0] * tilesize,
-            this.hpIcon.w * tilesize,
-            this.hpIcon.h * tilesize,
-            this.hpIcon.x * tilesize * baseRatio,
-            this.hpIcon.y * tilesize * baseRatio,
-            this.hpIcon.w * tilesize * baseRatio,
-            this.hpIcon.h * tilesize * baseRatio
-        );
-        // renders container
-        context.drawImage(
-            this.sheet,
-            this.hpBar.spriteX[0][0] * tilesize,
-            this.hpBar.spriteY[0][0] * tilesize,
-            this.hpBar.w * tilesize,
-            this.hpBar.h * tilesize,
-            this.hpBar.x * tilesize * baseRatio,
-            this.hpBar.y * tilesize * baseRatio,
-            this.hpBar.w * tilesize * baseRatio,
-            this.hpBar.h * tilesize * baseRatio
-        );
-        // renders damagedBar
-        context.drawImage(
-            this.sheet,
-            this.damagedBar.spriteX[0][0] * tilesize,
-            this.damagedBar.spriteY[0][0] * tilesize,
-            this.hpBar.w * tilesize * this.hpBar.prevRatio,
-            this.hpBar.h * tilesize,
-            this.hpBar.x * tilesize * baseRatio,
-            this.hpBar.y * tilesize * baseRatio,
-            this.hpBar.w * tilesize * baseRatio * this.hpBar.prevRatio,
-            this.hpBar.h * tilesize * baseRatio
-        );
-        // renders bar
-        context.drawImage(
-            this.sheet,
-            this.hpBar.spriteX[1][0] * tilesize,
-            this.hpBar.spriteY[1][0] * tilesize,
-            this.hpBar.w * tilesize * this.hpRatio,
-            this.hpBar.h * tilesize,
-            this.hpBar.x * tilesize * baseRatio,
-            this.hpBar.y * tilesize * baseRatio,
-            this.hpBar.w * tilesize * baseRatio * this.hpRatio,
-            this.hpBar.h * tilesize * baseRatio
-        );
-        // renders text
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
-        context.fillStyle = '#ad2f45';
-        context.fontSize =
-            'bold ' + Math.round(this.fontSize * baseRatio) + 'px ' + this.font;
+        )
+    }
+    renderText(context, tilesize, ratio, text) {
+        context.textBaseline = text.baseline;
+        context.textAlign = text.align;
+        context.fillStyle = text.color;
+        context.font = 'bold ' + Math.round(text.fontSize * ratio) + 'px ' + text.font;
         context.fillText(
-            this.source.hp + '/' + this.source.maxHp,
-            (this.hpBar.x + this.hpBar.w / 2) * tilesize * baseRatio,
-            this.hpBar.y * tilesize * baseRatio
+            text.content,
+            text.x * tilesize * ratio,
+            text.y * tilesize * ratio
         );
     }
-    renderManaBar(context, tilesize, baseRatio) {
-        // variables
-
-        // renders icond
-        context.drawImage(
-            this.sheet,
-            this.manaIcon.spriteX[0][0] * tilesize,
-            this.manaIcon.spriteY[0][0] * tilesize,
-            this.manaIcon.w * tilesize,
-            this.manaIcon.h * tilesize,
-            this.manaIcon.x * tilesize * baseRatio,
-            this.manaIcon.y * tilesize * baseRatio,
-            this.manaIcon.w * tilesize * baseRatio,
-            this.manaIcon.h * tilesize * baseRatio
-        );
-        // renders container
-        context.drawImage(
-            this.sheet,
-            this.manaBar.spriteX[0][0] * tilesize,
-            this.manaBar.spriteY[0][0] * tilesize,
-            this.manaBar.w * tilesize,
-            this.manaBar.h * tilesize,
-            this.manaBar.x * tilesize * baseRatio,
-            this.manaBar.y * tilesize * baseRatio,
-            this.manaBar.w * tilesize * baseRatio,
-            this.manaBar.h * tilesize * baseRatio
-        );
-        // renders damagedBar
-        context.drawImage(
-            this.sheet,
-            this.damagedBar.spriteX[0][0] * tilesize,
-            this.damagedBar.spriteY[0][0] * tilesize,
-            this.manaBar.w * tilesize * this.manaBar.prevRatio,
-            this.manaBar.h * tilesize,
-            this.manaBar.x * tilesize * baseRatio,
-            this.manaBar.y * tilesize * baseRatio,
-            this.manaBar.w * tilesize * baseRatio * this.manaBar.prevRatio,
-            this.manaBar.h * tilesize * baseRatio
-        );
-        // renders bar
-        context.drawImage(
-            this.sheet,
-            this.manaBar.spriteX[1][0] * tilesize,
-            this.manaBar.spriteY[1][0] * tilesize,
-            this.manaBar.w * tilesize * this.manaRatio,
-            this.manaBar.h * tilesize,
-            this.manaBar.x * tilesize * baseRatio,
-            this.manaBar.y * tilesize * baseRatio,
-            this.manaBar.w * tilesize * baseRatio * this.manaRatio,
-            this.manaBar.h * tilesize * baseRatio
-        );
-
-        // renders text
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
-        context.fillStyle = '#4fa4b8';
-        context.font =
-            'bold ' + Math.round(this.fontSize * baseRatio) + 'px ' + this.font;
-        context.fillText(
-            this.source.mana + '/' + this.source.maxMana,
-            (this.manaBar.x + this.manaBar.w / 2) * tilesize * baseRatio,
-            this.manaBar.y * tilesize * baseRatio
-        );
+}
+class HpComponent extends InterfaceComponent {
+    constructor(source, x, y) {
+        super(source, x, y);
+        this.ratio = 1;
+        this.prevRatio = 1;
+        this.w = 3;
+        this.h = 1;
+        this.contour = new SpriteComponent(6, 11, this.x, this.y, this.w, this.h);
+        this.prevBar = new SpriteComponent(9, 13, this.x, this.y, this.w, this.h);
+        this.progressBar = new SpriteComponent(9, 11, this.x, this.y, this.w, this.h);
+        this.icon = new SpriteComponent(5, 11, this.x - 1, this.y, 1, 1);
+        this.color = '#ad2f45';
+        this.text = new TextComponent(this.x + this.w / 2, this.y, this.color);
     }
-    renderExpBar(context, tilesize, baseRatio) {
-        // variables
+    compute(deltaTime) {
+        this.ratio = this.source.hp / this.source.maxHp;
+        if (this.prevRatio > this.ratio) {
+            this.prevRatio -= deltaTime / 200;
+        }
+        if (this.prevRatio < this.ratio) {
+            this.prevRatio = this.ratio;
+        }
+        this.text.content = `${this.source.hp} / ${this.source.maxHp}`;
 
-        // renders icon
-        context.drawImage(
-            this.sheet,
-            this.expIcon.spriteX[0][0] * tilesize,
-            this.expIcon.spriteY[0][0] * tilesize,
-            this.expIcon.w * tilesize,
-            this.expIcon.h * tilesize,
-            this.expIcon.x * tilesize * baseRatio,
-            this.expIcon.y * tilesize * baseRatio,
-            this.expIcon.w * tilesize * baseRatio,
-            this.expIcon.h * tilesize * baseRatio
-        );
-        // renders container
-        context.drawImage(
-            this.sheet,
-            this.expBar.spriteX[0][0] * tilesize,
-            this.expBar.spriteY[0][0] * tilesize,
-            this.expBar.w * tilesize,
-            this.expBar.h * tilesize,
-            this.expBar.x * tilesize * baseRatio,
-            this.expBar.y * tilesize * baseRatio,
-            this.expBar.w * tilesize * baseRatio,
-            this.expBar.h * tilesize * baseRatio
-        );
-        // renders bar
-        context.drawImage(
-            this.sheet,
-            this.expBar.spriteX[1][0] * tilesize,
-            this.expBar.spriteY[1][0] * tilesize,
-            this.expBar.w * tilesize * this.expRatio,
-            this.expBar.h * tilesize,
-            this.expBar.x * tilesize * baseRatio,
-            this.expBar.y * tilesize * baseRatio,
-            this.expBar.w * tilesize * baseRatio * this.expRatio,
-            this.expBar.h * tilesize * baseRatio
-        );
-
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
-        context.fillStyle = '#63ab3f';
-        context.font = 'bold ' + Math.round(this.fontSize * baseRatio) + 'px ' + this.font;
-        context.fillText(
-            this.source.exp + '/' + this.source.maxExp,
-            (this.expBar.x + this.expBar.w / 2) * tilesize * baseRatio,
-            (this.expBar.y + 0.01) * tilesize * baseRatio
-        );
-        // renders lvl icon
-        context.drawImage(
-            this.sheet,
-            this.lvlIcon.spriteX[0][0] * tilesize,
-            this.lvlIcon.spriteY[0][0] * tilesize,
-            this.lvlIcon.w * tilesize,
-            this.lvlIcon.h * tilesize,
-            this.lvlIcon.x * tilesize * baseRatio,
-            this.lvlIcon.y * tilesize * baseRatio,
-            this.lvlIcon.w * tilesize * baseRatio,
-            this.lvlIcon.h * tilesize * baseRatio
-        );
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
-        context.fillStyle = '#63ab3f';
-        context.font = 'bold ' + Math.round(this.fontSize * baseRatio) + 'px ' + this.font;
-        context.fillText(
-            this.source.lv,
-            (this.lvlIcon.x + this.lvlIcon.w / 2) * tilesize * baseRatio,
-            (this.lvlIcon.y + this.lvlIcon.h) * tilesize * baseRatio
-        );
     }
-    renderFloorIcon(context, tilesize, baseRatio) {
-        // renders icon
-        context.drawImage(
-            this.sheet,
-            this.floorIcon.spriteX[0][0] * tilesize,
-            this.floorIcon.spriteY[0][0] * tilesize,
-            this.floorIcon.w * tilesize,
-            this.floorIcon.h * tilesize,
-            this.floorIcon.x * tilesize * baseRatio,
-            this.floorIcon.y * tilesize * baseRatio,
-            this.floorIcon.w * tilesize * baseRatio,
-            this.floorIcon.h * tilesize * baseRatio
-        );
-        context.textAlign = 'left';
-        context.textBaseline = 'middle';
-        context.fillStyle = '#fef3c0';
-        context.font = 'bold ' + Math.round(this.fontSize * baseRatio) + 'px ' + this.font;
-        context.fillText(
-            map.currentFloor,
-            (this.floorIcon.x + this.floorIcon.w * 1.05) * tilesize * baseRatio,
-            (this.floorIcon.y + this.floorIcon.h / 1.7) * tilesize * baseRatio
-        );
+    /** 
+     * - Render the contour
+     * - Render the damaged bar according to prevRatio
+     * - Render the actual bar according to the ratio
+     */
+    render(context, tilesize, baseRatio) {
+        this.renderSprite(context, tilesize, baseRatio, this.contour);
+        this.renderSprite(context, tilesize, baseRatio, this.prevBar, this.prevRatio);
+        this.renderSprite(context, tilesize, baseRatio, this.progressBar, this.ratio);
+        this.renderSprite(context, tilesize, baseRatio, this.icon);
+        this.renderText(context, tilesize, baseRatio, this.text);
+    }
+}
+class ManaComponent extends InterfaceComponent {
+    constructor(source, x, y) {
+        super(source, x, y);
+        this.ratio = 1;
+        this.prevRatio = 1;
+        this.w = 3;
+        this.h = 1;
+
+        this.contour = new SpriteComponent(6, 12, this.x, this.y, this.w, this.h);
+        this.prevBar = new SpriteComponent(9, 13, this.x, this.y, this.w, this.h);
+        this.progressBar = new SpriteComponent(9, 12, this.x, this.y, this.w, this.h);
+        this.icon = new SpriteComponent(5, 12, this.x - 1, this.y, 1, 1);
+        this.color = '#4fa4b8';
+
+        this.text = new TextComponent(this.x + this.w / 2, this.y, this.color);
+    }
+    compute(deltaTime) {
+        this.ratio = this.source.mana / this.source.maxMana;
+        if (this.prevRatio > this.ratio) {
+            this.prevRatio -= deltaTime / 200;
+        }
+        if (this.prevRatio < this.ratio) {
+            this.prevRatio = this.ratio;
+        }
+        this.text.content = `${this.source.mana} / ${this.source.maxMana}`;
+
+    }
+    /** 
+     * - Render the contour
+     * - Render the damaged bar according to prevRatio
+     * - Render the actual bar according to the ratio
+     */
+    render(context, tilesize, baseRatio) {
+        this.renderSprite(context, tilesize, baseRatio, this.contour);
+        this.renderSprite(context, tilesize, baseRatio, this.prevBar, this.prevRatio);
+        this.renderSprite(context, tilesize, baseRatio, this.progressBar, this.ratio);
+        this.renderSprite(context, tilesize, baseRatio, this.icon);
+        this.renderText(context, tilesize, baseRatio, this.text);
+    }
+}
+class ExpComponent extends InterfaceComponent {
+    constructor(source, x, y) {
+        super(source, x, y);
+        this.ratio = 1;
+        this.prevRatio = 1;
+        this.w = 5;
+        this.h = 1;
+        this.color = '#63ab3f';
+        this.contour = new SpriteComponent(13, 11, this.x, this.y, this.w, this.h);
+        this.progressBar = new SpriteComponent(13, 12, this.x, this.y, this.w, this.h);
+        this.icon = new SpriteComponent(12, 11, this.x - 1, this.y, 1, 1);
+        this.text = new TextComponent(this.x + this.w / 2, this.y, this.color);
+
+        this.levelIcon = new SpriteComponent(12, 12, this.x + 5, this.y - 0.5, 1, 1);
+        this.levelText = new TextComponent(this.levelIcon.x + 0.5, this.levelIcon.y + 1, this.color);
+    }
+    compute(deltaTime) {
+        this.ratio = this.source.exp / this.source.maxExp;
+        this.text.content = `${this.source.exp} / ${this.source.maxExp}`;
+        this.levelText.content = `${this.source.lv}`;
+    }
+    /** 
+     * - Render the contour
+     * - Render the damaged bar according to prevRatio
+     * - Render the actual bar according to the ratio
+     */
+    render(context, tilesize, baseRatio) {
+        this.renderSprite(context, tilesize, baseRatio, this.contour);
+        this.renderSprite(context, tilesize, baseRatio, this.progressBar, this.ratio);
+        this.renderSprite(context, tilesize, baseRatio, this.icon);
+        this.renderText(context, tilesize, baseRatio, this.text);
+
+        this.renderSprite(context, tilesize, baseRatio, this.levelIcon);
+        this.renderText(context, tilesize, baseRatio, this.levelText);
+    }
+}
+
+/**
+ * - **SpriteX**: X position in the spritesheet
+ * - **SpriteY**: Y position in the spritesheet
+ * - **x**: X position on the canvas
+ * - **y**: Y position on the canvas
+ * - **w**: width on the canvas
+ * - **h**: height  on the canvas
+ */
+class SpriteComponent {
+    constructor(spriteX = 0, spriteY = 0, x = 0, y = 0, w = 0, h = 0) {
+        this.spriteX = spriteX;
+        this.spriteY = spriteY;
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
+}
+class TextComponent {
+    constructor(x, y, color = '#ad2f45', align = "center", baseline = "middle") {
+        this.content = '';
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.align = align;
+        this.baseline = baseline;
+        this.fontSize = 7;
+        this.font = 'Consolas, monaco, monospace';
+
     }
 }

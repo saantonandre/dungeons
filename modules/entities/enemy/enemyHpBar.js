@@ -1,5 +1,5 @@
 import { spritesheet } from "../../resourceManager.js"
-export class HpBar {
+export class EnemyHpBar {
     constructor(source) {
         this.spriteX = [
             [13, 14, 15]
