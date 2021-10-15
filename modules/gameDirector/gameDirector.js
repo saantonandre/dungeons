@@ -23,7 +23,13 @@ class GameDirector {
         this.camera = new Camera();
         this.camera.focus = this.player;
         this.map = gameMap;
-
+        this.tabbedOut = false;
+        document.addEventListener("visibilitychange", (evt) => {
+            this.tabbedOut = document.visibilityState == 'hidden' ? true : false;
+            if (this.tabbedOut) {
+                this.player.state = 'broke';
+            }
+        });
     }
     /** !!! PROVISIONAL !!!
      * - Generates the map
@@ -55,9 +61,6 @@ class GameDirector {
      * - Computes the UI
      */
     compute(meta) {
-        if (this.controls.mClickDown) {
-            console.log(this.level.entities)
-        }
         let garbage = [];
         let loadLevelCall = false;
         for (let entity of this.level.entities) {

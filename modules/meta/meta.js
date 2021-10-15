@@ -33,7 +33,6 @@ class Meta {
         this.tilesWidth = this.baseTilesWidth;
         /** Number of tiles displayed on screen (height) */
         this.tilesHeight = this.baseTilesHeight;
-
         this.init();
     }
     /** Initializes the fps counter if displayFps == true */

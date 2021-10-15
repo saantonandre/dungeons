@@ -28,7 +28,7 @@ export class Player extends Entity {
         this.exp = 0;
         this.lv = 1;
 
-        this.atk = 1444;
+        this.atk = 2;
 
         this.baseSpeed = 0.08;
         this.speed = this.baseSpeed;
@@ -90,8 +90,20 @@ export class Player extends Entity {
         this.state = 'normal';
         this.animation = 'idle';
         this.equipment.weapon.display = true;
+    }
+    computeBroke(deltaTime) {
         this.shadow = true;
         this.solid = true;
+        this.animation = 'broke';
+        this.equipment.weapon.display = false;
+        this.stateCounter += deltaTime;
+        if (this.controls.left || this.controls.right || this.controls.up || this.controls.down || this.controls.lClickDown || this.controls.rClickDown) {
+            this.recoverState();
+            return;
+        }
+        if (this.stateCounter >= 60) {
+            this.recoverState();
+        }
     }
     computeState(deltaTime) {
         switch (this.state) {
@@ -105,10 +117,7 @@ export class Player extends Entity {
                 this.updatePosition(deltaTime);
                 break;
             case 'broke':
-                this.stateCounter += deltaTime;
-                if (this.stateCounter > 60) {
-                    this.recoverState();
-                }
+                this.computeBroke(deltaTime)
                 break;
         }
     }
