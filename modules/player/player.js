@@ -28,12 +28,14 @@ export class Player extends Entity {
         this.exp = 0;
         this.lv = 1;
 
-        this.atk = 1;
+        this.atk = 1444;
 
         this.baseSpeed = 0.08;
         this.speed = this.baseSpeed;
 
         this.attacking = false;
+
+
 
         /** Invincibility frames amount */
         this.damaged = 0;
@@ -43,7 +45,9 @@ export class Player extends Entity {
         this.animation = "idle";
         this.setAnimation("idle", [0, 0, 0, 0], [6, 7, 8, 9]);
         this.setAnimation("idle", [1, 1, 1, 1], [6, 7, 8, 9], 1);
-
+        this.setAnimation("fall", [0], [10]);
+        this.setAnimation("broke", [0], [11]);
+        this.state = 'normal';
 
         this.equipment = new EquipmentManager(this);
         this.inventory = new InventoryManager(this);
@@ -53,12 +57,66 @@ export class Player extends Entity {
         this.hitboxOffset.y = 0.4;
         this.hitboxOffset.w = -0.4;
         this.hitboxOffset.h = -0.4;
+
+        this.stateCounter = 0;
+        this.targetX = 0;
+        this.targetY = 0;
+
+    }
+    /** Activates the falling animation, which triggers on floor change */
+    fall() {
+        this.updateHitbox();
+        this.targetY = this.y;
+        this.y = -10;
+        this.solid = false;
+        this.yVel = 0.7;
+        this.state = 'fall';
+        this.animation = 'fall';
+        this.stateCounter = 0;
+        this.equipment.weapon.display = false;
+        this.shadow = false;
+    }
+    computeFalling(deltaTime) {
+        if (this.y + this.yVel * deltaTime > this.targetY) {
+            this.y = this.targetY;
+            this.state = 'broke'
+            this.animation = 'broke';
+            this.yVel = 0;
+            this.director.camera.shake = 10;
+        }
+    }
+    recoverState() {
+        this.stateCounter = 0;
+        this.state = 'normal';
+        this.animation = 'idle';
+        this.equipment.weapon.display = true;
+        this.shadow = true;
+        this.solid = true;
+    }
+    computeState(deltaTime) {
+        switch (this.state) {
+            case 'normal':
+                this.resolveInput();
+                this.updatePosition(deltaTime);
+                this.updateHitbox();
+                break;
+            case 'fall':
+                this.computeFalling(deltaTime);
+                this.updatePosition(deltaTime);
+                break;
+            case 'broke':
+                this.stateCounter += deltaTime;
+                if (this.stateCounter > 60) {
+                    this.recoverState();
+                }
+                break;
+        }
     }
     compute(deltaTime, environment) {
         this.updateSprite(deltaTime);
-        this.resolveInput();
-        this.updatePosition(deltaTime);
-        this.updateHitbox();
+
+        this.computeState(deltaTime);
+
         this.checkCollisions(this, environment, false, false)
         this.equipment.compute(deltaTime, environment);
 

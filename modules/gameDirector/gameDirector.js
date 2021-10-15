@@ -33,22 +33,9 @@ class GameDirector {
      */
     initialize(meta, canvas) {
         this.mouse = new Mouse(canvas, meta, this.camera);
-        let player = new Player(7.5, 7.5, this);
+        let player = new Player(0, 0, this);
         this.player = player;
         this.changeFloor(meta)
-    }
-    changeFloor(meta) {
-        this.floor += 1;
-        this.map.generate();
-        this.currentLevel = this.map.findStart();
-        this.loadCurrentLevel(meta.tilesWidth, meta.tilesHeight);
-
-        this.movePlayerToCurrentLevel();
-    }
-    movePlayerToCurrentLevel() {
-        this.player.x = this.level.levelW / 2;
-        this.player.y = this.level.levelH / 2;
-        this.level.entities.push(this.player)
     }
     /** Deletes removed entities */
     garbageCleaner(garbage) {
@@ -132,16 +119,22 @@ class GameDirector {
         this.player.userInterface.render(context, tilesize, 2);
     }
 
-    loadCurrentLevel(tilesWidth, tilesHeight) {
-        this.level = this.map.levels[this.currentLevel[0]][this.currentLevel[1]];
-        this.level.levelX = (tilesWidth - this.level.levelW) / 2;
-        this.level.levelY = (tilesHeight - this.level.levelH) / 2;
-    }
-    changeLevel(dir, meta) {
-        // !!! PROVISIONAL !!!
+    changeFloor(meta) {
+        this.floor += 1;
+        this.map.generate();
+        this.currentLevel = this.map.findStart();
 
+        this.changeLevel([0, 0], meta, true)
+
+        this.player.fall();
+    }
+    changeLevel(dir, meta, floorChange = false) {
+        // !!! PROVISIONAL !!!
+        console.log("levelChange triggered")
         // Removes player from current level
-        this.level.entities.splice(this.level.entities.indexOf(this.player), 1);
+        if (this.level) {
+            this.level.entities.splice(this.level.entities.indexOf(this.player), 1);
+        }
 
         this.currentLevel[0] += dir[0];
         this.currentLevel[1] += dir[1];
@@ -151,6 +144,11 @@ class GameDirector {
 
         this.loadCurrentLevel(meta.tilesWidth, meta.tilesHeight);
         this.level.entities.push(this.player);
+        if (floorChange) {
+            this.player.x = this.level.levelW / 2;
+            this.player.y = this.level.levelH / 2;
+            return;
+        }
         for (let portal of this.level.portals) {
             /* If the portal matches the opposite of the entered portal, 
             teleport the player here. 
@@ -164,6 +162,11 @@ class GameDirector {
             }
         }
 
+    }
+    loadCurrentLevel(tilesWidth, tilesHeight) {
+        this.level = this.map.levels[this.currentLevel[0]][this.currentLevel[1]];
+        this.level.levelX = (tilesWidth - this.level.levelW) / 2;
+        this.level.levelY = (tilesHeight - this.level.levelH) / 2;
     }
     /** Sorts entities on ascending vertical position, background elements goes first */
     sortEntities() {

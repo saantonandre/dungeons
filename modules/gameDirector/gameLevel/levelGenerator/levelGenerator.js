@@ -236,14 +236,14 @@ export class LevelGenerator {
             throw new Error("Cannot generate a floor portal, too many links!")
         }
         let possibleLinks = [
-            [1, 0],
-            [0, 1],
-            [-1, 0],
-            [0, -1]
+            [1, -0],
+            [-0, 1],
+            [-1, -0],
+            [-0, -1]
         ]
         for (let i = possibleLinks.length - 1; i >= 0; i--) {
             for (let j = 0; j < this.links.length; j++) {
-                if (possibleLinks[i] == this.links[j]) {
+                if (possibleLinks[i][0] == this.links[j][0] && possibleLinks[i][1] == this.links[j][1]) {
                     possibleLinks.splice(i, 1);
                     break;
                 }

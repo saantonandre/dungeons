@@ -10,6 +10,7 @@ export class Entity {
         this.xVel = 0;
         this.yVel = 0;
 
+        this.display = true;
         // The scope in which this entity is enclosed to
         // this.environment = []; deprecated
 
@@ -167,7 +168,7 @@ export class Entity {
     }
     renderSprite(context, tilesize, ratio, camera, rot = false) {
 
-        if (this.removed) {
+        if (this.removed || !this.display) {
             // If the entity is removed, don't bother rendering
             return;
         }
