@@ -1,4 +1,3 @@
-import * as Physics from "../../physics/physics.js";
 import { Entity } from "../../entity/entity.js";
 
 /** Item prototype */
@@ -7,13 +6,10 @@ export class Item extends Entity {
         super(0, 0);
         this.shadow = true;
         this.owner = owner;
-        this.Physics = Physics;
         this.solid = false;
         this.type = "item";
         this.flying = false;
-        this.description = `Item description. 
-        This is an item description. Should have searched for a 
-        Lorem Ipsum but felt creative enough to do this myself.`
+        this.description = "Item description. This is an item description. Should have searched for a Lorem Ipsum but felt creative enough to do this myself."
         // Placeholder animation
         this.setAnimation("idle", [7], [10])
 

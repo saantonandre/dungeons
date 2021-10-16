@@ -123,13 +123,13 @@ export class Player extends Entity {
         }
     }
     compute(deltaTime, environment) {
+        this.equipment.compute(deltaTime, environment);
+        this.inventory.compute(deltaTime);
         this.updateSprite(deltaTime);
 
         this.computeState(deltaTime);
 
         this.checkCollisions(this, environment, false, false)
-        this.equipment.compute(deltaTime, environment);
-        this.inventory.compute(deltaTime);
 
         if (this.damaged > 0) {
             this.damaged -= deltaTime;

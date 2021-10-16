@@ -1,4 +1,3 @@
-import { spritesheet } from "../../resourceManager.js"
 export class EnemyHpBar {
     constructor(source) {
         this.spriteX = [
@@ -8,6 +7,7 @@ export class EnemyHpBar {
             [0, 0, 0]
         ];
         this.source = source;
+        this.sheet = this.source.sheet;
         this.source.hasHpBar = true;
         this.w = 1;
         this.h = 1;
@@ -30,7 +30,7 @@ export class EnemyHpBar {
     render(context, tilesize, ratio, camera) {
         // Renders the damaged bar
         context.drawImage(
-            spritesheet,
+            this.sheet,
             this.spriteX[0][2] * tilesize,
             this.spriteY[0][2] * tilesize,
             this.w * tilesize * this.prevRatio,
@@ -43,7 +43,7 @@ export class EnemyHpBar {
 
         // Renders the bar
         context.drawImage(
-            spritesheet,
+            this.sheet,
             this.spriteX[0][1] * tilesize,
             this.spriteY[0][1] * tilesize,
             this.w * tilesize * this.wRatio,
@@ -56,7 +56,7 @@ export class EnemyHpBar {
 
         // Renders the contour
         context.drawImage(
-            spritesheet,
+            this.sheet,
             this.spriteX[0][0] * tilesize,
             this.spriteY[0][0] * tilesize,
             this.w * tilesize,

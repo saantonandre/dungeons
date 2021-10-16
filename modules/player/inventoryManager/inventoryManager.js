@@ -6,6 +6,7 @@ export class InventoryManager {
         this.slotsAmount = 18;
         this.slotsUnlocked = 9;
         this.display = false;
+        this.newItemCollected = false;
         this.initialize();
     }
     initialize() {
@@ -21,6 +22,7 @@ export class InventoryManager {
             }
             if (slot.isEmpty) {
                 slot.item = item;
+                this.newItemCollected = true;
                 return true;
             }
         }

@@ -8,12 +8,18 @@ export class Sprite {
         this.sheet = spritesheet;
         this.animation = "idle";
         this.animations = {};
+        this.display = true;
         this.frame = 0;
         this.left = 0;
         this.frameCounter = 0;
         this.setAnimation("idle", [0], [0]);
 
 
+    }
+    loadAnimation(label) {
+        this.frameCounter = 0;
+        this.frame = 0;
+        this.animation = label;
     }
     onAnimationEnd() {
         // What happens after the current animation ends
@@ -46,10 +52,9 @@ export class Sprite {
         }
 
     }
-    renderSprite(context, tilesize, ratio, camera, rot = false) {
+    renderSprite(context, tilesize, ratio, camera = { x: 0, y: 0 }, rot = false) {
 
         if (!this.display) {
-            // If the entity is removed, don't bother rendering
             return;
         }
 
