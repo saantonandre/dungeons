@@ -38,6 +38,12 @@ export class Item extends Entity {
 
         this.owner = {};
     }
+    /** Removes itself from the entities array */
+    store() {
+        this.scheduledDeletion = true;
+        this.animations['idle'].offsetX = 0;
+        this.animations['idle'].offsetY = 0;
+    }
     /** Makes the item appear levitating */
     levitate(deltaTime) {
         this.animations["idle"].offsetY = Math.sin(this.sinIncrease += this.sinVel * deltaTime) / 10;
@@ -45,5 +51,6 @@ export class Item extends Entity {
     compute(deltaTime) {
         this.levitate(deltaTime);
         this.updatePosition(deltaTime);
+        this.updateHitbox();
     }
 }

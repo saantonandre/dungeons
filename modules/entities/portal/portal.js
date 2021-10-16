@@ -77,7 +77,6 @@ export class Portal extends Entity {
         if (!this.solid && gameDirector.player.state == 'normal' && this.Physics.collided(this, gameDirector.player)) {
             // Move player to the linked level
             gameDirector.changeLevel(this.dir, meta);
-            console.log("triggered by portal")
             return true;
         }
     }
@@ -114,7 +113,6 @@ export class FloorPortal extends Portal {
         if (!this.solid && gameDirector.player.state == 'normal' && this.Physics.collided(this, gameDirector.player)) {
             // Move player to the linked level
             gameDirector.changeFloor(meta);
-            console.log("triggered by floor portal")
             return true;
         }
     }

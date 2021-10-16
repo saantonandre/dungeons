@@ -64,7 +64,7 @@ class GameDirector {
         let garbage = [];
         let loadLevelCall = false;
         for (let entity of this.level.entities) {
-            if (entity.removed) {
+            if (entity.removed || entity.scheduledDeletion) {
                 garbage.push(this.level.entities.indexOf(entity));
                 continue;
             }
@@ -133,7 +133,6 @@ class GameDirector {
     }
     changeLevel(dir, meta, floorChange = false) {
         // !!! PROVISIONAL !!!
-        console.log("levelChange triggered")
         // Removes player from current level
         if (this.level) {
             this.level.entities.splice(this.level.entities.indexOf(this.player), 1);
@@ -174,10 +173,14 @@ class GameDirector {
     /** Sorts entities on ascending vertical position, background elements goes first */
     sortEntities() {
         this.level.entities.sort(function(a, b) {
-            if (b.background) {
-                return 0;
-            }
             return (a.y + a.h) - (b.y + b.h);
+        })
+        this.level.entities.sort(function(a, b) {
+            if (!a.background && b.background) {
+                return 1;
+            } else {
+                return -1;
+            }
         })
     }
     /** Renders the floor (ground level) tiles */

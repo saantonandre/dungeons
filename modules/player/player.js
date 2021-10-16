@@ -35,6 +35,7 @@ export class Player extends Entity {
 
         this.attacking = false;
 
+        this.hasItemInteraction = true;
 
 
         /** Invincibility frames amount */
@@ -128,6 +129,7 @@ export class Player extends Entity {
 
         this.checkCollisions(this, environment, false, false)
         this.equipment.compute(deltaTime, environment);
+        this.inventory.compute(deltaTime);
 
         if (this.damaged > 0) {
             this.damaged -= deltaTime;
