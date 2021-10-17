@@ -202,12 +202,14 @@ export class Player extends Entity {
             this.yVel /= 1.42;
         }
 
-        if (this.controls.lClickDown) {
-            this.attack();
-        }
+        if (!this.director.mouse.absolute.hoverUI) {
+            if (this.controls.lClickDown) {
+                this.attack();
+            }
 
-        if (this.controls.rClickDown) {
-            this.attack(true);
+            if (this.controls.rClickDown) {
+                this.attack(true);
+            }
         }
     }
 }

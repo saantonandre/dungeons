@@ -81,8 +81,52 @@ export class TextComponent {
         this.baseline = baseline;
         this.fontSize = 7;
         this.font = 'Consolas, monaco, monospace';
+        this.stroke = false;
         this.strokeColor = '#2c354d';
         this.strokeWidth = 0.3;
 
+    }
+    render(context, tilesize, ratio) {
+        if (this.stroke) {
+            context.lineWidth = this.strokeWidth * ratio;
+            context.strokeStyle = this.strokeColor;
+        }
+        context.textBaseline = this.baseline;
+        context.textAlign = this.align;
+        context.fillStyle = this.color;
+        context.font = 'bold ' + Math.round(this.fontSize * ratio) + 'px ' + this.font;
+        if (typeof this.content !== "string") {
+            // Content is split into an array of lines
+            for (let i = 0; i < this.content.length; i++) {
+                if (this.stroke) {
+
+                    context.strokeText(
+                        this.content[i],
+                        this.x * tilesize * ratio,
+                        (this.y * tilesize + this.fontSize * i) * ratio
+                    );
+                }
+                context.fillText(
+                    this.content[i],
+                    this.x * tilesize * ratio,
+                    (this.y * tilesize + this.fontSize * i) * ratio
+                );
+            }
+
+        } else {
+            if (this.stroke) {
+
+                context.strokeText(
+                    this.content,
+                    this.x * tilesize * ratio,
+                    this.y * tilesize * ratio
+                );
+            }
+            context.fillText(
+                this.content,
+                this.x * tilesize * ratio,
+                this.y * tilesize * ratio
+            )
+        }
     }
 }

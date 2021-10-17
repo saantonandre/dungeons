@@ -9,6 +9,9 @@ export class Item extends Entity {
         this.solid = false;
         this.type = "item";
         this.flying = false;
+
+        this.stackable = true;
+
         this.description = "Item description. This is an item description. Should have searched for a Lorem Ipsum but felt creative enough to do this myself."
         // Placeholder animation
         this.setAnimation("idle", [7], [10])

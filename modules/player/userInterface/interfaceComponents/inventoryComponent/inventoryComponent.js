@@ -32,6 +32,54 @@ export class InventoryComponent extends InterfaceComponent {
         }
     }
 }
+class Icon extends Sprite {
+    constructor(manager, x, y) {
+        super(x, y);
+        this.manager = manager;
+        this.animation = 'idle';
+        this.setAnimation("idle", [23], [26]);
+        this.setAnimation("bump", [23, 23, 23, 23], [28, 29, 30, 31]);
+        this.animations['bump'].slowness = 5;
+        this.setAnimation("highlight", [23], [27]);
+        this.active = false;
+    }
+    handleHover(controls) {
+        if (controls.lClickDown) {
+            if (this.animation !== 'idle') {
+                this.loadAnimation('idle');
+                this.active = !this.active
+            }
+        } else {
+            this.loadAnimation('highlight');
+        }
+    }
+    onAnimationEnd() {
+        switch (this.animation) {
+            case 'highlight':
+                this.loadAnimation('idle');
+                break;
+            case 'bump':
+                this.loadAnimation('idle');
+                break;
+        }
+    }
+    compute(mouse, controls, deltaTime) {
+        this.updateSprite(deltaTime);
+        if (this.manager.newItemCollected) {
+            this.manager.newItemCollected = false;
+            this.loadAnimation("bump");
+        }
+        if (pointSquareCol(mouse, this)) {
+            mouse.hoverUI = true;
+            this.handleHover(controls)
+        }
+
+
+    }
+    render(context, tilesize, baseRatio) {
+        this.renderSprite(context, tilesize, baseRatio);
+    }
+}
 class InventoryGrid {
     constructor(x, y, manager) {
         this.x = x;
@@ -79,19 +127,35 @@ class ItemSlot extends Sprite {
         this.setAnimation('idle', [26], [21]);
         this.setAnimation('highlight', [26], [22]);
         this.setAnimation('locked', [26], [23]);
+
+        this.amount = new TextComponent(this.x + this.w - 0.1, this.y + 0.1);
+        this.amount.align = 'right';
+        this.amount.color = '#f5ffe8';
+        this.amount.baseline = 'top';
+        this.amount.fontSize = 6;
+        this.amount.stroke = true;
+        this.amount.strokeColor = "#14182e";
+        this.amount.strokeWidth = 1;
+
         if (this.slotRef.locked) {
             this.animation = 'locked';
         }
+    }
+    handleHover() {
+
+        if (!this.slotRef.isEmpty) {
+            this.active = true;
+        }
+        this.animation = "highlight";
     }
     compute(mouse) {
         if (this.slotRef.locked) {
             return;
         }
+        this.amount.content = "" + this.slotRef.amount;
         if (pointSquareCol(mouse, this)) {
-            if (!this.slotRef.isEmpty) {
-                this.active = true;
-            }
-            this.animation = "highlight";
+            this.handleHover();
+            mouse.hoverUI = true;
         } else {
             this.active = false;
             this.animation = "idle";
@@ -105,6 +169,10 @@ class ItemSlot extends Sprite {
             this.slotRef.item.x = this.x;
             this.slotRef.item.y = this.y;
             this.slotRef.item.renderSprite(context, tilesize, baseRatio);
+            context.globalAlpha = 1;
+            if (this.slotRef.amount > 1) {
+                this.amount.render(context, tilesize, baseRatio);
+            }
         }
     }
 }
@@ -177,80 +245,10 @@ class ItemTooltip {
         )
 
         this.sourceContent.content = "Source: " + item.sourceName.toUpperCase();
-        this.renderText(context, tilesize, ratio, this.nameContent);
-        this.renderText(context, tilesize, ratio, this.descriptionContent);
-        this.renderText(context, tilesize, ratio, this.sourceContent);
+        this.nameContent.render(context, tilesize, ratio);
+        this.descriptionContent.render(context, tilesize, ratio);
+        this.sourceContent.render(context, tilesize, ratio);
         this.renderThumb(context, tilesize, ratio, item)
-    }
-    renderText(context, tilesize, ratio, text) {
-        context.textBaseline = text.baseline;
-        context.textAlign = text.align;
-        context.fillStyle = text.color;
-        context.font = 'bold ' + Math.round(text.fontSize * ratio) + 'px ' + text.font;
-        if (typeof text.content !== "string") {
-            // Content is split into an array of lines
-            for (let i = 0; i < text.content.length; i++) {
-                context.fillText(
-                    text.content[i],
-                    text.x * tilesize * ratio,
-                    (text.y * tilesize + text.fontSize * i) * ratio
-                );
-            }
-
-        } else {
-            context.fillText(
-                text.content,
-                text.x * tilesize * ratio,
-                text.y * tilesize * ratio
-            );
-        }
-    }
-}
-class Icon extends Sprite {
-    constructor(manager, x, y) {
-        super(x, y);
-        this.manager = manager;
-        this.animation = 'idle';
-        this.setAnimation("idle", [23], [26]);
-        this.setAnimation("bump", [23, 23, 23, 23], [28, 29, 30, 31]);
-        this.animations['bump'].slowness = 5;
-        this.setAnimation("highlight", [23], [27]);
-        this.active = false;
-    }
-    handleHover(controls) {
-        if (controls.lClickDown) {
-            if (this.animation !== 'idle') {
-                this.loadAnimation('idle');
-                this.active = !this.active
-            }
-        } else {
-            this.loadAnimation('highlight');
-        }
-    }
-    onAnimationEnd() {
-        switch (this.animation) {
-            case 'highlight':
-                this.loadAnimation('idle');
-                break;
-            case 'bump':
-                this.loadAnimation('idle');
-                break;
-        }
-    }
-    compute(mouse, controls, deltaTime) {
-        this.updateSprite(deltaTime);
-        if (this.manager.newItemCollected) {
-            this.manager.newItemCollected = false;
-            this.loadAnimation("bump");
-        }
-        if (pointSquareCol(mouse, this)) {
-            this.handleHover(controls)
-        }
-
-
-    }
-    render(context, tilesize, baseRatio) {
-        this.renderSprite(context, tilesize, baseRatio);
     }
 }
 

@@ -25,6 +25,8 @@ export class UserInterface {
         this.settingsComponent = new SettingsComponent(this.source, 23.5, 0.3);
     }
     compute(deltaTime) {
+        this.source.director.mouse.absolute.hoverUI = false;
+
         this.hpComponent.compute(deltaTime)
         this.manaComponent.compute(deltaTime)
         this.expComponent.compute(deltaTime)

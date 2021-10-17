@@ -5,9 +5,11 @@ export class Mouse {
         this.canvas = canvas;
         this.meta = meta;
         this.camera = camera;
+        /** Defines if the mouse is hovering the ui */
         this.absolute = {
             x: 0,
-            y: 0
+            y: 0,
+            hoverUI: false
         }
         document.addEventListener("mousemove", this.updatePos)
     }
