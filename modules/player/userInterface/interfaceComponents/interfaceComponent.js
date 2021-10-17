@@ -86,6 +86,9 @@ export class TextComponent {
         this.strokeWidth = 0.3;
 
     }
+    canvasFont(ratio) {
+        return 'bold ' + Math.round(this.fontSize * ratio) + 'px ' + this.font
+    }
     render(context, tilesize, ratio) {
         if (this.stroke) {
             context.lineWidth = this.strokeWidth * ratio;
@@ -94,7 +97,7 @@ export class TextComponent {
         context.textBaseline = this.baseline;
         context.textAlign = this.align;
         context.fillStyle = this.color;
-        context.font = 'bold ' + Math.round(this.fontSize * ratio) + 'px ' + this.font;
+        context.font = this.canvasFont(ratio);
         if (typeof this.content !== "string") {
             // Content is split into an array of lines
             for (let i = 0; i < this.content.length; i++) {

@@ -196,6 +196,7 @@ class ItemTooltip {
         this.descriptionContent = new TextComponent(this.descriptionBox.x, this.descriptionBox.y);
         this.descriptionContent.align = 'left';
         this.descriptionContent.color = '#dfe0e8';
+        this.descriptionContent.fontSize = 6.5;
         this.descriptionContent.baseline = 'top';
         this.sourceContent = new TextComponent(this.x + this.w - 0.1, this.y + this.h - 0.1);
         this.sourceContent.align = 'right';
@@ -203,6 +204,18 @@ class ItemTooltip {
         this.sourceContent.fontSize = 6;
         this.sourceContent.baseline = 'bottom';
 
+    }
+    /** Changes the nameContent color based on item rarity */
+    rarityColorChange(item) {
+        switch (item.rarity) {
+            case "rare":
+                this.nameContent.color = "#ffc2a1";
+                break;
+            case "common":
+                this.nameContent.color = "#f5ffe8";
+
+                break;
+        }
     }
     renderBox(context, tilesize, ratio) {
         context.globalAlpha = 0.6;
@@ -235,12 +248,13 @@ class ItemTooltip {
     render(context, tilesize, ratio, item) {
         this.renderBox(context, tilesize, ratio)
         this.nameContent.content = item.name;
-
+        this.rarityColorChange(item);
         this.descriptionContent.content = item.description;
         // Breaks down the description to multiple lines 
         this.descriptionContent.content = getLines(
             context,
             this.descriptionContent.content,
+            this.descriptionContent.canvasFont(ratio),
             this.descriptionBox.w * tilesize * ratio
         )
 
@@ -271,7 +285,8 @@ function pointSquareCol(point, sq) {
     return false;
 }
 /** Returns an array of lines based on the maximum available width */
-function getLines(ctx, text, maxWidth) {
+function getLines(ctx, text, font, maxWidth) {
+    ctx.font = font;
     let words = text.split(" ");
     let lines = [];
     let currentLine = words[0];

@@ -101,25 +101,25 @@ class GameDirector {
      * - Renders the hp bars
      * - Renders the UI
      */
-    render(context, tilesize, ratio) {
+    render(context, meta) {
         this.sortEntities();
-        this.renderFloor(context, tilesize, ratio);
+        this.renderFloor(context, meta.tilesize, meta.ratio);
 
         //(context, tilesize, ratio, offsetX, offsetY)
         for (let entity of this.level.entities) {
-            entity.renderShadow(context, tilesize, ratio, this.camera);
+            entity.renderShadow(context, meta.tilesize, meta.ratio, this.camera);
         }
         for (let entity of this.level.entities) {
-            entity.render(context, tilesize, ratio, this.camera);
+            entity.render(context, meta.tilesize, meta.ratio, this.camera);
             /** Hitbox rendering */
             //entity.renderHitbox(context, tilesize, ratio, this.camera)
         }
         for (let entity of this.level.entities) {
             if (entity.hasHpBar) {
-                entity.hpBar.render(context, tilesize, ratio, this.camera);
+                entity.hpBar.render(context, meta.tilesize, meta.ratio, this.camera);
             }
         }
-        this.player.userInterface.render(context, tilesize, 2);
+        this.player.userInterface.render(context, meta.tilesize, meta.baseRatio);
     }
 
     changeFloor(meta) {

@@ -21,7 +21,7 @@ class Game {
         meta.compute(); // updates the deltaTime and the fps counter
         c.clear(); // clears the canvas
         gameDirector.compute(meta);
-        gameDirector.render(c, meta.tilesize, meta.ratio);
+        gameDirector.render(c, meta);
         //gameDirector.consoleRender();
         requestAnimationFrame(this.update);
     }

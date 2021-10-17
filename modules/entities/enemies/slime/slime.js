@@ -1,5 +1,5 @@
 import { Enemy } from "../../enemy/enemy.js";
-import { Goo } from "../../../items/items.js"
+import { Goo, Bone } from "../../../items/items.js"
 export class Slime extends Enemy {
     constructor(x, y) {
         super(x, y);
@@ -11,8 +11,12 @@ export class Slime extends Enemy {
         this.name = "slime";
 
         // Drops
-        //if(Math.random()*2|0){ }; 50 % chance
-        this.drops.push(new Goo(this));
+        if (Math.random() * 100 < 60) {
+            this.drops.push(new Goo(this));
+        };
+        if (Math.random() * 100 < 20) {
+            this.drops.push(new Bone(this));
+        };
         //Stats
         this.atk = 5;
         this.expValue = 2;
@@ -160,6 +164,7 @@ export class Slime extends Enemy {
         // What happens after the current animation ends
         switch (this.animation) {
             case "death":
+                this.display = false;
                 this.removed = true;
                 break;
         }

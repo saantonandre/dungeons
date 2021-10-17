@@ -10,6 +10,8 @@ export class Item extends Entity {
         this.type = "item";
         this.flying = false;
 
+        this.rarity = "common";
+
         this.stackable = true;
 
         this.description = "Item description. This is an item description. Should have searched for a Lorem Ipsum but felt creative enough to do this myself."
