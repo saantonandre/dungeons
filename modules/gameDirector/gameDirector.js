@@ -77,6 +77,9 @@ class GameDirector {
             entity.resolveCollisions(meta.deltaTime, this.level.entities);
         }
         for (let entity of this.level.entities) {
+            if (entity.hasDisplayName) {
+                entity.displayName.compute(this.mouse);
+            }
             if (entity.hasHpBar) {
                 entity.hpBar.compute(meta.deltaTime);
             }
@@ -115,6 +118,9 @@ class GameDirector {
             //entity.renderHitbox(context, tilesize, ratio, this.camera)
         }
         for (let entity of this.level.entities) {
+            if (entity.hasDisplayName) {
+                entity.displayName.render(context, meta.tilesize, meta.ratio, this.camera);
+            }
             if (entity.hasHpBar) {
                 entity.hpBar.render(context, meta.tilesize, meta.ratio, this.camera);
             }

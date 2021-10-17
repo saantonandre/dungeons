@@ -19,7 +19,7 @@ export class InventoryComponent extends InterfaceComponent {
     compute(deltaTime) {
         this.icon.compute(this.mouse, this.controls, deltaTime);
         if (this.icon.active) {
-            this.inventoryGrid.compute(this.mouse)
+            this.inventoryGrid.compute(this.mouse, this.controls)
         }
     }
     render(context, tilesize, baseRatio) {
@@ -84,6 +84,7 @@ class InventoryGrid {
     constructor(x, y, manager) {
         this.x = x;
         this.y = y;
+        this.manager = manager;
         this.items = manager.slots;
         this.columns = 3;
         this.hasActiveSlot = false;
@@ -99,15 +100,16 @@ class InventoryGrid {
                 new ItemSlot(
                     this.x + (i % this.columns),
                     this.y + ((i / this.columns) | 0),
-                    this.items[i]
+                    this.items[i],
+                    this.manager
                 )
             );
         }
     }
-    compute(mouse) {
+    compute(mouse, controls) {
         this.hasActiveSlot = false;
         for (let slot of this.slots) {
-            slot.compute(mouse);
+            slot.compute(mouse, controls);
             if (slot.active) {
                 this.hasActiveSlot = true;
                 this.activeSlot = slot;
@@ -121,8 +123,9 @@ class InventoryGrid {
     }
 }
 class ItemSlot extends Sprite {
-    constructor(x, y, slot) {
+    constructor(x, y, slot, manager) {
         super(x, y);
+        this.manager = manager;
         this.slotRef = slot;
         this.setAnimation('idle', [26], [21]);
         this.setAnimation('highlight', [26], [22]);
@@ -137,24 +140,52 @@ class ItemSlot extends Sprite {
         this.amount.strokeColor = "#14182e";
         this.amount.strokeWidth = 1;
 
+        this.dragging = false;
+
         if (this.slotRef.locked) {
             this.animation = 'locked';
         }
     }
-    handleHover() {
-
-        if (!this.slotRef.isEmpty) {
-            this.active = true;
-        }
-        this.animation = "highlight";
+    handleDrag(mouse) {
+        mouse.slot = this;
+        mouse.dragging = true;
+        this.dragging = true;
     }
-    compute(mouse) {
+    handleDrop(mouse) {
+        this.slotRef.transfer(mouse.slot.slotRef);
+        mouse.slot.dragging = false;
+        mouse.dragging = false;
+        this.dragging = false;
+
+    }
+    handleHover(mouse, controls) {
+        this.animation = "highlight";
+        if (mouse.dragging && !controls.lClickDown) {
+            // trigger drop
+            this.handleDrop(mouse);
+        }
+        if (this.slotRef.isEmpty) {
+            return;
+        }
+        this.active = true;
+        if (!mouse.dragging && controls.lClickDown) {
+            // trigger drag
+            this.handleDrag(mouse);
+        }
+    }
+    compute(mouse, controls) {
         if (this.slotRef.locked) {
             return;
         }
         this.amount.content = "" + this.slotRef.amount;
+
+        if (!this.slotRef.isEmpty) {
+            this.slotRef.item.x = this.x;
+            this.slotRef.item.y = this.y;
+        }
+
         if (pointSquareCol(mouse, this)) {
-            this.handleHover();
+            this.handleHover(mouse, controls);
             mouse.hoverUI = true;
         } else {
             this.active = false;
@@ -166,8 +197,7 @@ class ItemSlot extends Sprite {
         this.renderSprite(context, tilesize, baseRatio);
         context.globalAlpha = 1;
         if (!this.slotRef.isEmpty && !this.slotRef.locked) {
-            this.slotRef.item.x = this.x;
-            this.slotRef.item.y = this.y;
+            if (this.dragging) { context.globalAlpha = 0.4; }
             this.slotRef.item.renderSprite(context, tilesize, baseRatio);
             context.globalAlpha = 1;
             if (this.slotRef.amount > 1) {

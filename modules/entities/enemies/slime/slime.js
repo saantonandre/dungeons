@@ -17,6 +17,8 @@ export class Slime extends Enemy {
         if (Math.random() * 100 < 20) {
             this.drops.push(new Bone(this));
         };
+
+
         //Stats
         this.atk = 5;
         this.expValue = 2;
@@ -54,6 +56,7 @@ export class Slime extends Enemy {
         this.setAnimation("death", [0, 0, 0, 0], [21, 23, 25, 27])
         this.animations["death"].slowness = 8;
         this.animations["death"].h = 2;
+        this.animations["death"].offsetY = -0.5;
 
 
         this.hitboxOffset.y = 0.3;
@@ -80,7 +83,7 @@ export class Slime extends Enemy {
         let rotation, xTarget, yTarget;
         switch (this.state) {
             case "idle":
-                this.animation = "idle";
+                this.loadAnimation("idle");
                 this.xVel = 0;
                 this.yVel = 0;
 
@@ -95,7 +98,7 @@ export class Slime extends Enemy {
 
                 this.xVel = xTarget * this.speed;
                 this.yVel = yTarget * this.speed;
-                this.animation = "moving";
+                this.loadAnimation("moving");
                 this.fleeing -= deltaTime;
                 if (
                     this.Physics.distance(this, this.prey) > this.attackRange * 2 ||
@@ -106,7 +109,7 @@ export class Slime extends Enemy {
                 }
                 break;
             case "chase":
-                this.animation = "moving";
+                this.loadAnimation("moving");
                 rotation = this.Physics.getRotation(this, this.prey);
                 xTarget = Math.cos(rotation);
                 yTarget = Math.sin(rotation);
@@ -118,7 +121,7 @@ export class Slime extends Enemy {
                 }
                 break;
             case "windup":
-                this.animation = "windup";
+                this.loadAnimation("windup");
                 this.xVel = 0;
                 this.yVel = 0;
                 this.windupFrames -= deltaTime;
@@ -130,7 +133,7 @@ export class Slime extends Enemy {
                 }
                 break;
             case "damaged":
-                this.animation = "damaged";
+                this.loadAnimation("damaged");
                 this.xVel = 0;
                 this.yVel = 0;
                 this.windupFrames = 30;
@@ -141,7 +144,7 @@ export class Slime extends Enemy {
                 }
                 break;
             case "attack":
-                this.animation = "attack";
+                this.loadAnimation("attack");
                 rotation = this.targetRot;
                 xTarget = Math.cos(rotation);
                 yTarget = Math.sin(rotation);
@@ -156,7 +159,7 @@ export class Slime extends Enemy {
                 }
                 break;
             case "dead":
-                this.animation = "death";
+                this.loadAnimation("death");
                 break;
         }
     }

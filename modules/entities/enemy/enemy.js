@@ -1,5 +1,6 @@
 import { Entity } from "../../entity/entity.js";
 import { EnemyHpBar } from "./enemyHpBar.js";
+import { DisplayName } from "./displayName.js";
 export class Enemy extends Entity {
     constructor(x, y) {
         super(x, y);
@@ -11,9 +12,11 @@ export class Enemy extends Entity {
         this.dmgFrames = 0;
         this.dead = false;
         this.lv = 1;
+
         this.expValue = 1;
 
         this.hpBar = new EnemyHpBar(this);
+        this.displayName = new DisplayName(this);
         this.prey = false;
         this.immovable = true;
 
@@ -31,7 +34,7 @@ export class Enemy extends Entity {
             }
         }
     }
-    onHit(source) {
+    onHit(source, executioner) {
         this.state = "damaged";
         this.damaged = source.attackID;
         this.dmgFrames = 5;
@@ -40,12 +43,13 @@ export class Enemy extends Entity {
         //vfxsManager.create("DmgText", this, source.atk | 0);
         //vfxsManager.create("DmgVfx", this);
         if (this.hp <= 0) {
-            this.onDeath(source)
+            this.onDeath(executioner)
             //let recipient = source.owner || source;
             //recipient.expManager.update(this);
         }
     }
-    onDeath() {
+    onDeath(executioner) {
+        executioner.expManager.update(this);
         this.state = "dead";
         this.solid = false;
         this.xVel = 0;

@@ -50,6 +50,7 @@ export class Entity extends Sprite {
         this.hasItemInteraction = false;
 
         this.hasHpBar = false;
+        this.hasDisplayName = false;
         // this.slowness = 6; //replaced for 'this.animations[animation].slowness'
         this.col = {
             L: 0,

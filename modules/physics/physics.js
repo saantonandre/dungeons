@@ -193,9 +193,9 @@ export function assembleChunk(chunk, obj) {
     return assembledChunks;
 }
 
-export function collided(a, b) {
-    var square1 = a.hitbox ? a.hitbox : a;
-    var square2 = b.hitbox ? b.hitbox : b;
+export function collided(a, b, forceSpriteBox = false) {
+    var square1 = a.hitbox && !forceSpriteBox ? a.hitbox : a;
+    var square2 = b.hitbox && !forceSpriteBox ? b.hitbox : b;
     if (square1.x < square2.x + square2.w) {
         if (square1.x + square1.w > square2.x) {
             if (square1.y < square2.y + square2.h) {
@@ -208,9 +208,9 @@ export function collided(a, b) {
     return false;
 }
 
-export function pointSquareCol(point, sq) {
+export function pointSquareCol(point, sq, forceSpriteBox = false) {
     var square = sq;
-    if (sq.hitbox !== undefined) {
+    if (!forceSpriteBox && sq.hitbox !== undefined) {
         square = sq.hitbox;
     }
     if (point.x >= square.x) {

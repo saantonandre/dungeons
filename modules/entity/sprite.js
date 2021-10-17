@@ -16,10 +16,15 @@ export class Sprite {
 
 
     }
+    /** Returns true if the animation has changed, false otherwise */
     loadAnimation(label) {
+        if (this.animation === label) {
+            return false;
+        }
         this.frameCounter = 0;
         this.frame = 0;
         this.animation = label;
+        return true;
     }
     onAnimationEnd() {
         // What happens after the current animation ends

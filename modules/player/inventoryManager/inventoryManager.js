@@ -12,11 +12,16 @@ export class InventoryManager {
     initialize() {
         this.slots = [];
         for (let i = 0; i < this.slotsAmount; i++) {
-            this.slots.push(new ItemSlot(i >= this.slotsUnlocked));
+            this.slots.push(new ItemSlot(i, i >= this.slotsUnlocked));
         }
     }
-    hasSpace() {
-
+    sortSlots() {
+        this.slots.sort((a, b) => { return a.id - b.id })
+    }
+    swapItems(slot1, slot2) {
+        let temp = slot1.item;
+        slot1.item = slot2.item;
+        slot2.item = temp;
     }
     stackItem(item) {
         for (let slot of this.slots) {
@@ -67,16 +72,15 @@ export class InventoryManager {
     }
 }
 class ItemSlot {
-    constructor(locked = false) {
-        this.spriteX = 26;
-        this.spriteY = 21 + locked;
-        this.w = 1;
-        this.h = 1;
+    constructor(id, locked = false) {
+        this.id = id;
         this.hasItem = false;
         this.amount = 0;
         this.locked = locked;
         this.item = {
-            name: "empty"
+            name: "empty",
+            x: 0,
+            y: 0
         };
 
     }
@@ -84,6 +88,20 @@ class ItemSlot {
         this.amount += 1;
         this.item = item;
         this.hasItem = true
+    }
+    transfer(recipientSlot) {
+        if (this.locked || recipientSlot.locked) {
+            throw new Error("Cant place to a locked slot")
+        }
+        let tempItem = recipientSlot.item,
+            tempAmount = recipientSlot.amount;
+
+        recipientSlot.item = this.item;
+        recipientSlot.amount = this.amount;
+
+        this.item = tempItem;
+        this.amount = tempAmount;
+        return true;
     }
     get isEmpty() {
         // Check if there is an item in this slot

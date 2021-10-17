@@ -9,7 +9,9 @@ export class Mouse {
         this.absolute = {
             x: 0,
             y: 0,
-            hoverUI: false
+            hoverUI: false,
+            dragging: false,
+            slot: {}
         }
         document.addEventListener("mousemove", this.updatePos)
     }

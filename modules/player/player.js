@@ -1,5 +1,7 @@
 import { Entity } from "../entity/entity.js";
 
+import { ExpManager } from "./expManager.js";
+
 import { EquipmentManager } from "./equipmentManager/equipmentManager.js";
 import { InventoryManager } from "./inventoryManager/inventoryManager.js";
 import { UserInterface } from "./userInterface/userInterface.js";
@@ -26,6 +28,7 @@ export class Player extends Entity {
         this.controls = director.controls;
         this.maxExp = 10;
         this.exp = 0;
+        this.expManager = new ExpManager(this);
         this.lv = 1;
 
         this.atk = 2;
