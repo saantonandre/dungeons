@@ -47,7 +47,6 @@ export class Entity extends Sprite {
         this.checkCollisions = checkCollisions;
         this.Physics = Physics;
 
-        this.hasItemInteraction = false;
 
         this.hasHpBar = false;
         this.hasDisplayName = false;

@@ -38,8 +38,6 @@ export class Player extends Entity {
 
         this.attacking = false;
 
-        this.hasItemInteraction = true;
-
 
         /** Invincibility frames amount */
         this.damaged = 0;
@@ -77,7 +75,7 @@ export class Player extends Entity {
         this.state = 'fall';
         this.animation = 'fall';
         this.stateCounter = 0;
-        this.equipment.weapon.display = false;
+        //this.equipment.weapon.display = false;
         this.shadow = false;
     }
     computeFalling(deltaTime) {
@@ -93,13 +91,13 @@ export class Player extends Entity {
         this.stateCounter = 0;
         this.state = 'normal';
         this.animation = 'idle';
-        this.equipment.weapon.display = true;
+        //this.equipment.weapon.display = true;
     }
     computeBroke(deltaTime) {
         this.shadow = true;
         this.solid = true;
         this.animation = 'broke';
-        this.equipment.weapon.display = false;
+        //this.equipment.weapon.display = false;
         this.stateCounter += deltaTime;
         if (this.controls.left || this.controls.right || this.controls.up || this.controls.down || this.controls.lClickDown || this.controls.rClickDown) {
             this.recoverState();
@@ -146,16 +144,7 @@ export class Player extends Entity {
         this.equipment.render(context, tilesize, ratio, camera);
     }
     attack(special = false) {
-        /* 
-                if (this.attacking) {
-                    return;
-                } */
-        this.attacking = true;
-        if (special) {
-            this.equipment.weapon.special(this.director.mouse)
-        } else {
-            this.equipment.weapon.attack(this.director.mouse)
-        }
+        this.equipment.handleAttack(special, this.director.mouse);
     }
     onHit(source) {
         if (this.damaged > 0) {

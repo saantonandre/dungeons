@@ -8,32 +8,54 @@ export class InventoryComponent extends InterfaceComponent {
         this.w = 1;
         this.h = 1;
         this.color = '#fef3c0';
-        this.manager = this.source.inventory;
         this.mouse = this.source.director.mouse.absolute;
         this.controls = this.source.controls;
-        /** Active: 6, 9 */
-        this.icon = new Icon(this.manager, this.x, this.y);
-        this.inventoryGrid = new InventoryGrid(this.x, this.y + 1, this.manager);
-        this.itemTooltip = new ItemTooltip(this.x, this.y + 1);
+
+        this.icon = new Icon(this.x, this.y, this.source.inventory);
+        this.inventoryGrid = new InventoryGrid(this.x, this.y + 1, this.source.inventory, this.triggerSlot);
+
+        this.leftColumn = new LeftColumn(this.x - 1, this.y + 1, this.source.equipment, this.triggerSlot);
+
+        this.itemTooltip = new ItemTooltip(this.x - 1, this.y + 1);
+    }
+    triggerSlot = (slot) => {
+        if (slot.slotRef.item.equippable) {
+            if (slot.slotType === "inventorySlot") {
+                // Equip (move to equipment)
+                this.source.equipment[`${slot.slotRef.item.type}Slot`].swap(slot.slotRef);
+            } else {
+                // Unequip (move to inventory)
+                let freeSlot = this.source.inventory.searchFreeSlot();
+                if (freeSlot) {
+                    slot.slotRef.swap(freeSlot);
+                }
+            }
+        }
     }
     compute(deltaTime) {
         this.icon.compute(this.mouse, this.controls, deltaTime);
         if (this.icon.active) {
-            this.inventoryGrid.compute(this.mouse, this.controls)
+            this.inventoryGrid.compute(this.mouse, this.controls);
+            this.leftColumn.compute(this.mouse, this.controls);
         }
     }
     render(context, tilesize, baseRatio) {
         this.icon.render(context, tilesize, baseRatio);
         if (this.icon.active) {
             this.inventoryGrid.render(context, tilesize, baseRatio)
+            this.leftColumn.render(context, tilesize, baseRatio)
             if (this.inventoryGrid.hasActiveSlot) {
-                this.itemTooltip.render(context, tilesize, baseRatio, this.inventoryGrid.activeSlot.slotRef.item);
+                this.itemTooltip.render(context, tilesize, baseRatio, this.inventoryGrid.activeSlot.slotRef);
+            } else if (this.leftColumn.hasActiveSlot) {
+                this.itemTooltip.render(context, tilesize, baseRatio, this.leftColumn.activeSlot.slotRef);
             }
         }
     }
 }
+
+/** The bag shaped icon, handles clicks/hovering and activates the UI */
 class Icon extends Sprite {
-    constructor(manager, x, y) {
+    constructor(x, y, manager) {
         super(x, y);
         this.manager = manager;
         this.animation = 'idle';
@@ -80,28 +102,35 @@ class Icon extends Sprite {
         this.renderSprite(context, tilesize, baseRatio);
     }
 }
+
+/** The inventory grid displays inventory slots */
 class InventoryGrid {
-    constructor(x, y, manager) {
+    constructor(x, y, manager, triggerSlot) {
         this.x = x;
         this.y = y;
         this.manager = manager;
         this.items = manager.slots;
-        this.columns = 3;
+        /** Amount of grid columns */
+        this.w = 3;
+        this.h = (manager.slots.length / this.w) | 0;
         this.hasActiveSlot = false;
+        /** Slot hovered by the mouse */
         this.activeSlot = {
 
         };
         this.slots = [];
+        /** Casted by the inventory component defines what happens on slot right click */
+        this.triggerSlot = triggerSlot;
         this.initializeSlots();
     }
     initializeSlots() {
         for (let i = 0; i < this.items.length; i++) {
             this.slots.push(
                 new ItemSlot(
-                    this.x + (i % this.columns),
-                    this.y + ((i / this.columns) | 0),
+                    this.x + (i % this.w),
+                    this.y + ((i / this.w) | 0),
                     this.items[i],
-                    this.manager
+                    this.triggerSlot
                 )
             );
         }
@@ -122,10 +151,49 @@ class InventoryGrid {
         }
     }
 }
-class ItemSlot extends Sprite {
-    constructor(x, y, slot, manager) {
-        super(x, y);
+/** Contains the equipment slots and the sort/delete options */
+class LeftColumn {
+    constructor(x, y, manager, triggerSlot) {
+        this.x = x;
+        this.y = y;
         this.manager = manager;
+        /** Amount of grid columns */
+        this.hasActiveSlot = false;
+        /** Slot hovered by the mouse */
+        this.activeSlot = {
+
+        };
+        this.slots = [];
+        /** Casted by the inventory component defines what happens on slot right click */
+        this.triggerSlot = triggerSlot
+
+        this.helmetSlot = new EquipmentSlot(this.x, this.y, manager.helmetSlot, 'helmet', this.triggerSlot);
+        this.armorSlot = new EquipmentSlot(this.x, this.y + 1, manager.armorSlot, 'armor', this.triggerSlot);
+        this.weaponSlot = new EquipmentSlot(this.x, this.y + 2, manager.weaponSlot, 'weapon', this.triggerSlot);
+        this.accessorySlot = new EquipmentSlot(this.x, this.y + 3, manager.accessorySlot, 'accessory', this.triggerSlot);
+
+        this.slots.push(this.helmetSlot, this.armorSlot, this.weaponSlot, this.accessorySlot);
+    }
+    compute(mouse, controls) {
+        this.hasActiveSlot = false;
+        for (let slot of this.slots) {
+            slot.compute(mouse, controls);
+            if (slot.active) {
+                this.hasActiveSlot = true;
+                this.activeSlot = slot;
+            }
+        }
+    }
+    render(context, tilesize, baseRatio) {
+        for (let slot of this.slots) {
+            slot.render(context, tilesize, baseRatio)
+        }
+    }
+}
+class ItemSlot extends Sprite {
+    constructor(x, y, slot, triggerSlot) {
+        super(x, y);
+        this.slotType = 'inventorySlot';
         this.slotRef = slot;
         this.setAnimation('idle', [26], [21]);
         this.setAnimation('highlight', [26], [22]);
@@ -140,6 +208,11 @@ class ItemSlot extends Sprite {
         this.amount.strokeColor = "#14182e";
         this.amount.strokeWidth = 1;
 
+        this.rightClickListener = false;
+
+        /** Casted by the inventory component defines what happens on slot right click */
+        this.triggerSlot = triggerSlot
+
         this.dragging = false;
 
         if (this.slotRef.locked) {
@@ -152,11 +225,18 @@ class ItemSlot extends Sprite {
         this.dragging = true;
     }
     handleDrop(mouse) {
-        this.slotRef.transfer(mouse.slot.slotRef);
+        // To avoid swapping inventory items into equipment
+        if (!this.slotRef.isEmpty && mouse.slot.slotType === 'equipmentSlot' && this.slotRef.item.type !== mouse.slot.slotRef.item.type) {
+            return false;
+        }
+        this.slotRef.swap(mouse.slot.slotRef);
         mouse.slot.dragging = false;
         mouse.dragging = false;
         this.dragging = false;
 
+    }
+    handleRightClick() {
+        this.triggerSlot(this);
     }
     handleHover(mouse, controls) {
         this.animation = "highlight";
@@ -168,9 +248,13 @@ class ItemSlot extends Sprite {
             return;
         }
         this.active = true;
-        if (!mouse.dragging && controls.lClickDown) {
-            // trigger drag
-            this.handleDrag(mouse);
+        if (!mouse.dragging) {
+            if (controls.lClickDown) {
+                // trigger drag
+                this.handleDrag(mouse);
+            } else if (!this.rightClickListener && controls.rClickDown) {
+                this.handleRightClick();
+            }
         }
     }
     compute(mouse, controls) {
@@ -191,6 +275,7 @@ class ItemSlot extends Sprite {
             this.active = false;
             this.animation = "idle";
         }
+        this.rightClickListener = controls.rClickDown;
     }
     render(context, tilesize, baseRatio) {
         context.globalAlpha = 0.8;
@@ -198,7 +283,7 @@ class ItemSlot extends Sprite {
         context.globalAlpha = 1;
         if (!this.slotRef.isEmpty && !this.slotRef.locked) {
             if (this.dragging) { context.globalAlpha = 0.4; }
-            this.slotRef.item.renderSprite(context, tilesize, baseRatio);
+            this.slotRef.item.renderItem(this.x, this.y, context, tilesize, baseRatio);
             context.globalAlpha = 1;
             if (this.slotRef.amount > 1) {
                 this.amount.render(context, tilesize, baseRatio);
@@ -206,6 +291,43 @@ class ItemSlot extends Sprite {
         }
     }
 }
+class EquipmentSlot extends ItemSlot {
+    constructor(x, y, slot, type, triggerSlot) {
+        super(x, y, slot, triggerSlot);
+        this.slotType = 'equipmentSlot';
+        this.type = type;
+        switch (type) {
+            case 'helmet':
+                this.setAnimation('idle', [24], [21]);
+                this.setAnimation('highlight', [25], [21]);
+                break;
+            case 'armor':
+                this.setAnimation('idle', [24], [22]);
+                this.setAnimation('highlight', [25], [22]);
+                break;
+            case 'weapon':
+                this.setAnimation('idle', [24], [23]);
+                this.setAnimation('highlight', [25], [23]);
+                break;
+            case 'accessory':
+                this.setAnimation('idle', [24], [24]);
+                this.setAnimation('highlight', [25], [24]);
+                break;
+        }
+    }
+    handleDrop(mouse) {
+        if (mouse.slot.slotRef.item.type !== this.type) {
+            return false;
+        }
+        this.slotRef.swap(mouse.slot.slotRef);
+        mouse.slot.dragging = false;
+        mouse.dragging = false;
+        this.dragging = false;
+        return true;
+    }
+
+}
+/** Renders the processed details of the passed item */
 class ItemTooltip {
     constructor(x, y) {
         this.w = 8;
@@ -234,6 +356,29 @@ class ItemTooltip {
         this.sourceContent.fontSize = 6;
         this.sourceContent.baseline = 'bottom';
 
+    }
+    render(context, tilesize, ratio, slotRef) {
+        if (slotRef.isEmpty) {
+            return;
+        }
+        let item = slotRef.item;
+        this.renderBox(context, tilesize, ratio)
+        this.nameContent.content = item.name;
+        this.rarityColorChange(item);
+        this.descriptionContent.content = item.description;
+        // Breaks down the description to multiple lines 
+        this.descriptionContent.content = getLines(
+            context,
+            this.descriptionContent.content,
+            this.descriptionContent.canvasFont(ratio),
+            this.descriptionBox.w * tilesize * ratio
+        )
+
+        this.sourceContent.content = "Source: " + item.sourceName.toUpperCase();
+        this.nameContent.render(context, tilesize, ratio);
+        this.descriptionContent.render(context, tilesize, ratio);
+        this.sourceContent.render(context, tilesize, ratio);
+        this.renderThumb(context, tilesize, ratio, item)
     }
     /** Changes the nameContent color based on item rarity */
     rarityColorChange(item) {
@@ -267,32 +412,9 @@ class ItemTooltip {
     }
     renderThumb(context, tilesize, ratio, item) {
 
-        let xBackup = item.x;
-        let yBackup = item.y;
-        item.x = (this.x + this.w / 2 - 1) / 2;
-        item.y = (this.y + 0.5) / 2;
-        item.renderSprite(context, tilesize, ratio * 2);
-        item.x = xBackup;
-        item.y = yBackup;
-    }
-    render(context, tilesize, ratio, item) {
-        this.renderBox(context, tilesize, ratio)
-        this.nameContent.content = item.name;
-        this.rarityColorChange(item);
-        this.descriptionContent.content = item.description;
-        // Breaks down the description to multiple lines 
-        this.descriptionContent.content = getLines(
-            context,
-            this.descriptionContent.content,
-            this.descriptionContent.canvasFont(ratio),
-            this.descriptionBox.w * tilesize * ratio
-        )
-
-        this.sourceContent.content = "Source: " + item.sourceName.toUpperCase();
-        this.nameContent.render(context, tilesize, ratio);
-        this.descriptionContent.render(context, tilesize, ratio);
-        this.sourceContent.render(context, tilesize, ratio);
-        this.renderThumb(context, tilesize, ratio, item)
+        let x = this.x + this.w / 2 - 1;
+        let y = this.y + 0.7;
+        item.renderItem(x, y, context, tilesize, ratio, 2, 2);
     }
 }
 

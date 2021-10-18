@@ -10,7 +10,7 @@ export class SettingsComponent extends InterfaceComponent {
         this.h = 1;
         this.color = '#fef3c0';
         /** Active: 7, 9 */
-        this.icon = new SpriteComponent(7, 8, this.x, this.y, this.w, 1);
+        this.icon = new SpriteComponent(24, 26, this.x, this.y, this.w, 1);
     }
     compute(deltaTime) {}
     render(context, tilesize, baseRatio) {

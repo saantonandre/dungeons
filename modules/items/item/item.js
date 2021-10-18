@@ -7,11 +7,13 @@ export class Item extends Entity {
         this.shadow = true;
         this.owner = owner;
         this.solid = false;
+        this.name = "Item prototype";
         this.type = "item";
+        this.rarity = "common";
+        this.sourceName = "Unknown";
         this.flying = false;
 
-        this.rarity = "common";
-
+        this.equippable = false;
         this.stackable = true;
 
         this.description = "Item description. This is an item description. Should have searched for a Lorem Ipsum but felt creative enough to do this myself."
@@ -53,5 +55,13 @@ export class Item extends Entity {
         this.levitate(deltaTime);
         this.updatePosition(deltaTime);
         this.updateHitbox();
+    }
+}
+export class Equippable extends Item {
+    constructor(owner) {
+        super(owner);
+        this.equippable = true;
+        /** helmet, armor, weapon, accessory */
+        this.type = "";
     }
 }

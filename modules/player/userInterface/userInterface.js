@@ -4,7 +4,7 @@ import { ExpComponent } from './interfaceComponents/expComponent.js';
 import { FloorComponent } from './interfaceComponents/floorComponent.js';
 
 
-import { EquipmentComponent } from './interfaceComponents/equipmentComponent/equipmentComponent.js';
+import { SkillsComponent } from './interfaceComponents/skillsComponent/skillsComponent.js';
 import { InventoryComponent } from './interfaceComponents/inventoryComponent/inventoryComponent.js';
 import { SettingsComponent } from './interfaceComponents/settingsComponent/settingsComponent.js';
 
@@ -24,7 +24,7 @@ export class UserInterface {
         this.floorComponent = new FloorComponent(this.source, 17, 0.5);
 
 
-        this.equipmentComponent = new EquipmentComponent(this.source, 20.5, 0.3);
+        this.skillsComponent = new SkillsComponent(this.source, 20.5, 0.3);
         this.inventoryComponent = new InventoryComponent(this.source, 22, 0.3);
 
         this.settingsComponent = new SettingsComponent(this.source, 23.5, 0.3);
@@ -39,7 +39,7 @@ export class UserInterface {
         this.expComponent.compute(deltaTime)
         this.floorComponent.compute(deltaTime)
 
-        this.equipmentComponent.compute(deltaTime)
+        this.skillsComponent.compute(deltaTime)
         this.inventoryComponent.compute(deltaTime)
         this.settingsComponent.compute(deltaTime)
 
@@ -47,10 +47,10 @@ export class UserInterface {
     }
     handleDragging(context, tilesize, baseRatio) {
         if (this.mouse.dragging) {
-            this.mouse.slot.slotRef.item.x = this.mouse.x - this.mouse.slot.slotRef.item.w / 2;
-            this.mouse.slot.slotRef.item.y = this.mouse.y - this.mouse.slot.slotRef.item.h / 2;
+            let x = this.mouse.x - this.mouse.slot.slotRef.item.w / 2;
+            let y = this.mouse.y - this.mouse.slot.slotRef.item.h / 2;
             //context.globalAlpha = 0.6;
-            this.mouse.slot.slotRef.item.render(context, tilesize, baseRatio);
+            this.mouse.slot.slotRef.item.renderItem(x, y, context, tilesize, baseRatio);
             //context.globalAlpha = 1;
             if (!this.source.director.controls.lClickDown) {
                 this.mouse.dragging = false;
@@ -65,7 +65,7 @@ export class UserInterface {
         this.floorComponent.render(context, tilesize, baseRatio);
         this.floorComponent.render(context, tilesize, baseRatio);
 
-        this.equipmentComponent.render(context, tilesize, baseRatio);
+        this.skillsComponent.render(context, tilesize, baseRatio);
         this.inventoryComponent.render(context, tilesize, baseRatio);
         this.settingsComponent.render(context, tilesize, baseRatio);
         this.handleDragging(context, tilesize, baseRatio)

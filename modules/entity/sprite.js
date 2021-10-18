@@ -12,6 +12,7 @@ export class Sprite {
         this.frame = 0;
         this.left = 0;
         this.frameCounter = 0;
+        this.scheduleDeletion = false;
         this.setAnimation("idle", [0], [0]);
 
 
@@ -28,6 +29,20 @@ export class Sprite {
     }
     onAnimationEnd() {
         // What happens after the current animation ends
+    }
+    /** Renders the base sprite, not animated as a static icon, in a specific location */
+    renderItem(x, y, context, tilesize, ratio, w = 1, h = 1) {
+        context.drawImage(
+            this.sheet, // source of the sprite
+            this.animations['idle'].keyframesX[0][0] * tilesize, // x pos of the sprite
+            this.animations['idle'].keyframesY[0][0] * tilesize, // y pos of the sprite
+            this.animations['idle'].w * tilesize, // width of the sprite
+            this.animations['idle'].h * tilesize, // height of the sprite
+            x * tilesize * ratio, // x of the entity
+            y * tilesize * ratio, // y of the entity
+            w * tilesize * ratio, // width of the entity
+            h * tilesize * ratio // height of the entity
+        );
     }
     updateSprite(deltaTime) {
         this.frameCounter += deltaTime;
@@ -59,7 +74,7 @@ export class Sprite {
     }
     renderSprite(context, tilesize, ratio, camera = { x: 0, y: 0 }, rot = false) {
 
-        if (!this.display) {
+        if (!this.display || this.scheduleDeletion) {
             return;
         }
 

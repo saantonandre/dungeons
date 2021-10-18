@@ -1,8 +1,13 @@
-import { Item } from "../item/item.js";
-export class SwordPrototype extends Item {
+import { Equippable } from "../item/item.js";
+export class SwordPrototype extends Equippable {
     constructor(owner) {
-        super();
+        super(owner);
         this.owner = owner;
+        // To rework later, types and subtypes item -> consumable item -> weapon etc
+        this.type = "weapon";
+        this.subtype = "weapon";
+        this.name = "Sword Prototype";
+        this.description = "A wooden sword. It's pretty aerodynamic so you can launch it pretty far."
 
         this.w = 1;
         this.h = 1;
@@ -13,8 +18,6 @@ export class SwordPrototype extends Item {
         this.setAnimation("attack", [11], [5], 1);
 
         // Stats
-        this.type = "weapon";
-        this.name = "Sword prototype";
         this.weaponAtk = 2;
 
         /** The sword hitbox (line) */
