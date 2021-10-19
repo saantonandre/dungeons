@@ -19,7 +19,7 @@ export class ExpManager {
 
         this.owner.hp += this.owner.maxHp - maxHp;
         this.owner.mana += this.owner.maxMana - maxMana;
-        this.owner.atk = (this.owner.atk * 1.1 + 1) | 0;
+        this.owner.stats.atk *= 1.1 + 1;
 
         //vfxsManager.sparkleEntity(this.owner, 60, 1);
         //vfxsManager.create("StatusText", this.owner, "level UP");

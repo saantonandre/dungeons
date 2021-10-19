@@ -157,7 +157,6 @@ export class Entity extends Sprite {
 }
 class Stats {
     constructor(source) {
-        this.name = source.type;
         this.lv = 1;
         this.maxHp = 20;
         this.hp = this.maxHp;
@@ -166,5 +165,6 @@ class Stats {
         this.maxMana = 15;
         this.mana = this.maxMana;
         this.atk = 1;
+        this.atkSpeed = 1;
     }
 }

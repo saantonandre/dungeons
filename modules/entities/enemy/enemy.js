@@ -35,6 +35,7 @@ export class Enemy extends Entity {
         }
     }
     onHit(source, executioner) {
+        if (this.state === "dead") { return }
         this.state = "damaged";
         this.damaged = source.attackID;
         this.dmgFrames = 5;
@@ -43,6 +44,7 @@ export class Enemy extends Entity {
         //vfxsManager.create("DmgText", this, source.atk | 0);
         //vfxsManager.create("DmgVfx", this);
         if (this.hp <= 0) {
+            this.hp = 0;
             this.onDeath(executioner)
             //let recipient = source.owner || source;
             //recipient.expManager.update(this);

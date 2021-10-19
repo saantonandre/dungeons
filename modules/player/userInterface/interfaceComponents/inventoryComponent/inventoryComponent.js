@@ -22,6 +22,7 @@ export class InventoryComponent extends InterfaceComponent {
         if (slot.slotRef.item.equippable) {
             if (slot.slotType === "inventorySlot") {
                 // Equip (move to equipment)
+                console.log(`${slot.slotRef.item.type}Slot`)
                 this.source.equipment[`${slot.slotRef.item.type}Slot`].swap(slot.slotRef);
             } else {
                 // Unequip (move to inventory)

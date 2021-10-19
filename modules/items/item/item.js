@@ -2,15 +2,15 @@ import { Entity } from "../../entity/entity.js";
 
 /** Item prototype */
 export class Item extends Entity {
-    constructor(owner) {
+    constructor(source = { name: "unknown", x: 0, y: 0 }) {
         super(0, 0);
         this.shadow = true;
-        this.owner = owner;
+        this.source = source;
         this.solid = false;
         this.name = "Item prototype";
+        this.sourceName = this.source.name;
         this.type = "item";
         this.rarity = "common";
-        this.sourceName = "Unknown";
         this.flying = false;
 
         this.equippable = false;
@@ -30,16 +30,15 @@ export class Item extends Entity {
         this.friction = 0.98;
 
     }
-    /** Removes itself from the owner drops array and goes to the entities array */
+    /** Removes itself from the source drops array and goes to the entities array */
     dispatch(environment) {
-        this.x = this.owner.x;
-        this.y = this.owner.y;
+        this.x = this.source.x;
+        this.y = this.source.y;
 
         // Changes this environment
         environment.push(this)
         this.environment = environment;
 
-        this.owner = {};
     }
     /** Removes itself from the entities array */
     store() {
@@ -58,10 +57,14 @@ export class Item extends Entity {
     }
 }
 export class Equippable extends Item {
-    constructor(owner) {
-        super(owner);
+    constructor(source) {
+        super(source);
+        this.owner = source;
         this.equippable = true;
         /** helmet, armor, weapon, accessory */
         this.type = "";
+    }
+    equip(owner) {
+        this.owner = owner;
     }
 }

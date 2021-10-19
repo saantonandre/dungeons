@@ -20,6 +20,12 @@ export class Player extends Entity {
         this.facing = "r";
 
         /* STATS */
+        this.stats = {
+            hp: 10,
+            maxHp: 10,
+            atk: 1,
+            atkSpeed: 1
+        }
         this.maxHp = 10;
         this.hp = this.maxHp;
 
@@ -31,7 +37,6 @@ export class Player extends Entity {
         this.expManager = new ExpManager(this);
         this.lv = 1;
 
-        this.atk = 2;
 
         this.baseSpeed = 0.08;
         this.speed = this.baseSpeed;
@@ -65,6 +70,8 @@ export class Player extends Entity {
         this.targetY = 0;
 
     }
+    get atk() { return this.stats.atk + this.equipment.atk }
+    get atkSpeed() { return this.stats.atkSpeed * this.equipment.atkSpeed }
     /** Activates the falling animation, which triggers on floor change */
     fall() {
         this.updateHitbox();
@@ -77,6 +84,7 @@ export class Player extends Entity {
         this.stateCounter = 0;
         //this.equipment.weapon.display = false;
         this.shadow = false;
+        this.equipment.display = false;
     }
     computeFalling(deltaTime) {
         if (this.y + this.yVel * deltaTime > this.targetY) {
@@ -91,6 +99,7 @@ export class Player extends Entity {
         this.stateCounter = 0;
         this.state = 'normal';
         this.animation = 'idle';
+        this.equipment.display = true;
         //this.equipment.weapon.display = true;
     }
     computeBroke(deltaTime) {
@@ -124,7 +133,6 @@ export class Player extends Entity {
         }
     }
     compute(deltaTime, environment) {
-        this.equipment.compute(deltaTime, environment);
         this.inventory.compute(deltaTime);
         this.updateSprite(deltaTime);
 
@@ -132,6 +140,7 @@ export class Player extends Entity {
 
         this.checkCollisions(this, environment, false, false)
 
+        this.equipment.compute(deltaTime, environment);
         if (this.damaged > 0) {
             this.damaged -= deltaTime;
         }

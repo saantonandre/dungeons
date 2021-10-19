@@ -1,24 +1,24 @@
 import { Equippable } from "../item/item.js";
 export class SwordPrototype extends Equippable {
-    constructor(owner) {
-        super(owner);
-        this.owner = owner;
+    constructor(source) {
+        super(source);
+        this.owner = source;
         // To rework later, types and subtypes item -> consumable item -> weapon etc
         this.type = "weapon";
         this.subtype = "weapon";
         this.name = "Sword Prototype";
         this.description = "A wooden sword. It's pretty aerodynamic so you can launch it pretty far."
 
-        this.w = 1;
-        this.h = 1;
         this.setAnimation("idle", [11], [2]);
         this.setAnimation("idle", [11], [3], 1);
 
         this.setAnimation("attack", [11], [4]);
         this.setAnimation("attack", [11], [5], 1);
 
-        // Stats
-        this.weaponAtk = 2;
+        // Stats that will attach to the owner
+        this.stats.atk = 1;
+        this.stats.atkSpeed = 1;
+
 
         /** The sword hitbox (line) */
         this.lineHitbox = {
@@ -45,20 +45,18 @@ export class SwordPrototype extends Equippable {
         this.state = "idle";
 
         /** The speed of the sword during the attack */
-        this.attackSpeed = 1;
         this.reloadSpeed = 5;
-        this.attackRange = 1.5;
+        this.attackRange = 1.4;
         this.attackDuration = 160;
         this.attackCounter = 0;
 
         /** define if this is detached from the owner */
         this.detached = false;
 
-        this.specialSpeed = 0.6;
         this.friction = 0.98;
     }
     get atk() {
-        return this.state == "special" ? (this.owner.atk + this.weaponAtk) * 2 : (this.owner.atk + this.weaponAtk);
+        return this.owner.atk;
     }
     get centerX() {
         return (this.owner.x + this.owner.w / 2);
@@ -70,13 +68,30 @@ export class SwordPrototype extends Equippable {
         if (this.state !== 'idle') {
             return;
         }
-        this.state = "special";
-        this.animation = 'attack';
+        this.state = 'special';
         this.attackID = Math.random();
         let mousePlayerRot = this.Physics.getAngle(mousePos.x, mousePos.y, this.centerX, this.centerY)
+        this.owner.xVelExt = -Math.cos(mousePlayerRot) / 2;
+        this.owner.yVelExt = -Math.sin(mousePlayerRot) / 2;
         this.rot = this.baseRot + mousePlayerRot;
-        this.xVel = -Math.cos(this.rot - this.baseRot) * this.specialSpeed;
-        this.yVel = -Math.sin(this.rot - this.baseRot) * this.specialSpeed;
+        this.targetX = -Math.cos(mousePlayerRot) * this.attackRange;
+        this.targetY = -Math.sin(mousePlayerRot) * this.attackRange;
+    }
+    computeSpecial(deltaTime, environment) {
+        this.animation = 'attack';
+        this.owner.frame = 0;
+        this.owner.frameCounter = 0;
+        this.attackCounter += (this.attackDuration - this.attackCounter) / 10 + this.owner.atkSpeed * deltaTime;
+        if (this.attackCounter > this.attackDuration) {
+            this.attackCounter = this.attackDuration;
+            this.state = 'return';
+        }
+        this.offsetX = (this.targetX / this.attackDuration) * this.attackCounter;
+        this.offsetY = (this.targetY / this.attackDuration) * this.attackCounter;
+
+
+        this.updateLineHitbox();
+        this.checkLineCollisions(environment);
     }
     attack(mousePos) {
         if (this.state !== 'idle') {
@@ -88,7 +103,19 @@ export class SwordPrototype extends Equippable {
         this.rot = this.baseRot + mousePlayerRot;
         this.targetX = -Math.cos(mousePlayerRot) * this.attackRange;
         this.targetY = -Math.sin(mousePlayerRot) * this.attackRange;
+    }
+    computeAttack(deltaTime, environment) {
+        this.animation = 'attack';
+        this.attackCounter += (this.attackDuration - this.attackCounter) / 5 + this.owner.atkSpeed * deltaTime;
+        if (this.attackCounter > this.attackDuration) {
+            this.attackCounter = this.attackDuration;
+            this.state = 'return';
+        }
+        this.offsetX = (this.targetX / this.attackDuration) * this.attackCounter;
+        this.offsetY = (this.targetY / this.attackDuration) * this.attackCounter;
 
+        this.updateLineHitbox();
+        this.checkLineCollisions(environment);
     }
     computeState(deltaTime, environment) {
         switch (this.state) {
@@ -97,19 +124,12 @@ export class SwordPrototype extends Equippable {
                 break;
             case 'attack':
                 this.computeAttack(deltaTime, environment);
-                this.animation = 'attack';
                 break;
             case 'return':
                 this.computeReturn(deltaTime);
-                this.animation = 'idle';
                 break;
             case 'special':
                 this.computeSpecial(deltaTime, environment);
-                this.animation = 'attack';
-                break;
-            case 'impaled':
-                this.computeImpaled();
-                this.animation = "idle";
                 break;
         }
     }
@@ -137,85 +157,22 @@ export class SwordPrototype extends Equippable {
                         entity.yVelExt = (this.targetY - this.offsetY) / 10;
                     }
                 }
-                if (this.state == "special") {
-                    if (entity.solid && !entity.grounded && !(entity.type == "enemy")) {
-
-                        this.impale();
-                    }
-                }
             }
         }
 
     }
-    unequip() {
-        this.owner.equipment.weapon = this.owner.equipment.noWeapon;
-        this.owner.director.level.entities.push(this);
-    }
-    equip() {
-        this.offsetX = 0;
-        this.offsetY = 0;
-        this.owner.equipment.weapon = this;
-        this.owner.director.level.entities.splice(this.owner.director.level.entities.indexOf(this), 1);
-    }
-    impale() {
-        this.unequip();
-        this.xVel = 0;
-        this.yVel = 0;
-        this.detached = true;
-        this.state = 'impaled';
-        this.lineHitbox.x1 = this.x + this.w / 2 + (this.w / 2 * Math.cos(this.rot - this.baseRot));
-        this.lineHitbox.y1 = this.y + this.h / 2 + (this.h / 2 * Math.sin(this.rot - this.baseRot));
-    }
-    computeImpaled() {
-        if (this.Physics.lineSquareCol(this.lineHitbox, this.owner)) {
-            this.state = "idle";
-            this.detached = false;
-            this.equip();
-        }
-    }
-    computeSpecial(deltaTime, environment) {
-        this.detached = true;
-        this.xVel *= Math.pow(this.friction, deltaTime);
-        this.yVel *= Math.pow(this.friction, deltaTime);
-        if (Math.abs(this.xVel) + Math.abs(this.yVel) < 0.1) {
-            this.impale();
-        }
-        this.x += this.xVel * deltaTime;
-        this.y += this.yVel * deltaTime;
-
-        //this.lineHitbox.x1 = this.x + this.w / 2 + (this.w / 2 * Math.cos(this.rot - this.baseRot));
-        //this.lineHitbox.y1 = this.y + this.h / 2 + (this.h / 2 * Math.sin(this.rot - this.baseRot));
-        this.lineHitbox.x1 = this.centerX;
-        this.lineHitbox.y1 = this.centerY;
-        this.lineHitbox.x2 = this.x + this.w / 2 - (this.w / 2 * Math.cos(this.rot - this.baseRot));
-        this.lineHitbox.y2 = this.y + this.h / 2 - (this.h / 2 * Math.sin(this.rot - this.baseRot));
-        this.checkLineCollisions(environment);
-    }
-    computeAttack(deltaTime, environment) {
-        if (this.attackCounter === this.attackDuration) {
-            this.state = 'return';
-        }
-        this.attackCounter += (this.attackDuration - this.attackCounter) / 5 + this.attackSpeed * deltaTime * 2;
-        if (this.attackCounter > this.attackDuration) {
-            this.attackCounter = this.attackDuration;
-        }
-        this.offsetX = (this.targetX / this.attackDuration) * this.attackCounter;
-        this.offsetY = (this.targetY / this.attackDuration) * this.attackCounter;
-
-        this.updateLineHitbox();
-        this.checkLineCollisions(environment);
-    }
     /** Compute the returning to the owner */
     computeReturn(deltaTime) {
-        if (this.attackCounter === 0) {
+        this.animation = 'idle';
+        this.attackCounter -=
+            (this.attackDuration - this.attackCounter) / 5 +
+            this.reloadSpeed * this.owner.atkSpeed * deltaTime;
+
+        if (this.attackCounter < 0) {
+            //Returned to player
+            this.attackCounter = 0;
             this.rot = 0;
             this.state = 'idle';
-        }
-        this.attackCounter -=
-            ((this.attackCounter - this.attackDuration) * -1) / 5 +
-            this.attackSpeed * deltaTime * this.reloadSpeed;
-        if (this.attackCounter < 0) {
-            this.attackCounter = 0;
         }
         this.offsetX = (this.targetX / this.attackDuration) * this.attackCounter;
         this.offsetY = (this.targetY / this.attackDuration) * this.attackCounter;
@@ -236,18 +193,5 @@ export class SwordPrototype extends Equippable {
     }
     render(context, tilesize, ratio, camera) {
         this.renderSprite(context, tilesize, ratio, camera, this.rot);
-        /* 
-        context.fillRect(
-            (this.centerX - 0.1 + camera.x) * tilesize * ratio,
-            (this.centerY - 0.1 + camera.y) * tilesize * ratio,
-            0.2 * tilesize * ratio,
-            0.2 * tilesize * ratio,
-        )
-        context.fillRect(
-            (this.owner.director.mouse.x + camera.x) * tilesize * ratio,
-            (this.owner.director.mouse.y + camera.y) * tilesize * ratio,
-            0.2 * tilesize * ratio,
-            0.2 * tilesize * ratio,
-        ) */
     }
 }

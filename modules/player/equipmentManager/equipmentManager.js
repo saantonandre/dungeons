@@ -1,18 +1,38 @@
 // FOR TESTING
-import { SwordPrototype } from "../../items/swordPrototype/swordPrototype.js"
+import { SwordPrototype } from "../../items/prototypes/swordPrototype.js"
+import { HelmetPrototype } from "../../items/prototypes/helmetPrototype.js"
+import { ArmorPrototype } from "../../items/prototypes/armorPrototype.js"
 
 export class EquipmentManager {
-    constructor(source) {
-        this.owner = source;
+    constructor(owner) {
+        this.owner = owner;
 
-        this.weaponSlot = new EquipmentSlot("weapon");
-        this.weaponSlot.assign(new SwordPrototype(this.owner));
+        this.weaponSlot = new EquipmentSlot("weapon", this.owner);
+        this.weaponSlot.assign(new SwordPrototype());
 
-        this.helmetSlot = new EquipmentSlot("helmet");
+        this.helmetSlot = new EquipmentSlot("helmet", this.owner);
+        this.helmetSlot.assign(new HelmetPrototype());
 
-        this.armorSlot = new EquipmentSlot("armor");
+        this.armorSlot = new EquipmentSlot("armor", this.owner);
+        this.armorSlot.assign(new ArmorPrototype());
 
-        this.accessorySlot = new EquipmentSlot("accessory");
+        this.accessorySlot = new EquipmentSlot("accessory", this.owner);
+
+        this.display = true;
+    }
+    /** Combined attack power of the equipment */
+    get atk() {
+        return this.weaponSlot.item.stats.atk || 0 +
+            this.helmetSlot.item.stats.atk || 0 +
+            this.armorSlot.item.stats.atk || 0 +
+            this.accessorySlot.item.stats.atk || 0;
+    }
+    /** Combined attack power of the equipment */
+    get atkSpeed() {
+        return this.weaponSlot.item.stats.atkSpeed || 1 *
+            this.helmetSlot.item.stats.atkSpeed || 1 *
+            this.armorSlot.item.stats.atkSpeed || 1 *
+            this.accessorySlot.item.stats.atkSpeed || 1;
     }
     handleAttack(special, mouse) {
         if (this.weaponSlot.isEmpty) {
@@ -26,21 +46,23 @@ export class EquipmentManager {
         this.owner.attacking = true;
     }
     compute(deltaTime, environment) {
-        this.weaponSlot.compute(deltaTime, environment);
         this.helmetSlot.compute(deltaTime);
         this.armorSlot.compute(deltaTime);
         this.accessorySlot.compute(deltaTime);
+        this.weaponSlot.compute(deltaTime, environment);
     }
     render(context, tilesize, ratio, camera) {
-        this.weaponSlot.render(context, tilesize, ratio, camera);
-        this.helmetSlot.render(context, tilesize, ratio, camera);
+        if (!this.display) { return }
         this.armorSlot.render(context, tilesize, ratio, camera);
+        this.helmetSlot.render(context, tilesize, ratio, camera);
         this.accessorySlot.render(context, tilesize, ratio, camera);
+        this.weaponSlot.render(context, tilesize, ratio, camera);
     }
 }
 
 class EquipmentSlot {
-    constructor(type) {
+    constructor(type, owner) {
+        this.owner = owner;
         this.type = type;
         this.locked = false;
         this.amount = 0;
@@ -54,6 +76,7 @@ class EquipmentSlot {
 
     }
     assign(item) {
+        item.equip(this.owner);
         this.item = item;
         this.amount = 1;
     }
