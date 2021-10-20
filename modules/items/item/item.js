@@ -76,6 +76,13 @@ export class Equippable extends Item {
         this.type = "";
     }
     equip(owner) {
+        console.log(owner)
         this.owner = owner;
+    }
+    render(context, tilesize, ratio, camera) {
+        this.left = this.owner.left;
+        this.x = this.owner.x;
+        this.y = this.owner.y;
+        this.renderSprite(context, tilesize, ratio, camera);
     }
 }

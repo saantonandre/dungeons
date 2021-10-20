@@ -20,9 +20,6 @@ export class HelmetPrototype extends Equippable {
 
     }
     compute(deltaTime) {
-        this.x = this.owner.x;
-        this.y = this.owner.y;
-        this.left = this.owner.left
         if (this.owner.frame > 1) {
             this.animations['idle'].offsetY = -0.3;
         } else {

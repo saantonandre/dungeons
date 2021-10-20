@@ -122,6 +122,9 @@ class EquipmentSlot {
 
         this.item = tempItem;
         this.amount = tempAmount;
+        if (!this.isEmpty) {
+            this.assign(this.item);
+        }
         return true;
     }
     get isEmpty() {

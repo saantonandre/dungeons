@@ -15,9 +15,5 @@ export class AccessoryPrototype extends Equippable {
 
 
     }
-    compute(deltaTime) {
-        this.x = this.owner.x;
-        this.y = this.owner.y;
-        this.left = this.owner.left
-    }
+    compute(deltaTime) {}
 }

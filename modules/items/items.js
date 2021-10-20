@@ -1,4 +1,5 @@
 import { Item } from "./item/item.js";
+import { SwordPrototype } from "./prototypes/swordPrototype.js";
 export class Goo extends Item {
     constructor(source) {
         super(source);
@@ -14,5 +15,20 @@ export class Bone extends Item {
         this.rarity = "rare";
         this.description = "While invertabrates, some slimes do have bones. Just not properly -theirs-."
         this.setAnimation("idle", [1], [22])
+    }
+}
+export class MemeSword extends SwordPrototype {
+    constructor(source) {
+        super(source);
+        this.name = "Memelord's sword";
+        this.sourceName = "some memelord?"
+        this.description = "Le mao 💀"
+        this.stats.atkSpeed = 5000;
+        this.stats.atk = 100;
+        this.setAnimation("idle", [10], [2]);
+        this.setAnimation("idle", [10], [3], 1);
+
+        this.setAnimation("attack", [10], [4]);
+        this.setAnimation("attack", [10], [5], 1);
     }
 }

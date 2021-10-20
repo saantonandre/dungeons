@@ -5,6 +5,8 @@ import { ExpManager } from "./expManager.js";
 import { EquipmentManager } from "./equipmentManager/equipmentManager.js";
 import { InventoryManager } from "./inventoryManager/inventoryManager.js";
 import { UserInterface } from "./userInterface/userInterface.js";
+
+import { MemeSword } from "../items/items.js"
 export class Player extends Entity {
     constructor(x = 7.5, y = 7.5, director) {
         super(x, y);
@@ -66,6 +68,9 @@ export class Player extends Entity {
         this.targetY = 0;
         this.hp = this.maxHp;
         this.mana = this.maxMana;
+
+        // Change
+        this.inventory.pickUp(new MemeSword());
 
     }
     get atk() { return this.stats.atk + this.equipment.atk }
@@ -154,8 +159,8 @@ export class Player extends Entity {
         this.computeState(deltaTime);
 
         this.checkCollisions(this, environment, false, false)
-
         this.equipment.compute(deltaTime, environment);
+
         if (this.damaged > 0) {
             this.damaged -= deltaTime;
         }
