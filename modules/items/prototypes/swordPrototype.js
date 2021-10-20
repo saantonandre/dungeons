@@ -7,7 +7,7 @@ export class SwordPrototype extends Equippable {
         this.type = "weapon";
         this.subtype = "weapon";
         this.name = "Sword Prototype";
-        this.description = "A wooden sword. It's pretty aerodynamic so you can launch it pretty far."
+        this.description = "A wooden sword. It's pretty light and aerodynamic."
 
         this.setAnimation("idle", [11], [2]);
         this.setAnimation("idle", [11], [3], 1);
@@ -17,7 +17,7 @@ export class SwordPrototype extends Equippable {
 
         // Stats that will attach to the owner
         this.stats.atk = 1;
-        this.stats.atkSpeed = 1;
+        this.stats.atkSpeed = 1.2;
 
 
         /** The sword hitbox (line) */

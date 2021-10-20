@@ -76,6 +76,8 @@ export class TextComponent {
         this.content = '';
         this.x = x;
         this.y = y;
+        this.w = 1;
+        this.h = 1;
         this.color = color;
         this.align = align;
         this.baseline = baseline;

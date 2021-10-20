@@ -1,4 +1,5 @@
 import { TextComponent, InterfaceComponent } from "../interfaceComponent.js";
+import { ItemTooltip } from "./itemTooltip.js";
 import { Sprite } from "../../../../entity/sprite.js";
 export class InventoryComponent extends InterfaceComponent {
     constructor(source, x, y) {
@@ -18,6 +19,7 @@ export class InventoryComponent extends InterfaceComponent {
 
         this.itemTooltip = new ItemTooltip(this.x - 1, this.y + 1);
     }
+    /** Define what happens when a slot is right-clicked, this function gets passed to the **leftColumn>slots** and **inventoryGrid>slots** */
     triggerSlot = (slot) => {
         if (slot.slotRef.item.equippable) {
             if (slot.slotType === "inventorySlot") {
@@ -33,6 +35,7 @@ export class InventoryComponent extends InterfaceComponent {
             }
         }
     }
+    /** computes the sub-components */
     compute(deltaTime) {
         this.icon.compute(this.mouse, this.controls, deltaTime);
         if (this.icon.active) {
@@ -40,6 +43,7 @@ export class InventoryComponent extends InterfaceComponent {
             this.leftColumn.compute(this.mouse, this.controls);
         }
     }
+    /** renders the sub-components */
     render(context, tilesize, baseRatio) {
         this.icon.render(context, tilesize, baseRatio);
         if (this.icon.active) {
@@ -328,96 +332,6 @@ class EquipmentSlot extends ItemSlot {
     }
 
 }
-/** Renders the processed details of the passed item */
-class ItemTooltip {
-    constructor(x, y) {
-        this.w = 8;
-        this.h = 6;
-        this.x = x - this.w;
-        this.y = y;
-        this.descriptionBox = {
-            w: this.w * 0.9,
-            h: this.h * 0.9 - 2,
-            x: this.x + (this.w - this.w * 0.9) / 2,
-            y: this.y + 2.5 + (this.h - this.h * 0.9) / 2,
-        }
-        this.nameContent = new TextComponent(this.x + this.w / 2, this.y + 0.2);
-        this.nameContent.align = 'center';
-        this.nameContent.color = '#f5ffe8';
-        this.nameContent.baseline = 'top';
-        this.nameContent.fontSize = 10;
-        this.descriptionContent = new TextComponent(this.descriptionBox.x, this.descriptionBox.y);
-        this.descriptionContent.align = 'left';
-        this.descriptionContent.color = '#dfe0e8';
-        this.descriptionContent.fontSize = 6.5;
-        this.descriptionContent.baseline = 'top';
-        this.sourceContent = new TextComponent(this.x + this.w - 0.1, this.y + this.h - 0.1);
-        this.sourceContent.align = 'right';
-        this.sourceContent.color = '#ffc2a1';
-        this.sourceContent.fontSize = 6;
-        this.sourceContent.baseline = 'bottom';
-
-    }
-    render(context, tilesize, ratio, slotRef) {
-        if (slotRef.isEmpty) {
-            return;
-        }
-        let item = slotRef.item;
-        this.renderBox(context, tilesize, ratio)
-        this.nameContent.content = item.name;
-        this.rarityColorChange(item);
-        this.descriptionContent.content = item.description;
-        // Breaks down the description to multiple lines 
-        this.descriptionContent.content = getLines(
-            context,
-            this.descriptionContent.content,
-            this.descriptionContent.canvasFont(ratio),
-            this.descriptionBox.w * tilesize * ratio
-        )
-
-        this.sourceContent.content = "Source: " + item.sourceName.toUpperCase();
-        this.nameContent.render(context, tilesize, ratio);
-        this.descriptionContent.render(context, tilesize, ratio);
-        this.sourceContent.render(context, tilesize, ratio);
-        this.renderThumb(context, tilesize, ratio, item)
-    }
-    /** Changes the nameContent color based on item rarity */
-    rarityColorChange(item) {
-        switch (item.rarity) {
-            case "rare":
-                this.nameContent.color = "#ffc2a1";
-                break;
-            case "common":
-                this.nameContent.color = "#f5ffe8";
-
-                break;
-        }
-    }
-    renderBox(context, tilesize, ratio) {
-        context.globalAlpha = 0.6;
-        context.fillStyle = "#14182e";
-        context.fillRect(
-            (this.x) * tilesize * ratio,
-            (this.y) * tilesize * ratio,
-            (this.w) * tilesize * ratio,
-            (this.h) * tilesize * ratio,
-        )
-        context.fillStyle = "#14182e";
-        context.fillRect(
-            (this.x) * tilesize * ratio,
-            (this.y) * tilesize * ratio,
-            (this.w) * tilesize * ratio,
-            tilesize * ratio,
-        )
-        context.globalAlpha = 1;
-    }
-    renderThumb(context, tilesize, ratio, item) {
-
-        let x = this.x + this.w / 2 - 1;
-        let y = this.y + 0.7;
-        item.renderItem(x, y, context, tilesize, ratio, 2, 2);
-    }
-}
 
 
 function pointSquareCol(point, sq) {
@@ -436,24 +350,4 @@ function pointSquareCol(point, sq) {
         }
     }
     return false;
-}
-/** Returns an array of lines based on the maximum available width */
-function getLines(ctx, text, font, maxWidth) {
-    ctx.font = font;
-    let words = text.split(" ");
-    let lines = [];
-    let currentLine = words[0];
-
-    for (let i = 1; i < words.length; i++) {
-        let word = words[i];
-        let width = ctx.measureText(currentLine + " " + word).width;
-        if (width < maxWidth) {
-            currentLine += " " + word;
-        } else {
-            lines.push(currentLine);
-            currentLine = word;
-        }
-    }
-    lines.push(currentLine);
-    return lines;
 }

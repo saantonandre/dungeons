@@ -20,12 +20,11 @@ export class Player extends Entity {
         this.facing = "r";
 
         /* STATS */
-        this.stats = {
-            hp: 10,
-            maxHp: 10,
-            atk: 1,
-            atkSpeed: 1
-        }
+        this.stats.hp = 10;
+        this.stats.maxHp = 10;
+        this.stats.atk = 1;
+        this.stats.atkSpeed = 1;
+
         this.maxHp = 10;
         this.hp = this.maxHp;
 

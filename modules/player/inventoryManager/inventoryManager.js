@@ -8,9 +8,10 @@ export class InventoryManager {
         this.slotsUnlocked = 9;
         this.display = false;
         this.newItemCollected = false;
-        this.initialize();
+        this.pupulate();
     }
-    initialize() {
+    /** Pupulates the inventory with slots */
+    pupulate() {
         this.slots = [];
         for (let i = 0; i < this.slotsAmount; i++) {
             this.slots.push(new ItemSlot(i >= this.slotsUnlocked));
@@ -19,6 +20,7 @@ export class InventoryManager {
     sortSlots() {
         // this.slots.sort((a, b) => { return a.id - b.id })
     }
+    /** Returns true if the item has been stacked, false if there are no matches and the inventory is full */
     stackItem(item) {
         for (let slot of this.slots) {
             if (slot.locked || slot.isEmpty) {
@@ -60,8 +62,8 @@ export class InventoryManager {
         }
         return false;
     }
+    /** Checks for player collisions with items in the current environment */
     compute() {
-        // Checks player collisions with items
         for (let entity of this.owner.director.level.entities) {
             if (entity.type === 'item' && !entity.scheduledDeletion && this.owner.Physics.collided(this.owner, entity)) {
                 if (this.pickUp(entity)) {
@@ -74,6 +76,7 @@ export class InventoryManager {
 
     }
 }
+/** Slot data type used by the inventory manager/component */
 class ItemSlot {
     constructor(locked = false) {
         this.amount = 0;

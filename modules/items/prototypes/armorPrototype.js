@@ -7,7 +7,7 @@ export class ArmorPrototype extends Equippable {
         this.type = "armor";
         this.subtype = "armor";
         this.name = "Armor Prototype";
-        this.description = "A sick looking armor which intimidates enemies making it look like you have abs."
+        this.description = "A sick looking armor."
 
         this.setAnimation("idle", [3], [7]);
         this.setAnimation("idle", [4], [7], 1);
