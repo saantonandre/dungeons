@@ -18,9 +18,9 @@ export class UserInterface {
         this.mouse = this.source.director.mouse.absolute;
         this.Physics = this.source.Physics;
 
-        this.hpComponent = new HpComponent(this.source.stats, 1.5, 0.5);
-        this.manaComponent = new ManaComponent(this.source.stats, 5.5, 0.5);
-        this.expComponent = new ExpComponent(this.source.stats, 10, 0.5);
+        this.hpComponent = new HpComponent(this.source, 1.5, 0.5);
+        this.manaComponent = new ManaComponent(this.source, 5.5, 0.5);
+        this.expComponent = new ExpComponent(this.source, 10, 0.5);
         this.floorComponent = new FloorComponent(this.source, 17, 0.5);
 
 

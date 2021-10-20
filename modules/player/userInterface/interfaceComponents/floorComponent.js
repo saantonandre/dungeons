@@ -1,4 +1,4 @@
-import { SpriteComponent, TextComponent, InterfaceComponent } from "./interfaceComponent.js";
+import { ImageComponent, TextComponent, InterfaceComponent } from "./interfaceComponent.js";
 
 
 export class FloorComponent extends InterfaceComponent {
@@ -9,7 +9,7 @@ export class FloorComponent extends InterfaceComponent {
         this.w = 2;
         this.h = 1;
         this.color = '#fef3c0';
-        this.icon = new SpriteComponent(12, 14, this.x, this.y - 0.5, this.w, 1);
+        this.icon = new ImageComponent(12, 14, this.x, this.y - 0.5, this.w, 1);
         this.text = new TextComponent(this.x + this.w / 2, this.y + 0.5, this.color);
     }
     compute(deltaTime) {
@@ -21,7 +21,7 @@ export class FloorComponent extends InterfaceComponent {
      * - Render the actual bar according to the ratio
      */
     render(context, tilesize, baseRatio) {
-        this.renderSprite(context, tilesize, baseRatio, this.icon);
-        this.renderText(context, tilesize, baseRatio, this.text);
+        this.icon.render(context, tilesize, baseRatio);
+        this.text.render(context, tilesize, baseRatio);
     }
 }

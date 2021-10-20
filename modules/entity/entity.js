@@ -72,6 +72,11 @@ export class Entity extends Sprite {
         }
         this.updateHitbox();
     }
+    get atk() { return this.stats.atk }
+
+    get hp() { return this.stats.hp }
+    set hp(value) { this.stats.hp = value }
+
     updateHitbox() {
         this.hitbox.x = this.x + this.hitboxOffset.x;
         this.hitbox.y = this.y + this.hitboxOffset.y;

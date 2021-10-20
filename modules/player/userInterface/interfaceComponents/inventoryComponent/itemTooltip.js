@@ -1,4 +1,4 @@
-import { TextComponent } from "../interfaceComponent.js"
+import { TextComponent, ImageComponent } from "../interfaceComponent.js";
 /** Renders the processed details of the passed item */
 export class ItemTooltip {
     constructor(x, y) {
@@ -30,20 +30,26 @@ export class ItemTooltip {
         this.descriptionContent.baseline = 'top';
         this.descriptionContent.w = this.w * 0.9;
 
+        this.statsContent = new StatsContent(this.descriptionContent.x, this.descriptionContent.y + this.descriptionContent.h)
+        this.statsContent.w = this.descriptionContent.w;
+
         this.sourceContent = new TextComponent(this.x + this.w - 0.1, this.y + this.h - 0.1);
         this.sourceContent.align = 'right';
         this.sourceContent.color = '#ffc2a1bb';
         this.sourceContent.fontSize = 6;
         this.sourceContent.baseline = 'top';
 
-        this.statsContent = new StatsContent();
 
     }
     computeHeights(tilesize) {
         this.thumbnail.y = this.nameContent.y + this.nameContent.fontSize / tilesize;
         this.descriptionContent.y = this.thumbnail.y + this.thumbnail.h;
         this.descriptionContent.h = this.descriptionContent.content.length * (this.descriptionContent.fontSize / tilesize); // Amount of text rows
-        this.sourceContent.y = this.descriptionContent.y + this.descriptionContent.h + 0.2;
+
+        this.statsContent.y = this.descriptionContent.y + this.descriptionContent.h + 0.1; // Amount of text rows
+        this.statsContent.h = this.statsContent.statsAmount > 0 ? Math.ceil(this.statsContent.statsAmount / 2) : 0; // Amount of text rows
+
+        this.sourceContent.y = this.statsContent.y + this.statsContent.h + 0.2;
         this.h = this.sourceContent.y + this.sourceContent.fontSize / tilesize - this.y;
     }
     render(context, tilesize, ratio, slotRef) {
@@ -69,6 +75,7 @@ export class ItemTooltip {
         this.nameContent.render(context, tilesize, ratio);
         this.drawLine(context, tilesize, ratio, this.nameContent.y + this.nameContent.fontSize / tilesize);
         this.descriptionContent.render(context, tilesize, ratio);
+        this.statsContent.render(context, tilesize, ratio, item);
         this.sourceContent.render(context, tilesize, ratio);
         item.renderItem(this.thumbnail.x, this.thumbnail.y, context, tilesize, ratio, this.thumbnail.w, this.thumbnail.h);
     }
@@ -123,10 +130,61 @@ export class ItemTooltip {
         context.globalAlpha = 1;
     }
 }
-/** Analyzes and renders the stats */
-class StatsContent {
-    constructor() {
 
+/**Analyzes and renders the stats
+ * - Coun
+ */
+class StatsContent {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.w = 0;
+        this.h = 0;
+        this.statIcon = new ImageComponent();
+        this.statText = new TextComponent();
+        this.statText.align = "left";
+        this.statText.fontSize = 8;
+        this.statSprites = {
+            atk: [22, 21],
+            atkSpeed: [22, 22],
+            maxHp: [22, 23],
+            maxMana: [22, 24]
+        }
+        this.statColors = {
+            atk: '#ff8933',
+            atkSpeed: '#f0b541',
+            maxHp: '#ad2f45',
+            maxMana: '#4fa4b8'
+        }
+        this.statsAmount = 0;
+        // 22,21 --> 22,24
+
+    }
+    renderStat(context, tilesize, ratio, item, stat) {
+        this.statIcon.spriteX = this.statSprites[stat][0];
+        this.statIcon.spriteY = this.statSprites[stat][1];
+        this.statIcon.x = this.x + this.w / 2 * ((this.statsAmount - 1) % 2);
+        this.statIcon.y = this.y + ((this.statsAmount - 1) / 2 | 0);
+        this.statIcon.render(context, tilesize, ratio)
+
+        this.statText.x = this.x + this.statIcon.w + this.w / 2 * ((this.statsAmount - 1) % 2);
+        this.statText.y = this.y + this.statIcon.h / 2 + ((this.statsAmount - 1) / 2 | 0);
+
+        let isPercentage = stat === 'atkSpeed' ? '%' : '';
+        this.statText.content = `+${item.stats[stat]}${isPercentage}`
+        this.statText.color = this.statColors[stat];
+        this.statText.render(context, tilesize, ratio)
+    }
+    render(context, tilesize, ratio, item) {
+        context.globalAlpha = 0.8;
+        this.statsAmount = 0;
+        for (let stat in item.stats) {
+            if (item.stats[stat] !== 0) {
+                this.statsAmount++;
+                this.renderStat(context, tilesize, ratio, item, stat);
+            }
+        }
+        context.globalAlpha = 1;
     }
 }
 /** Returns an array of lines based on the maximum available width */

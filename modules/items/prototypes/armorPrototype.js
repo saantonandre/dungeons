@@ -8,11 +8,11 @@ export class ArmorPrototype extends Equippable {
         this.subtype = "armor";
         this.name = "Armor Prototype";
         this.description = "A sick looking armor."
-
         this.setAnimation("idle", [3], [7]);
         this.setAnimation("idle", [4], [7], 1);
         //this.animations['idle'].offsetY = -0.5;
 
+        this.stats.maxHp = 10;
 
     }
     compute(deltaTime) {

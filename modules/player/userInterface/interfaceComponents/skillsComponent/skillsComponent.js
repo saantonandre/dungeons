@@ -1,4 +1,4 @@
-import { SpriteComponent, InterfaceComponent } from "../interfaceComponent.js";
+import { ImageComponent, InterfaceComponent } from "../interfaceComponent.js";
 
 export class SkillsComponent extends InterfaceComponent {
     constructor(source, x, y) {
@@ -9,10 +9,10 @@ export class SkillsComponent extends InterfaceComponent {
         this.h = 1;
         this.color = '#fef3c0';
         /** Active: 5, 9 */
-        this.icon = new SpriteComponent(22, 26, this.x, this.y, this.w, 1);
+        this.icon = new ImageComponent(22, 26, this.x, this.y, this.w, 1);
     }
     compute(deltaTime) {}
     render(context, tilesize, baseRatio) {
-        this.renderSprite(context, tilesize, baseRatio, this.icon);
+        this.icon.render(context, tilesize, baseRatio);
     }
 }

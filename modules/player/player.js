@@ -25,7 +25,7 @@ export class Player extends Entity {
         this.stats.maxMana = 15;
         this.stats.mana = this.stats.maxMana;
         this.stats.atk = 1;
-        this.stats.atkSpeed = 1;
+        this.stats.atkSpeed = 100;
         this.stats.maxExp = 5;
         this.stats.exp = 0;
 
@@ -64,10 +64,29 @@ export class Player extends Entity {
         this.stateCounter = 0;
         this.targetX = 0;
         this.targetY = 0;
+        this.hp = this.maxHp;
+        this.mana = this.maxMana;
 
     }
     get atk() { return this.stats.atk + this.equipment.atk }
-    get atkSpeed() { return this.stats.atkSpeed * this.equipment.atkSpeed }
+    get atkSpeed() { return (this.stats.atkSpeed + this.equipment.atkSpeed) / 100 }
+
+    get maxHp() { return this.stats.maxHp + this.equipment.maxHp }
+
+    get hp() { return this.stats.hp }
+    set hp(value) { this.stats.hp = value }
+
+    get exp() { return this.stats.exp }
+    get maxExp() { return this.stats.maxExp }
+
+    get maxMana() { return this.stats.maxMana + this.equipment.maxMana }
+
+    get mana() { return this.stats.mana }
+    set mana(value) { this.stats.mana = value }
+
+    get lv() { return this.stats.lv }
+    set lv(value) { this.stats.lv = value }
+
     /** Activates the falling animation, which triggers on floor change */
     fall() {
         this.updateHitbox();
@@ -157,9 +176,9 @@ export class Player extends Entity {
         }
         this.damaged = 10;
         this.director.camera.shake = 10;
-        this.stats.hp -= source.stats.atk;
-        if (this.stats.hp < 0) {
-            this.stats.hp = 0;
+        this.hp -= source.atk;
+        if (this.hp < 0) {
+            this.hp = 0;
         }
     }
     resolveInput() {

@@ -18,39 +18,6 @@ export class InterfaceComponent {
             font: this.font
         }
     }
-    renderSprite(context, tilesize, ratio, item, widthRatio = 1) {
-        context.drawImage(
-            this.sheet,
-            item.spriteX * tilesize,
-            item.spriteY * tilesize,
-            item.w * tilesize * widthRatio,
-            item.h * tilesize,
-            item.x * tilesize * ratio,
-            item.y * tilesize * ratio,
-            item.w * tilesize * ratio * widthRatio,
-            item.h * tilesize * ratio,
-
-        )
-    }
-    renderText(context, tilesize, ratio, text) {
-        context.textBaseline = text.baseline;
-        context.textAlign = text.align;
-        context.fillStyle = text.color;
-        context.font = 'bold ' + Math.round(text.fontSize * ratio) + 'px ' + text.font;
-        context.fillText(
-            text.content,
-            text.x * tilesize * ratio,
-            text.y * tilesize * ratio
-        );
-        context.strokeStyle = text.strokeColor;
-        context.lineWidth = text.strokeWidth * ratio;
-        context.font = 'bold ' + Math.round(text.fontSize * ratio) + 'px ' + text.font;
-        context.strokeText(
-            text.content,
-            text.x * tilesize * ratio,
-            text.y * tilesize * ratio
-        );
-    }
 }
 /**
  * - **SpriteX**: X position in the spritesheet
@@ -61,14 +28,29 @@ export class InterfaceComponent {
  * - **h**: height  on the canvas
  */
 
-export class SpriteComponent {
-    constructor(spriteX = 0, spriteY = 0, x = 0, y = 0, w = 0, h = 0) {
+export class ImageComponent {
+    constructor(spriteX = 0, spriteY = 0, x = 0, y = 0, w = 1, h = 1) {
+        this.sheet = spritesheet;
         this.spriteX = spriteX;
         this.spriteY = spriteY;
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
+    }
+    render(context, tilesize, ratio, widthRatio = 1) {
+        context.drawImage(
+            this.sheet,
+            this.spriteX * tilesize,
+            this.spriteY * tilesize,
+            this.w * tilesize * widthRatio,
+            this.h * tilesize,
+            this.x * tilesize * ratio,
+            this.y * tilesize * ratio,
+            this.w * tilesize * ratio * widthRatio,
+            this.h * tilesize * ratio,
+
+        )
     }
 }
 export class TextComponent {

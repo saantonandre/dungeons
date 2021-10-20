@@ -20,8 +20,11 @@ export class Slime extends Enemy {
 
 
         //Stats
-        this.atk = 5;
-        this.expValue = 2;
+        this.stats.atk = 3;
+        this.stats.expValue = 2;
+
+
+
         this.aggroRange = 10;
         this.targetRot = 0;
         this.dashSpeed = 4;

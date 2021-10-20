@@ -22,17 +22,47 @@ export class EquipmentManager {
     }
     /** Combined attack power of the equipment */
     get atk() {
-        return this.weaponSlot.item.stats.atk || 0 +
-            this.helmetSlot.item.stats.atk || 0 +
-            this.armorSlot.item.stats.atk || 0 +
-            this.accessorySlot.item.stats.atk || 0;
+        let stat = 'atk';
+
+        let weaponSlot = this.weaponSlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
+        let helmetSlot = this.helmetSlot.isEmpty ? 0 : this.helmetSlot.item.stats[stat];
+        let armorSlot = this.armorSlot.isEmpty ? 0 : this.armorSlot.item.stats[stat];
+        let accessorySlot = this.accessorySlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
+
+        return weaponSlot + helmetSlot + armorSlot + accessorySlot;
     }
     /** Combined attack power of the equipment */
     get atkSpeed() {
-        return this.weaponSlot.item.stats.atkSpeed || 1 *
-            this.helmetSlot.item.stats.atkSpeed || 1 *
-            this.armorSlot.item.stats.atkSpeed || 1 *
-            this.accessorySlot.item.stats.atkSpeed || 1;
+        let stat = 'atkSpeed';
+
+        let weaponSlot = this.weaponSlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
+        let helmetSlot = this.helmetSlot.isEmpty ? 0 : this.helmetSlot.item.stats[stat];
+        let armorSlot = this.armorSlot.isEmpty ? 0 : this.armorSlot.item.stats[stat];
+        let accessorySlot = this.accessorySlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
+
+        return weaponSlot + helmetSlot + armorSlot + accessorySlot;
+    }
+    /** Combined maxHp of the equipment */
+    get maxHp() {
+        let stat = 'maxHp';
+
+        let weaponSlot = this.weaponSlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
+        let helmetSlot = this.helmetSlot.isEmpty ? 0 : this.helmetSlot.item.stats[stat];
+        let armorSlot = this.armorSlot.isEmpty ? 0 : this.armorSlot.item.stats[stat];
+        let accessorySlot = this.accessorySlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
+
+        return weaponSlot + helmetSlot + armorSlot + accessorySlot;
+    }
+    /** Combined maxMana of the equipment */
+    get maxMana() {
+        let stat = 'maxMana';
+
+        let weaponSlot = this.weaponSlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
+        let helmetSlot = this.helmetSlot.isEmpty ? 0 : this.helmetSlot.item.stats[stat];
+        let armorSlot = this.armorSlot.isEmpty ? 0 : this.armorSlot.item.stats[stat];
+        let accessorySlot = this.accessorySlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
+
+        return weaponSlot + helmetSlot + armorSlot + accessorySlot;
     }
     handleAttack(special, mouse) {
         if (this.weaponSlot.isEmpty) {

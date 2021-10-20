@@ -14,8 +14,9 @@ export class HelmetPrototype extends Equippable {
         this.animations['idle'].offsetY = -0.3;
 
         // Stats that will attach to the owner
-        this.stats.atk = 1;
-        this.stats.atkSpeed = 1;
+        this.stats.atkSpeed = 5;
+        this.stats.maxMana = 5;
+        this.stats.maxHp = 5;
 
     }
     compute(deltaTime) {

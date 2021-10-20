@@ -16,8 +16,8 @@ export class SwordPrototype extends Equippable {
         this.setAnimation("attack", [11], [5], 1);
 
         // Stats that will attach to the owner
-        this.stats.atk = 1;
-        this.stats.atkSpeed = 1.2;
+        this.stats.atk = 2;
+        this.stats.atkSpeed = 20;
 
 
         /** The sword hitbox (line) */

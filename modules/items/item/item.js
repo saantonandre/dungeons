@@ -63,8 +63,8 @@ class ItemStats {
     constructor() {
         this.atk = 0;
         this.atkSpeed = 0;
-        this.hp = 0;
-        this.mana = 0;
+        this.maxHp = 0;
+        this.maxMana = 0;
     }
 }
 export class Equippable extends Item {
