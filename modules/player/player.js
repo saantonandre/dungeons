@@ -20,21 +20,18 @@ export class Player extends Entity {
         this.facing = "r";
 
         /* STATS */
-        this.stats.hp = 10;
         this.stats.maxHp = 10;
+        this.stats.hp = this.stats.maxHp;
+        this.stats.maxMana = 15;
+        this.stats.mana = this.stats.maxMana;
         this.stats.atk = 1;
         this.stats.atkSpeed = 1;
+        this.stats.maxExp = 5;
+        this.stats.exp = 0;
 
-        this.maxHp = 10;
-        this.hp = this.maxHp;
 
-        this.maxMana = 10;
-        this.mana = this.maxMana;
         this.controls = director.controls;
-        this.maxExp = 10;
-        this.exp = 0;
         this.expManager = new ExpManager(this);
-        this.lv = 1;
 
 
         this.baseSpeed = 0.08;
@@ -160,9 +157,9 @@ export class Player extends Entity {
         }
         this.damaged = 10;
         this.director.camera.shake = 10;
-        this.hp -= source.atk;
-        if (this.hp < 0) {
-            this.hp = 0;
+        this.stats.hp -= source.stats.atk;
+        if (this.stats.hp < 0) {
+            this.stats.hp = 0;
         }
     }
     resolveInput() {

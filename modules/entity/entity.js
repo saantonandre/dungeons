@@ -18,6 +18,8 @@ export class Entity extends Sprite {
         this.type = "entity";
         this.state = "idle";
 
+        this.stats = new Stats(this);
+
         /** Last in rendering order? */
         this.background = false;
         /** Is it part of the ground? can flying objects collide with this?*/
@@ -37,7 +39,6 @@ export class Entity extends Sprite {
          */
         this.drops = [];
 
-        this.stats = new Stats(this);
 
 
         // Offsets from the shadow;
@@ -156,9 +157,9 @@ export class Entity extends Sprite {
     }
 }
 class Stats {
-    constructor(source) {
+    constructor() {
         this.lv = 1;
-        this.maxHp = 20;
+        this.maxHp = 10;
         this.hp = this.maxHp;
         this.maxExp = 0;
         this.exp = 0;
@@ -166,5 +167,6 @@ class Stats {
         this.mana = this.maxMana;
         this.atk = 1;
         this.atkSpeed = 1;
+        this.expValue = 1;
     }
 }

@@ -13,6 +13,9 @@ export class Item extends Entity {
         this.rarity = "common";
         this.flying = false;
 
+        // Stats resetting
+        this.stats = new ItemStats();
+
         this.equippable = false;
         this.stackable = true;
 
@@ -54,6 +57,14 @@ export class Item extends Entity {
         this.levitate(deltaTime);
         this.updatePosition(deltaTime);
         this.updateHitbox();
+    }
+}
+class ItemStats {
+    constructor() {
+        this.atk = 0;
+        this.atkSpeed = 0;
+        this.hp = 0;
+        this.mana = 0;
     }
 }
 export class Equippable extends Item {

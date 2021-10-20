@@ -7,7 +7,7 @@ export class DisplayName {
         this.w = 1;
         this.h = 1;
         this.prevRatio = 1;
-        this.text = `lv ${this.source.lv}`;
+        this.text = `lv ${this.source.stats.lv}`;
         this.color = '#f5ffe8';
 
         this.size = 5;
@@ -27,7 +27,7 @@ export class DisplayName {
         return `bold ${Math.round(size * ratio)}px ${this.font}`;
     }
     getInfo() {
-        this.text = `lv ${this.source.lv}`;
+        this.text = `lv ${this.source.stats.lv}`;
         this.text2 = `${this.source.name}`
     }
     compute(mouse) {

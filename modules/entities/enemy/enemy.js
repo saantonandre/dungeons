@@ -6,12 +6,9 @@ export class Enemy extends Entity {
         super(x, y);
         this.type = "enemy";
         this.shadow = true;
-        this.maxHp = 10;
-        this.hp = this.maxHp;
-        this.atk = 1;
         this.dmgFrames = 0;
         this.dead = false;
-        this.lv = 1;
+
 
         this.expValue = 1;
 
@@ -39,12 +36,12 @@ export class Enemy extends Entity {
         this.state = "damaged";
         this.damaged = source.attackID;
         this.dmgFrames = 5;
-        this.hp -= source.atk;
+        this.stats.hp -= source.atk;
         // atk text
         //vfxsManager.create("DmgText", this, source.atk | 0);
         //vfxsManager.create("DmgVfx", this);
-        if (this.hp <= 0) {
-            this.hp = 0;
+        if (this.stats.hp <= 0) {
+            this.stats.hp = 0;
             this.onDeath(executioner)
             //let recipient = source.owner || source;
             //recipient.expManager.update(this);

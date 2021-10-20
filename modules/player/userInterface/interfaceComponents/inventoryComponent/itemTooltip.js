@@ -36,6 +36,8 @@ export class ItemTooltip {
         this.sourceContent.fontSize = 6;
         this.sourceContent.baseline = 'top';
 
+        this.statsContent = new StatsContent();
+
     }
     computeHeights(tilesize) {
         this.thumbnail.y = this.nameContent.y + this.nameContent.fontSize / tilesize;
@@ -119,6 +121,12 @@ export class ItemTooltip {
         context.closePath();
         context.stroke()
         context.globalAlpha = 1;
+    }
+}
+/** Analyzes and renders the stats */
+class StatsContent {
+    constructor() {
+
     }
 }
 /** Returns an array of lines based on the maximum available width */
