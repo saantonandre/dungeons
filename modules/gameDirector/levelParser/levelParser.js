@@ -66,7 +66,7 @@ export class LevelParser {
                         break;
                 }
 
-                floor.push(new Entities.Floor(x, y));
+                floor.push(new Entities.FloorTile(x, y));
             }
         }
         entities = this.mergeSameIdEntities(entities);

@@ -1,6 +1,6 @@
 import { Entity } from "../entity/entity.js";
 
-import { ExpManager } from "./expManager.js";
+import { ExpManager } from "./expManager/expManager.js";
 
 import { EquipmentManager } from "./equipmentManager/equipmentManager.js";
 import { InventoryManager } from "./inventoryManager/inventoryManager.js";
@@ -15,6 +15,7 @@ export class Player extends Entity {
         /** A reference to the game director. 
          * Needed for:
          * - Changing levels
+         * - accessing to the mouse
          */
         this.director = director;
 
@@ -120,13 +121,12 @@ export class Player extends Entity {
         this.state = 'normal';
         this.animation = 'idle';
         this.equipment.display = true;
-        //this.equipment.weapon.display = true;
     }
     computeBroke(deltaTime) {
         this.shadow = true;
         this.solid = true;
         this.animation = 'broke';
-        //this.equipment.weapon.display = false;
+        this.equipment.display = false;
         this.stateCounter += deltaTime;
         if (this.controls.left || this.controls.right || this.controls.up || this.controls.down || this.controls.lClickDown || this.controls.rClickDown) {
             this.recoverState();

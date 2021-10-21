@@ -61,22 +61,21 @@ class GameDirector {
      * - Computes the UI
      */
     compute(meta) {
+        /** Where dead entities ends up */
         let garbage = [];
+        /** Reiterates the computation if the level is recreated */
         let loadLevelCall = false;
+        // Computes the interface
         this.player.userInterface.compute(meta.deltaTime);
+        // Calls the compute function on every entities
         for (let entity of this.level.entities) {
             if (entity.removed || entity.scheduledDeletion) {
+                // Pushes the entities to the garbage
                 garbage.push(this.level.entities.indexOf(entity));
                 continue;
             }
             entity.compute(meta.deltaTime, this.level.entities);
-        }
-        this.garbageCleaner(garbage);
-
-        for (let entity of this.level.entities) {
             entity.resolveCollisions(meta.deltaTime, this.level.entities);
-        }
-        for (let entity of this.level.entities) {
             if (entity.hasDisplayName) {
                 entity.displayName.compute(this.mouse);
             }
@@ -84,13 +83,15 @@ class GameDirector {
                 entity.hpBar.compute(meta.deltaTime);
             }
         }
-        /** Portal specific computing, need comms with this, the map and the player */
+        // Detaches the removed entities from this.level.entities
+        this.garbageCleaner(garbage);
+        // Portal specific computing, need comms with this, the map and the player
         for (let portal of this.level.portals) {
             loadLevelCall = portal.computePortal(meta, this);
         }
+        // Computes the camera position
         this.camera.compute(meta, this.level);
 
-        // Reiterates the computation if the level is recreated
         if (loadLevelCall) {
             this.compute(meta)
         }
@@ -106,17 +107,21 @@ class GameDirector {
      */
     render(context, meta) {
         this.sortEntities();
-        this.renderFloor(context, meta.tilesize, meta.ratio);
-
-        //(context, tilesize, ratio, offsetX, offsetY)
+        /** Renders the floor (ground level) tiles */
+        for (let tile of this.level.floor) {
+            tile.render(context, meta.tilesize, meta.ratio, this.camera);
+        }
+        /** Needs to be a separate cycle to avoid shadow overlapping to entities */
         for (let entity of this.level.entities) {
             entity.renderShadow(context, meta.tilesize, meta.ratio, this.camera);
         }
+        /** Entities basic rendering */
         for (let entity of this.level.entities) {
             entity.render(context, meta.tilesize, meta.ratio, this.camera);
             /** Hitbox rendering */
             //entity.renderHitbox(context, tilesize, ratio, this.camera)
         }
+        /** Needs to be a separate cycle to avoid entities overlapping the GUIs */
         for (let entity of this.level.entities) {
             if (entity.hasDisplayName) {
                 entity.displayName.render(context, meta.tilesize, meta.ratio, this.camera);
@@ -176,7 +181,7 @@ class GameDirector {
         this.level.levelX = (tilesWidth - this.level.levelW) / 2;
         this.level.levelY = (tilesHeight - this.level.levelH) / 2;
     }
-    /** Sorts entities on ascending vertical position, background elements goes first */
+    /** Sorts the entities by type (.background goes first) and vertical position (lower -> higher) */
     sortEntities() {
         this.level.entities.sort(function(a, b) {
             return (a.y + a.h) - (b.y + b.h);
@@ -188,13 +193,6 @@ class GameDirector {
                 return -1;
             }
         })
-    }
-    /** Renders the floor (ground level) tiles */
-    renderFloor(context, tilesize, ratio) {
-        //(context, tilesize, ratio, offsetX, offsetY)
-        for (let tile of this.level.floor) {
-            tile.render(context, tilesize, ratio, this.camera);
-        }
     }
 
 }

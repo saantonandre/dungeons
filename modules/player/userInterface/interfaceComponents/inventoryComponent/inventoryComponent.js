@@ -69,28 +69,29 @@ class Icon extends Sprite {
         this.setAnimation("highlight", [23], [27]);
         this.active = false;
     }
+    // If mouse is hover this element
     handleHover(controls) {
         if (controls.lClickDown) {
+            // If left btn down
             if (this.animation !== 'idle') {
+                // If this isn't in the 'idle' state (eg. is highlighted or bumping)
+                // - Change this animation to 'idle' and this state to 'active'
                 this.loadAnimation('idle');
-                this.active = !this.active
+                this.active = !this.active;
             }
         } else {
+            // If mouse is hovering but not clicked, highlight
             this.loadAnimation('highlight');
         }
     }
     onAnimationEnd() {
         switch (this.animation) {
-            case 'highlight':
-                this.loadAnimation('idle');
-                break;
             case 'bump':
                 this.loadAnimation('idle');
                 break;
         }
     }
     compute(mouse, controls, deltaTime) {
-        this.updateSprite(deltaTime);
         if (this.manager.newItemCollected) {
             this.manager.newItemCollected = false;
             this.loadAnimation("bump");
@@ -98,9 +99,12 @@ class Icon extends Sprite {
         if (pointSquareCol(mouse, this)) {
             mouse.hoverUI = true;
             this.handleHover(controls)
+        } else {
+            if (this.animation === 'highlight') {
+                this.animation = 'idle';
+            }
         }
-
-
+        this.updateSprite(deltaTime);
     }
     render(context, tilesize, baseRatio) {
         this.renderSprite(context, tilesize, baseRatio);

@@ -1,5 +1,5 @@
 import { Entity } from "../../entity/entity.js"
-export class Floor extends Entity {
+export class FloorTile extends Entity {
     // A normal, collidable block
     constructor(x, y) {
         super(x, y);

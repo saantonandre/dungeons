@@ -1,5 +1,5 @@
 import { Block } from "./block/block.js";
-import { Floor } from "./tiles/floor.js"
+import { FloorTile } from "./tiles/floorTile.js"
 import { Portal, FloorPortal } from "./portal/portal.js"
 
 import { Slime } from "./enemies/slime/slime.js";
@@ -8,7 +8,7 @@ import { Bat } from "./enemies/bat/bat.js";
 
 // Non-living
 export { Block };
-export { Floor };
+export { FloorTile };
 export { Portal };
 export { FloorPortal };
 
