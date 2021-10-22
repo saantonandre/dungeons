@@ -20,7 +20,10 @@ export class Sprite {
 
 
     }
-    /** Returns true if the animation has changed, false otherwise */
+    /** Returns true if the animation has changed, false otherwise 
+     * 
+     *  Usage example: this.loadAnimation('attack')
+     */
     loadAnimation(label) {
         if (this.animation === label) {
             return false;
@@ -49,7 +52,7 @@ export class Sprite {
          * 
          */
     }
-    /** Renders the base sprite, not animated as a static icon, in a specific location */
+    /** Renders the base sprite, not animated, as a static icon in a specific location */
     renderItem(x, y, context, tilesize, ratio, w = 1, h = 1) {
         context.drawImage(
             this.sheet, // source of the sprite
@@ -77,7 +80,11 @@ export class Sprite {
             this.onAnimationEnd();
         }
     }
-    /** Adds or overwrites an animation */
+    /** Adds or overwrites an animation 
+     * 
+     *  Example usage: this.setAnimation('attack',[0,0,0],[1,2,3])
+     *  
+     */
     setAnimation(label, keyframesX, keyframesY, left = 0) {
         if (!this.animations[label]) {
             this.animations[label] = new Animation(this);
