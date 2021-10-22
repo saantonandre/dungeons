@@ -1,6 +1,7 @@
 import { checkCollisions } from "../physics/checkCollisions.js"
 import * as Physics from "../physics/physics.js"
 import { Sprite } from "./sprite.js"
+import { vfxManager } from "../vfxManager/vfxManager.js"
 export class Entity extends Sprite {
     constructor(x, y) {
         super(x, y);
@@ -17,6 +18,7 @@ export class Entity extends Sprite {
         this.friction = 0.85;
         this.type = "entity";
         this.state = "idle";
+        this.createVfx = vfxManager.create;
 
         this.stats = new Stats(this);
 
@@ -31,7 +33,6 @@ export class Entity extends Sprite {
         this.shadow = false;
         this.solid = true;
         this.removed = false;
-        this.scheduledDeletion = false;
 
         /** A list containing this entity's drops. 
          * When this entity will get removed by the garbage cleaner  
@@ -76,6 +77,9 @@ export class Entity extends Sprite {
 
     get hp() { return this.stats.hp }
     set hp(value) { this.stats.hp = value }
+
+    get centerX() { return this.x + this.w / 2 }
+    get centerY() { return this.y + this.h / 2 }
 
     updateHitbox() {
         this.hitbox.x = this.x + this.hitboxOffset.x;

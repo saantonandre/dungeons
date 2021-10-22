@@ -37,8 +37,7 @@ export class Enemy extends Entity {
         this.damaged = source.attackID;
         this.dmgFrames = 5;
         this.stats.hp -= source.atk;
-        // atk text
-        //vfxsManager.create("DmgText", this, source.atk | 0);
+        // atk vfx
         //vfxsManager.create("DmgVfx", this);
         if (this.stats.hp <= 0) {
             this.stats.hp = 0;

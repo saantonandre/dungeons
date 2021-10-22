@@ -10,6 +10,8 @@ export class GameLevel {
         this.floor = [];
         /** List of the current room's portals */
         this.portals = [];
+        /** List of the current room's visual Fxs */
+        this.visualFxs = [];
 
         this.levelGenerator = new LevelGenerator();
         this.levelParser = new LevelParser();

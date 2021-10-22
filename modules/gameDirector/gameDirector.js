@@ -1,4 +1,5 @@
 import { gameMap } from "./gameMap/gameMap.js";
+import { vfxManager } from "../vfxManager/vfxManager.js";
 import { Camera } from "./camera/camera.js";
 
 import { Player } from "../player/player.js";
@@ -23,6 +24,8 @@ class GameDirector {
         this.camera = new Camera();
         this.camera.focus = this.player;
         this.map = gameMap;
+        this.vfxRecyclePool = vfxManager.recyclePool;
+
         this.tabbedOut = false;
         document.addEventListener("visibilitychange", (evt) => {
             this.tabbedOut = document.visibilityState == 'hidden' ? true : false;
@@ -46,6 +49,10 @@ class GameDirector {
     /** Deletes removed entities */
     garbageCleaner(garbage) {
         for (let i = garbage.length - 1; i >= 0; i--) {
+            if (this.level.entities[garbage[i]].type === 'vfx') {
+                this.vfxRecyclePool.push(this.level.entities.splice(garbage[i], 1)[0]);
+                continue;
+            }
             for (let drop of this.level.entities[garbage[i]].drops) {
                 drop.dispatch(this.level.entities);
             }
@@ -69,7 +76,7 @@ class GameDirector {
         this.player.userInterface.compute(meta.deltaTime);
         // Calls the compute function on every entities
         for (let entity of this.level.entities) {
-            if (entity.removed || entity.scheduledDeletion) {
+            if (entity.removed) {
                 // Pushes the entities to the garbage
                 garbage.push(this.level.entities.indexOf(entity));
                 continue;
@@ -187,7 +194,7 @@ class GameDirector {
             return (a.y + a.h) - (b.y + b.h);
         })
         this.level.entities.sort(function(a, b) {
-            if (!a.background && b.background) {
+            if (!a.background && b.background || a.type == 'vfx') {
                 return 1;
             } else {
                 return -1;

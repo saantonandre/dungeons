@@ -45,7 +45,6 @@ export class Item extends Entity {
     }
     /** Removes itself from the entities array */
     store() {
-        this.scheduledDeletion = true;
         this.animations['idle'].offsetX = 0;
         this.animations['idle'].offsetY = 0;
     }

@@ -12,7 +12,6 @@ export class Sprite {
         this.frame = 0;
         this.left = 0;
         this.frameCounter = 0;
-        this.scheduleDeletion = false;
         this.setAnimation("idle", [0], [0]);
 
 
@@ -74,7 +73,7 @@ export class Sprite {
     }
     renderSprite(context, tilesize, ratio, camera = { x: 0, y: 0 }, rot = false) {
 
-        if (!this.display || this.scheduleDeletion) {
+        if (!this.display) {
             return;
         }
 

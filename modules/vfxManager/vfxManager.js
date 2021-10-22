@@ -5,49 +5,26 @@
 import * as Vfxs from "./vfxs.js"
 class VfxManager {
     constructor() {
-        this.vfxs = [];
-        /** Instead of being deleted, removed Vfxs gets moved here to be reused later */
+        /** Instead of being deleted, removed Vfxs gets moved here to be reused later, gets populated by the gameDirector */
         this.recyclePool = [];
         /** Contains vfx classes declarations */
         this.vfxClasses = Vfxs;
     }
-    compute(deltaTime) {
-        for (let vfx of this.vfxs) {
-            if (vfx.removed) {
-                continue;
-            }
-            vfx.compute(deltaTime);
-        }
-        this.collectRemoved();
-    }
-    render(context, tilesize, ratio, camera) {
-        for (let vfx of this.vfxs) {
-            if (vfx.removed) {
-                continue;
-            }
-            vfx.render(context, tilesize, ratio, camera);
-        }
-    }
-    /** Moves removed vfxs to the recyclePool */
-    collectRemoved() {
-        for (let i = this.vfxs.length - 1; i >= 0; i--) {
-            if (this.vfxs[i].removed) {
-                this.recyclePool.push(this.vfxs.splice(i, 1))
-            }
-        }
-    }
     /** Returns a recycled vfx or FALSE */
-    getRecycledVfx(vfxType, x, y) {
-        for (let vfx of this.recyclePool) {
-            if (vfx.type === vfxType) {
-                vfx.reset(x, y);
-                return removed;
+    getRecycledVfx(vfxName, x, y) {
+        for (let i = 0; i < this.recyclePool.length; i++) {
+            if (this.recyclePool[i].name === vfxName) {
+                this.recyclePool[i].reset(x, y);
+                console.log("found!")
+                return this.recyclePool.splice(i, 1)[0];
             }
         }
+        //console.log("not found!", this.recyclePool)
         return false;
     }
-    /** Returns a Vfx of the requested type */
-    create(vfxType, x, y) {
-        return getRecycledVfx(vfxType, x, y) || new this.vfxClasses[vfxType](vfxType, x, y);
+    /** Returns a Vfx of the requested type, this function gets imported and called by entities */
+    create = (vfxName, x, y) => {
+        return this.getRecycledVfx(vfxName, x, y) || new this.vfxClasses[vfxName](x, y);
     }
 }
+export let vfxManager = new VfxManager();

@@ -17,7 +17,7 @@ export class SwordPrototype extends Equippable {
 
         // Stats that will attach to the owner
         this.stats.atk = 2;
-        this.stats.atkSpeed = 20;
+        this.stats.atkSpeed = 10;
 
 
         /** The sword hitbox (line) */
@@ -81,7 +81,7 @@ export class SwordPrototype extends Equippable {
         this.animation = 'attack';
         this.owner.frame = 0;
         this.owner.frameCounter = 0;
-        this.attackCounter += (this.attackDuration - this.attackCounter) / 10 + this.owner.atkSpeed * deltaTime;
+        this.attackCounter += ((this.attackDuration - this.attackCounter) / 5 + this.owner.atkSpeed) * deltaTime;
         if (this.attackCounter > this.attackDuration) {
             this.attackCounter = this.attackDuration;
             this.state = 'return';
@@ -106,7 +106,7 @@ export class SwordPrototype extends Equippable {
     }
     computeAttack(deltaTime, environment) {
         this.animation = 'attack';
-        this.attackCounter += (this.attackDuration - this.attackCounter) / 5 + this.owner.atkSpeed * deltaTime;
+        this.attackCounter += ((this.attackDuration - this.attackCounter) / 5 + this.owner.atkSpeed) * deltaTime;
         if (this.attackCounter > this.attackDuration) {
             this.attackCounter = this.attackDuration;
             this.state = 'return';
@@ -150,9 +150,11 @@ export class SwordPrototype extends Equippable {
             }
             if (this.Physics.lineSquareCol(this.lineHitbox, entity)) {
                 // Collision happened
-                if (entity.type == "enemy") {
+                if (entity.type === "enemy" && !(entity.state === 'dead')) {
                     if (entity.damaged !== this.attackID) {
                         entity.onHit(this, this.owner)
+                        // Creates a vfx
+                        environment.push(this.createVfx("DmgVfx", entity.centerX, entity.centerY))
                         entity.xVelExt = (this.targetX - this.offsetX) / 10;
                         entity.yVelExt = (this.targetY - this.offsetY) / 10;
                     }

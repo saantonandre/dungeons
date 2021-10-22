@@ -65,8 +65,9 @@ export class InventoryManager {
     /** Checks for player collisions with items in the current environment */
     compute() {
         for (let entity of this.owner.director.level.entities) {
-            if (entity.type === 'item' && !entity.scheduledDeletion && this.owner.Physics.collided(this.owner, entity)) {
+            if (entity.type === 'item' && !entity.removed && this.owner.Physics.collided(this.owner, entity)) {
                 if (this.pickUp(entity)) {
+                    entity.removed = true;
                     entity.store();
                 }
             }

@@ -13,7 +13,7 @@ export class Player extends Entity {
         this.type = "player";
 
         /** A reference to the game director. 
-         * Needed for:
+         *  Needed for:
          * - Changing levels
          * - accessing to the mouse
          */
@@ -28,7 +28,7 @@ export class Player extends Entity {
         this.stats.maxMana = 15;
         this.stats.mana = this.stats.maxMana;
         this.stats.atk = 1;
-        this.stats.atkSpeed = 100;
+        this.stats.atkSpeed = 0;
         this.stats.maxExp = 5;
         this.stats.exp = 0;
 
