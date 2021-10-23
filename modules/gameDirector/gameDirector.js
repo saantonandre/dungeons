@@ -76,12 +76,12 @@ class GameDirector {
         this.player.userInterface.compute(meta.deltaTime);
         // Calls the compute function on every entities
         for (let entity of this.level.entities) {
+            entity.compute(meta.deltaTime, this.level.entities);
             if (entity.removed) {
                 // Pushes the entities to the garbage
                 garbage.push(this.level.entities.indexOf(entity));
                 continue;
             }
-            entity.compute(meta.deltaTime, this.level.entities);
             entity.resolveCollisions(meta.deltaTime, this.level.entities);
             if (entity.hasDisplayName) {
                 entity.displayName.compute(this.mouse);

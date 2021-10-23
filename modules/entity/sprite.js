@@ -16,7 +16,7 @@ export class Sprite {
         this.frame = 0;
         this.left = 0;
         this.frameCounter = 0;
-        this.setAnimation("idle", [0], [0]);
+        //this.setAnimation("idle", [0], [0]);
 
 
     }
@@ -106,6 +106,9 @@ export class Sprite {
         if (!this.display) {
             /** Skips rendering */
             return;
+        }
+        if (this.removed) {
+            //console.log('rendering a removed entity!!!')
         }
 
         if (rot) {

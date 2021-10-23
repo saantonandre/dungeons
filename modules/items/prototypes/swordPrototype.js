@@ -154,7 +154,9 @@ export class SwordPrototype extends Equippable {
                     if (entity.damaged !== this.attackID) {
                         entity.onHit(this, this.owner)
                         // Creates a vfx
-                        environment.push(this.createVfx("DmgVfx", entity.centerX, entity.centerY))
+                        environment.push(this.createVfx("DmgVfx", entity))
+                        environment.push(this.createVfx("TextVfx", entity, `${this.atk}`))
+
                         entity.xVelExt = (this.targetX - this.offsetX) / 10;
                         entity.yVelExt = (this.targetY - this.offsetY) / 10;
                     }

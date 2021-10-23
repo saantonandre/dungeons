@@ -73,9 +73,13 @@ export class Entity extends Sprite {
         }
         this.updateHitbox();
     }
+    /** Returns the stats.atk value */
     get atk() { return this.stats.atk }
 
+    /** Returns the stats.hp value */
     get hp() { return this.stats.hp }
+
+    /** Returns the stats.maxHp value */
     set hp(value) { this.stats.hp = value }
 
     get centerX() { return this.x + this.w / 2 }
@@ -93,6 +97,8 @@ export class Entity extends Sprite {
     onItemCollision(item) {
         // Do nothing
     }
+
+    /** Moves this entity according to the lateral collisions */
     resolveCollisions() {
         if (this.immovable) {
             return;
@@ -108,7 +114,7 @@ export class Entity extends Sprite {
         this.xVelExt = source.xVel;
         this.yVelExt = source.yVel;
     }
-    /** Sets the new x and y positions */
+    /** Moves this entity according to its velocities */
     updatePosition(deltaTime) {
         //Check for external velocities
         if (this.xVelExt !== 0) {
@@ -130,6 +136,8 @@ export class Entity extends Sprite {
     render(context, tilesize, ratio, camera) {
         this.renderSprite(context, tilesize, ratio, camera);
     }
+
+    /** Used for debugging, displays the entity's hitbox */
     renderHitbox(context, tilesize, ratio, camera) {
         context.strokeStyle = "red";
         context.beginPath();
@@ -165,6 +173,8 @@ export class Entity extends Sprite {
         context.globalAlpha = 1;
     }
 }
+
+/** Default stats of an entity */
 class Stats {
     constructor() {
         this.lv = 1;

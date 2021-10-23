@@ -1,14 +1,17 @@
 import { Sprite } from "../entity/sprite.js";
+import { Text } from "../text/text.js";
 
-class Vfx extends Sprite {
+/** Prototype Vfx */
+class SpriteVfx extends Sprite {
     /**
      * 
      * @param {Number} x horizontal position in the canvas
      * @param {Number} y vertical position in the canvas
      * @param {Number} duration The amount of animation cycles
      */
-    constructor(x, y, duration = 1) {
-        super(x, y);
+    constructor(source, duration = 1) {
+        super(source.centerX, source.centerY);
+        this.source = source;
         this.type = "vfx";
         this.name = "proto";
         this.duration = duration;
@@ -23,9 +26,11 @@ class Vfx extends Sprite {
         this.x += Math.random() * this.randomAmount - this.randomAmount / 2;
         this.y += Math.random() * this.randomAmount - this.randomAmount / 2;
     }
-    reset(x, y) {
-        this.x = x - this.w / 2;
-        this.y = y - this.h / 2;
+    reset(source) {
+        /** Returns to the original state */
+        this.source = source;
+        this.moveAtSource()
+
         if (this.randomPos) {
             this.randomizePos();
         }
@@ -33,40 +38,83 @@ class Vfx extends Sprite {
         this.frame = 0;
         this.frameCounter = 0;
         this.duration = this.initialDuration;
-        //console.log("resetted!")
+        this.additionalResetOperations();
+    }
+    /** Each vfx may have different reset options */
+    additionalResetOperations() {
+
+    }
+    moveAtSource() {
+        this.x = this.source.centerX - this.w / 2;
+        this.y = this.source.centerY - this.h / 2;
     }
     compute(deltaTime) {
         this.updateSprite(deltaTime);
     }
     render(context, tilesize, ratio, camera) {
-        this.renderSprite(context, tilesize, ratio, camera);
+        this.renderSprite(context, tilesize, ratio, camera, this.rot);
 
     }
     onAnimationEnd() {
-        switch (this.animation) {
-            case 'idle':
-                this.duration--;
-                if (this.duration <= 0) {
-                    this.removed = true;
-                    //console.log("deleted!")
-                }
-                break;
+        this.duration--;
+        if (this.duration <= 0) {
+            /** Removes vfx at the end of the duration */
+            this.removed = true;
         }
     }
 }
-
-export class DmgVfx extends Vfx {
-    constructor(x, y, duration = 1) {
-        super(x, y, duration);
-        console.log("created!")
+/** DmgVfxs have 4 random animations and 4 random rotations */
+export class DmgVfx extends SpriteVfx {
+    constructor(source, duration = 1) {
+        super(source, duration);
         this.name = 'DmgVfx';
         this.w = 1;
         this.h = 1;
-        this.x -= this.w / 2;
-        this.y -= this.h / 2;
         this.randomPos = true;
         this.randomizePos();
-        this.setAnimation('idle', [17, 17, 17, 17], [0, 1, 2, 3]);
-        this.animations['idle'].slowness = 6;
+        this.setAnimation('boom', [17, 17, 17, 17], [0, 1, 2, 3]);
+        this.setAnimation('cut', [18, 18, 18, 18], [0, 1, 2, 3]);
+        this.setAnimation('cut_long', [20, 20, 20, 20], [0, 1, 2, 3]);
+        this.animations['cut_long'].w = 2;
+        this.additionalResetOperations();
+    }
+    additionalResetOperations() {
+        let animations = Object.entries(this.animations)
+        /** Assign a random animation */
+        this.animation = animations[Math.random() * animations.length | 0][0];
+        let rotations = [0, 90, 180, -90];
+        this.rot = rotations[Math.random() * rotations.length | 0];
+    }
+}
+export class TextVfx extends SpriteVfx {
+    constructor(source, content) {
+        super(source);
+        this.name = 'TextVfx';
+        this.text = new Text(0, 0);
+        this.text.content = content;
+        this.text.color = '#ad2f45';
+        this.text.shadow = true;
+        this.text.fontSize = 10;
+        this.progress = 0;
+    }
+    reset(source, content) {
+        this.removed = false;
+        this.progress = 0;
+        this.text.content = content;
+        this.source = source;
+    }
+    compute(deltaTime) {
+        this.progress += (Math.PI / 60) * deltaTime;
+        if (this.progress >= Math.PI) {
+            this.removed = true;
+            return;
+        }
+        this.x = this.source.centerX + this.progress / 10;
+        this.y = this.source.centerY - Math.sin(this.progress);
+        this.text.x = this.x;
+        this.text.y = this.y;
+    }
+    render(context, tilesize, ratio, camera) {
+        this.text.render(context, tilesize, ratio, camera);
     }
 }

@@ -1,4 +1,6 @@
 import { spritesheet } from "../../../resourceManager.js";
+import { Text } from '../../../text/text.js'
+export { Text as TextComponent };
 export class InterfaceComponent {
     constructor(source, x, y) {
         this.source = source;
@@ -51,69 +53,5 @@ export class ImageComponent {
             this.h * tilesize * ratio,
 
         )
-    }
-}
-export class TextComponent {
-    constructor(x, y, color = '#ad2f45', align = "center", baseline = "middle") {
-        this.content = '';
-        this.x = x;
-        this.y = y;
-        this.w = 1;
-        this.h = 1;
-        this.color = color;
-        this.align = align;
-        this.baseline = baseline;
-        this.fontSize = 7;
-        this.font = 'Consolas, monaco, monospace';
-        this.stroke = false;
-        this.strokeColor = '#2c354d';
-        this.strokeWidth = 0.3;
-
-    }
-    canvasFont(ratio) {
-        return 'bold ' + Math.round(this.fontSize * ratio) + 'px ' + this.font
-    }
-    render(context, tilesize, ratio) {
-        if (this.stroke) {
-            context.lineWidth = this.strokeWidth * ratio;
-            context.strokeStyle = this.strokeColor;
-        }
-        context.textBaseline = this.baseline;
-        context.textAlign = this.align;
-        context.fillStyle = this.color;
-        context.font = this.canvasFont(ratio);
-        if (typeof this.content !== "string") {
-            // Content is split into an array of lines
-            for (let i = 0; i < this.content.length; i++) {
-                if (this.stroke) {
-
-                    context.strokeText(
-                        this.content[i],
-                        this.x * tilesize * ratio,
-                        (this.y * tilesize + this.fontSize * i) * ratio
-                    );
-                }
-                context.fillText(
-                    this.content[i],
-                    this.x * tilesize * ratio,
-                    (this.y * tilesize + this.fontSize * i) * ratio
-                );
-            }
-
-        } else {
-            if (this.stroke) {
-
-                context.strokeText(
-                    this.content,
-                    this.x * tilesize * ratio,
-                    this.y * tilesize * ratio
-                );
-            }
-            context.fillText(
-                this.content,
-                this.x * tilesize * ratio,
-                this.y * tilesize * ratio
-            )
-        }
     }
 }
