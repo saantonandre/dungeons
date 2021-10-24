@@ -19,8 +19,6 @@ export class Player extends Entity {
          */
         this.director = director;
 
-        /** Side which the player is facing */
-        this.facing = "r";
 
         /* STATS */
         this.stats.maxHp = 10;
@@ -136,12 +134,16 @@ export class Player extends Entity {
             this.recoverState();
         }
     }
-    computeState(deltaTime) {
+    computeState(deltaTime, environment) {
         switch (this.state) {
             case 'normal':
                 this.resolveInput();
+                this.inventory.compute(deltaTime);
+                this.equipment.compute(deltaTime, environment);
                 this.updatePosition(deltaTime);
                 this.updateHitbox();
+                this.checkCollisions(this, environment, false, false)
+                this.resolveCollisions()
                 break;
             case 'fall':
                 this.computeFalling(deltaTime);
@@ -153,17 +155,11 @@ export class Player extends Entity {
         }
     }
     compute(deltaTime, environment) {
-        this.inventory.compute(deltaTime);
-        this.updateSprite(deltaTime);
-
-        this.computeState(deltaTime);
-
-        this.checkCollisions(this, environment, false, false)
-        this.equipment.compute(deltaTime, environment);
-
+        this.computeState(deltaTime, environment);
         if (this.damaged > 0) {
             this.damaged -= deltaTime;
         }
+        this.updateSprite(deltaTime);
     }
     render(context, tilesize, ratio, camera) {
         if (this.damaged > 0 && (this.damaged | 0) % 2) {
@@ -189,27 +185,23 @@ export class Player extends Entity {
     resolveInput() {
         // Moves
         if (this.controls.left && !this.controls.right && !this.col.L) {
-            this.facing = "l";
             this.xVel = -this.speed;
             this.left = 1;
         } else if (this.xVel < 0) {
             this.xVel = 0;
         }
         if (this.controls.right && !this.controls.left && !this.col.R) {
-            this.facing = "r";
             this.xVel = this.speed;
             this.left = 0;
         } else if (this.xVel > 0) {
             this.xVel = 0;
         }
         if (this.controls.up && !this.controls.down && !this.col.B) {
-            this.facing = "t";
             this.yVel = -this.speed;
         } else if (this.yVel < 0) {
             this.yVel = 0;
         }
         if (this.controls.down && !this.controls.up && !this.col.T) {
-            this.facing = "b";
             this.yVel = this.speed;
         } else if (this.yVel > 0) {
             this.yVel = 0;

@@ -101,8 +101,27 @@ export class Entity extends Sprite {
     /** Moves this entity according to the lateral collisions */
     resolveCollisions() {
         if (this.immovable) {
-            return;
+            //return;
         }
+        if (this.col.L && this.xVel + this.xVelExt < 0) {
+            this.xVel = 0;
+            this.xVelExt = 0;
+        }
+        if (this.col.R && this.xVel + this.xVelExt > 0) {
+            this.xVel = 0;
+            this.xVelExt = 0;
+        }
+        if (this.col.T && this.yVel + this.yVelExt < 0) {
+            this.yVel = 0;
+            this.yVelExt = 0;
+        }
+        if (this.col.B && this.yVel + this.yVelExt > 0) {
+            this.yVel = 0;
+            this.yVelExt = 0;
+        }
+
+
+
         this.x += this.col.L - this.col.R;
         this.y += this.col.T - this.col.B;
         this.col.L = 0;

@@ -69,6 +69,7 @@ export class SwordPrototype extends Equippable {
             return;
         }
         this.state = 'special';
+        this.left = 0;
         this.attackID = Math.random();
         let mousePlayerRot = this.Physics.getAngle(mousePos.x, mousePos.y, this.centerX, this.centerY)
         this.owner.xVelExt = -Math.cos(mousePlayerRot) / 2;
@@ -76,6 +77,8 @@ export class SwordPrototype extends Equippable {
         this.rot = this.baseRot + mousePlayerRot;
         this.targetX = -Math.cos(mousePlayerRot) * this.attackRange;
         this.targetY = -Math.sin(mousePlayerRot) * this.attackRange;
+        this.offsetX = 0;
+        this.offsetY = 0;
     }
     computeSpecial(deltaTime, environment) {
         this.animation = 'attack';
@@ -98,11 +101,15 @@ export class SwordPrototype extends Equippable {
             return;
         }
         this.state = 'attack';
+        this.animation = 'attack';
+        this.left = 0;
         this.attackID = Math.random();
         let mousePlayerRot = this.Physics.getAngle(mousePos.x, mousePos.y, this.centerX, this.centerY)
         this.rot = this.baseRot + mousePlayerRot;
         this.targetX = -Math.cos(mousePlayerRot) * this.attackRange;
         this.targetY = -Math.sin(mousePlayerRot) * this.attackRange;
+        this.offsetX = 0;
+        this.offsetY = 0;
     }
     computeAttack(deltaTime, environment) {
         this.animation = 'attack';
@@ -121,6 +128,8 @@ export class SwordPrototype extends Equippable {
         switch (this.state) {
             case 'idle':
                 this.animation = 'idle';
+                this.left = this.owner.left;
+                this.offsetX = this.left - this.w / 2;
                 break;
             case 'attack':
                 this.computeAttack(deltaTime, environment);
@@ -183,12 +192,6 @@ export class SwordPrototype extends Equippable {
     }
     compute(deltaTime, environment) {
         this.computeState(deltaTime, environment);
-        if (this.state == 'idle') {
-            this.left = this.owner.left;
-            this.offsetX = this.left - this.w / 2;
-        } else {
-            this.left = 0;
-        }
         // Computes offsets (when attacking)
         if (!this.detached) {
             this.x = this.owner.x + this.offsetX;

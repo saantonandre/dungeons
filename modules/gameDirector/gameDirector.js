@@ -67,7 +67,7 @@ class GameDirector {
      * - Updates the camera
      * - Computes the UI
      */
-    compute(meta) {
+    compute = (meta) => {
         /** Where dead entities ends up */
         let garbage = [];
         /** Reiterates the computation if the level is recreated */
@@ -76,13 +76,13 @@ class GameDirector {
         this.player.userInterface.compute(meta.deltaTime);
         // Calls the compute function on every entities
         for (let entity of this.level.entities) {
+            entity.resolveCollisions(meta.deltaTime, this.level.entities);
             entity.compute(meta.deltaTime, this.level.entities);
             if (entity.removed) {
                 // Pushes the entities to the garbage
                 garbage.push(this.level.entities.indexOf(entity));
                 continue;
             }
-            entity.resolveCollisions(meta.deltaTime, this.level.entities);
             if (entity.hasDisplayName) {
                 entity.displayName.compute(this.mouse);
             }
@@ -95,6 +95,10 @@ class GameDirector {
         // Portal specific computing, need comms with this, the map and the player
         for (let portal of this.level.portals) {
             loadLevelCall = portal.computePortal(meta, this);
+            if (loadLevelCall) {
+                // Stop computing other portals since they are now next level's portal
+                break;
+            }
         }
         // Computes the camera position
         this.camera.compute(meta, this.level);
@@ -112,7 +116,7 @@ class GameDirector {
      * - Renders the hp bars
      * - Renders the UI
      */
-    render(context, meta) {
+    render = (context, meta) => {
         this.sortEntities();
         /** Renders the floor (ground level) tiles */
         for (let tile of this.level.floor) {
