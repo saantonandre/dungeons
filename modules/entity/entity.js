@@ -33,6 +33,7 @@ export class Entity extends Sprite {
         this.shadow = false;
         this.solid = true;
         this.removed = false;
+        this.immovable = false;
 
         /** A list containing this entity's drops. 
          * When this entity will get removed by the garbage cleaner  
@@ -100,9 +101,6 @@ export class Entity extends Sprite {
 
     /** Moves this entity according to the lateral collisions */
     resolveCollisions() {
-        if (this.immovable) {
-            //return;
-        }
         if (this.col.L && this.xVel + this.xVelExt < 0) {
             this.xVel = 0;
             this.xVelExt = 0;
@@ -122,8 +120,8 @@ export class Entity extends Sprite {
 
 
 
-        this.x += this.col.L - this.col.R;
-        this.y += this.col.T - this.col.B;
+        //this.x += this.col.L - this.col.R;
+        //this.y += this.col.T - this.col.B;
         this.col.L = 0;
         this.col.R = 0;
         this.col.T = 0;
@@ -133,9 +131,7 @@ export class Entity extends Sprite {
         this.xVelExt = source.xVel;
         this.yVelExt = source.yVel;
     }
-    /** Moves this entity according to its velocities */
-    updatePosition(deltaTime) {
-        //Check for external velocities
+    updateVelocities(deltaTime) {
         if (this.xVelExt !== 0) {
             this.xVelExt *= Math.pow(this.friction, deltaTime);
             if (Math.abs(this.xVelExt) < 0.001) {
@@ -148,6 +144,10 @@ export class Entity extends Sprite {
                 this.yVelExt = 0;
             }
         }
+    }
+    /** Moves this entity according to its velocities */
+    updatePosition(deltaTime) {
+        this.resolveCollisions();
         this.x += (this.xVel + this.xVelExt) * deltaTime;
         this.y += (this.yVel + this.yVelExt) * deltaTime;
     }

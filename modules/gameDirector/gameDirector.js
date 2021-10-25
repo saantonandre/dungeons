@@ -7,6 +7,7 @@ import { Player } from "../player/player.js";
 import { Controls } from "../controls/controls.js";
 import { Mouse } from "../mouse/mouse.js";
 
+import { debug } from '../debug/debug.js';
 class GameDirector {
 
     constructor() {
@@ -141,6 +142,7 @@ class GameDirector {
                 entity.hpBar.render(context, meta.tilesize, meta.ratio, this.camera);
             }
         }
+        debug.render(context, meta.tilesize, meta.ratio, this.camera);
         this.player.userInterface.render(context, meta.tilesize, meta.baseRatio);
     }
 

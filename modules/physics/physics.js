@@ -54,70 +54,7 @@ export function isOutOfBounds(entity, optionalMargin) {
 }
 */
 
-export function colCheck(shapeA, shapeB) {
-    if (shapeA == null || shapeB == null) {
-        return true;
-    }
-    // get the vectors to check against
-    var shapeAA, shapeBB;
-    if (shapeA.hitbox != null) {
-        shapeAA = shapeA.hitbox;
-    } else {
-        shapeAA = shapeA;
-    }
-    if (shapeB.hitbox != null) {
-        shapeBB = shapeB.hitbox;
-    } else {
-        shapeBB = shapeB;
-    }
-    var vX = (shapeAA.x + (shapeAA.w / 2)) - (shapeBB.x + (shapeBB.w / 2)),
-        vY = (shapeAA.y + (shapeAA.h / 2)) - (shapeBB.y + (shapeBB.h / 2)),
-        // add the half widths and half heights of the objects
-        hWidths = (shapeAA.w / 2) + (shapeBB.w / 2),
-        hHeights = (shapeAA.h / 2) + (shapeBB.h / 2),
-        colDir = false;
 
-    // if the x and y vector are less than the half width or half height, they we must be inside the object, causing a collision
-    if (Math.abs(vX) < hWidths && Math.abs(vY) < hHeights) {
-        // figures out on which side we are colliding (top, bottom, left, or right)
-        var oX = hWidths - Math.abs(vX),
-            oY = hHeights - Math.abs(vY);
-        if (oX >= oY) {
-            if (vY > 0) {
-                colDir = 't';
-                if (shapeA.col.T < oY) {
-                    if (oY > 0.01)
-                        shapeA.col.T += oY;
-                }
-            } else {
-                colDir = 'b';
-                if (shapeA.col.B < oY) {
-                    if (oY > 0.01)
-                        shapeA.col.B += oY;
-                }
-            }
-
-        } else {
-            if (vX > 0) {
-                colDir = 'l';
-                if (shapeA.col.L < oX) {
-                    if (oX > 0.01)
-                        shapeA.col.L += oX;
-                }
-            } else {
-                colDir = 'r';
-                if (shapeA.col.R < oX) {
-                    if (oX > 0.01)
-                        shapeA.col.R += oX;
-                }
-            }
-        }
-
-    }
-
-    return colDir;
-
-}
 
 /*
     To use this:
@@ -194,12 +131,12 @@ export function assembleChunk(chunk, obj) {
 }
 
 export function collided(a, b, forceSpriteBox = false) {
-    var square1 = a.hitbox && !forceSpriteBox ? a.hitbox : a;
-    var square2 = b.hitbox && !forceSpriteBox ? b.hitbox : b;
-    if (square1.x < square2.x + square2.w) {
-        if (square1.x + square1.w > square2.x) {
-            if (square1.y < square2.y + square2.h) {
-                if (square1.y + square1.h > square2.y) {
+    let rect1 = a.hitbox && !forceSpriteBox ? a.hitbox : a;
+    let rect2 = b.hitbox && !forceSpriteBox ? b.hitbox : b;
+    if (rect1.x < rect2.x + rect2.w) {
+        if (rect1.x + rect1.w > rect2.x) {
+            if (rect1.y < rect2.y + rect2.h) {
+                if (rect1.y + rect1.h > rect2.y) {
                     return true;
                 }
             }
@@ -208,15 +145,12 @@ export function collided(a, b, forceSpriteBox = false) {
     return false;
 }
 
-export function pointSquareCol(point, sq, forceSpriteBox = false) {
-    var square = sq;
-    if (!forceSpriteBox && sq.hitbox !== undefined) {
-        square = sq.hitbox;
-    }
-    if (point.x >= square.x) {
-        if (point.x <= square.x + square.w) {
-            if (point.y >= square.y) {
-                if (point.y <= square.y + square.h) {
+export function pointSquareCol(point, rectangle, forceSpriteBox = false) {
+    let rect = rectangle.hitbox && !forceSpriteBox ? rectangle.hitbox : rectangle;
+    if (point.x >= rect.x) {
+        if (point.x <= rect.x + rect.w) {
+            if (point.y >= rect.y) {
+                if (point.y <= rect.y + rect.h) {
                     return true;
                 }
             }

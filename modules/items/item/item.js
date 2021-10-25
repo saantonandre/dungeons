@@ -54,6 +54,7 @@ export class Item extends Entity {
     }
     compute(deltaTime) {
         this.levitate(deltaTime);
+        this.updateVelocities(deltaTime);
         this.updatePosition(deltaTime);
         this.updateHitbox();
     }

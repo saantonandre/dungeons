@@ -72,8 +72,8 @@ export class SwordPrototype extends Equippable {
         this.left = 0;
         this.attackID = Math.random();
         let mousePlayerRot = this.Physics.getAngle(mousePos.x, mousePos.y, this.centerX, this.centerY)
-        this.owner.xVelExt = -Math.cos(mousePlayerRot) / 2;
-        this.owner.yVelExt = -Math.sin(mousePlayerRot) / 2;
+        this.owner.xVelExt = -Math.cos(mousePlayerRot);
+        this.owner.yVelExt = -Math.sin(mousePlayerRot);
         this.rot = this.baseRot + mousePlayerRot;
         this.targetX = -Math.cos(mousePlayerRot) * this.attackRange;
         this.targetY = -Math.sin(mousePlayerRot) * this.attackRange;

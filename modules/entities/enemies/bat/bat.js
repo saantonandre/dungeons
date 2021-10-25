@@ -88,9 +88,10 @@ export class Bat extends Enemy {
         }
         this.searchPrey(environment);
         this.computeState(deltaTime);
+        this.updateVelocities(deltaTime);
+        this.checkCollisions(this, environment, deltaTime)
         this.updatePosition(deltaTime);
         this.updateHitbox();
-        this.checkCollisions(this, environment)
         this.updateSprite(deltaTime);
     }
     onCollision(collidedEntity) {

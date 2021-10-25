@@ -35,6 +35,7 @@ export class Player extends Entity {
         this.expManager = new ExpManager(this);
 
 
+        //this.baseSpeed = 20;
         this.baseSpeed = 0.08;
         this.speed = this.baseSpeed;
 
@@ -140,10 +141,10 @@ export class Player extends Entity {
                 this.resolveInput();
                 this.inventory.compute(deltaTime);
                 this.equipment.compute(deltaTime, environment);
+                this.updateVelocities(deltaTime);
+                this.checkCollisions(this, environment, deltaTime)
                 this.updatePosition(deltaTime);
                 this.updateHitbox();
-                this.checkCollisions(this, environment, false, false)
-                this.resolveCollisions()
                 break;
             case 'fall':
                 this.computeFalling(deltaTime);

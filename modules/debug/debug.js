@@ -10,7 +10,42 @@ class Debug {
         div.style.padding = '10px';
         this.div = div;
         this.active = false;
-        this.times = []
+        this.times = [];
+        this.drawLater = [];
+    }
+    drawRect(rect) {
+        this.drawLater.push({ type: 'rect', x: rect.x, y: rect.y, w: rect.w, h: rect.h })
+    }
+    drawPoint(point) {
+        this.drawLater.push({ type: 'point', x: point.x - 0.1, y: point.y - 0.1, w: 0.2, h: 0.2 })
+    }
+    drawLine(pointA, pointB) {
+        this.drawLater.push({ type: 'line', x1: pointA.x, y1: pointA.y, x2: pointB.x, y2: pointB.y })
+    }
+    render(context, tilesize, ratio, camera) {
+        context.beginPath();
+        context.strokeStyle = "red";
+        for (let draw of this.drawLater) {
+            switch (draw.type) {
+                case 'point':
+                case 'rect':
+                    context.rect(
+                        (draw.x + camera.x) * tilesize * ratio,
+                        (draw.y + camera.y) * tilesize * ratio,
+                        (draw.w) * tilesize * ratio,
+                        (draw.h) * tilesize * ratio
+                    )
+                    break;
+                case 'line':
+                    context.moveTo((draw.x1 + camera.x) * tilesize * ratio, (draw.y1 + camera.y) * tilesize * ratio);
+                    context.lineTo((draw.x2 + camera.x) * tilesize * ratio, (draw.y2 + camera.y) * tilesize * ratio);
+                    break;
+
+            }
+        }
+        context.closePath();
+        context.stroke();
+        this.drawLater.length = 0;
     }
     activate() {
         this.active = true;

@@ -69,9 +69,10 @@ export class Slime extends Enemy {
     compute(deltaTime, environment) {
         this.searchPrey(environment);
         this.computeState(deltaTime);
+        this.updateVelocities(deltaTime);
+        this.checkCollisions(this, environment, deltaTime)
         this.updatePosition(deltaTime);
         this.updateHitbox();
-        this.checkCollisions(this, environment);
         this.updateSprite(deltaTime);
     }
     render(context, tilesize, ratio, camera) {
