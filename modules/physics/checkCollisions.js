@@ -203,7 +203,7 @@ function resolveDynamicRectVsRect(obj, deltaTime, rectB) {
 
     let objHitbox1 = obj.hitbox ? obj.hitbox : obj;
     let objHitbox2 = rectB.hitbox ? rectB.hitbox : rectB;
-
+    //debug.drawRect(objHitbox2, 'cyan')
     if (dynamicRectVsRect(objHitbox1, objHitbox2, velocitiesX, velocitiesY, deltaTime, contactPoint, contactNormal, contactTime)) {
         //if (contactNormal.x < 0) { obj.col.R = -contactNormal.x * Math.abs(velocitiesY) * (1 - contactTime.value); }
         //if (contactNormal.x > 0) { obj.col.L = contactNormal.x * Math.abs(velocitiesX) * (1 - contactTime.value); }
@@ -406,6 +406,9 @@ export function simpleCollisionCheck(obj, entities) {
             }
             if (entity.onCollision) {
                 entity.onCollision(obj);
+            }
+            if (resolveException(obj, entity)) {
+                continue;
             }
             colCheck(obj, entity);
         }

@@ -180,8 +180,8 @@ export class Slime extends Enemy {
         if (collidedEntity === this.prey && this.state === "attack") {
 
             collidedEntity.onHit(this);
-            collidedEntity.xVelExt = this.xVel;
-            collidedEntity.yVelExt = this.yVel;
+            collidedEntity.xVelExt += this.xVel;
+            collidedEntity.yVelExt += this.yVel;
             this.fleeing = 120;
             this.state = "flee";
         }
