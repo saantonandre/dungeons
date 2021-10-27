@@ -62,16 +62,9 @@ export class InventoryManager {
         }
         return false;
     }
-    /** Checks for player collisions with items in the current environment */
+    /**  */
     compute() {
-        for (let entity of this.owner.director.level.entities) {
-            if (entity.type === 'item' && !entity.removed && this.owner.Physics.collided(this.owner, entity)) {
-                if (this.pickUp(entity)) {
-                    entity.removed = true;
-                    entity.store();
-                }
-            }
-        }
+
     }
     render() {
 

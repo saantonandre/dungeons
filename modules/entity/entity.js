@@ -93,10 +93,7 @@ export class Entity extends Sprite {
         this.hitbox.h = this.h + this.hitboxOffset.h;
     }
     onCollision(source) {
-
-    }
-    onItemCollision(item) {
-        // Do nothing
+        /** Exceptional collision events */
     }
 
     /** Moves this entity according to the lateral collisions */

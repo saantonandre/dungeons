@@ -42,7 +42,7 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
     // Step 2: 
     for (let i = 0; i < entities.length; i++) {
         let entity = entities[i];
-        // Skip exceptions
+        // Skip collision exceptions
         if (collisionException(obj, entity)) {
             continue;
         }
@@ -61,6 +61,10 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
                 }
                 if (entity.onCollision) {
                     entity.onCollision(obj);
+                }
+                // Skip resolve exceptions
+                if (resolveException(obj, entity)) {
+                    continue;
                 }
                 colPointsVector.push({ id: i, ct: ct.value })
 
@@ -83,7 +87,7 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
     // (Its' implied that at least one of the velocities isn't 0)
     // (Its' also implied there has been a collision at this point)
     if (velocitiesX != 0 && velocitiesY != 0) {
-        console.log("Recursion happened");
+        //console.log("Recursion happened");
         checkCollisions(obj, entities, deltaTime);
     }
 }
@@ -342,8 +346,15 @@ function rayVsRect(origin, direction, target, contactPoint, contactNormal, timeH
     return true;
 }
 
-/** Defines whether the collision check should be avoided */
+/** Defines whether the collision check is unnecessary */
 function collisionException(obj, entity) {
+    if (entity.removed || entity == obj) {
+        return true;
+    }
+    return false;
+}
+/** Defines whether the collision resolve should be avoided */
+function resolveException(obj, entity) {
     if (!entity.solid ||
         entity.removed ||
         entity == obj ||
@@ -371,7 +382,7 @@ function collided(a, b, forceSpriteBox = false) {
 }
 
 /** Gets called if a more advanced colcheck is not necessary */
-function simpleCollisionCheck(obj, entities) {
+export function simpleCollisionCheck(obj, entities) {
     for (let entity of entities) {
         if (collisionException(obj, entity)) {
             continue;

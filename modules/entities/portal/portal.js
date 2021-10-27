@@ -19,6 +19,8 @@ export class Portal extends Entity {
         this.left = 0;
 
         this.animation = "open";
+        /** Has the player collided with the portal? */
+        this.collidedWithPlayer = false;
 
         this.setAnimation("closed", [15], [19])
         this.setAnimation("opening", [15, 15, 15, 15, 15, 15, 15, 15, 15], [19, 20, 21, 22, 23, 24, 25, 26, 27])
@@ -74,10 +76,20 @@ export class Portal extends Entity {
     /** Portal computing, returns true if changeLevel is called */
     computePortal(meta, gameDirector) {
         this.computeAction(gameDirector.level.entities);
-        if (!this.solid && gameDirector.player.state == 'normal' && this.Physics.collided(this, gameDirector.player)) {
+        if (this.collidedWithPlayer) {
+            this.collidedWithPlayer = false;
             // Move player to the linked level
             gameDirector.changeLevel(this.dir, meta);
             return true;
+        }
+    }
+    onCollision(source) {
+        switch (source.type) {
+            case 'player':
+                if (!this.solid /** is open */ ) {
+                    this.collidedWithPlayer = true;
+                }
+                break;
         }
     }
     /** Entity computing */
@@ -110,7 +122,8 @@ export class FloorPortal extends Portal {
     computePortal(meta, gameDirector) {
         //
         this.computeAction(gameDirector.level.entities);
-        if (!this.solid && gameDirector.player.state == 'normal' && this.Physics.collided(this, gameDirector.player)) {
+        if (this.collidedWithPlayer) {
+            this.collidedWithPlayer = false;
             // Move player to the linked level
             gameDirector.changeFloor(meta);
             return true;

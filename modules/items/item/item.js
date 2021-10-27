@@ -18,6 +18,7 @@ export class Item extends Entity {
 
         this.equippable = false;
         this.stackable = true;
+        this.collected = false;
 
         this.description = "Item description. This is an item description. Should have searched for a Lorem Ipsum but felt creative enough to do this myself."
         // Placeholder animation
@@ -33,6 +34,16 @@ export class Item extends Entity {
         this.friction = 0.98;
 
     }
+
+    onCollision(source) {
+        switch (source.type) {
+            case 'player':
+                if (source.inventory.pickUp(this)) {
+                    this.store();
+                }
+                break;
+        }
+    }
     /** Removes itself from the source drops array and goes to the entities array */
     dispatch(environment) {
         this.x = this.source.x;
@@ -41,18 +52,22 @@ export class Item extends Entity {
         // Changes this environment
         environment.push(this)
         this.environment = environment;
+        this.collected = false;
+        this.removed = false;
 
     }
     /** Removes itself from the entities array */
     store() {
         this.animations['idle'].offsetX = 0;
         this.animations['idle'].offsetY = 0;
+        this.collected = true;
+        this.removed = true;
     }
     /** Makes the item appear levitating */
     levitate(deltaTime) {
         this.animations["idle"].offsetY = Math.sin(this.sinIncrease += this.sinVel * deltaTime) / 10;
     }
-    compute(deltaTime) {
+    compute(deltaTime, environment) {
         this.levitate(deltaTime);
         this.updateVelocities(deltaTime);
         this.updatePosition(deltaTime);
