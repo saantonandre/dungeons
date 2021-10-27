@@ -28,7 +28,9 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
     };
 
     /** debug player dir*/
-    debug.drawLine({ x: obj.centerX, y: obj.centerY }, { x: obj.centerX + velocitiesX * deltaTime, y: obj.centerY + velocitiesY * deltaTime }, "white")
+    //debug.drawLine({ x: obj.centerX, y: obj.centerY }, { x: obj.centerX + velocitiesX * deltaTime, y: obj.centerY + velocitiesY * deltaTime }, "white")
+    /** debug broadHitbox*/
+    //debug.drawRect(broadHitbox, "cyan")
 
     /** Vector containing pairs of (ID, contactTime) */
     let colPointsVector = [];
@@ -39,6 +41,8 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
     /** Contact normal */
     const cn = { x: 0, y: 0 };
 
+    /** Defines if the level has been changed */
+    let levelChange = false;
     // Step 2: 
     for (let i = 0; i < entities.length; i++) {
         let entity = entities[i];
@@ -60,7 +64,10 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
                     obj.onCollision(entity);
                 }
                 if (entity.onCollision) {
-                    entity.onCollision(obj);
+                    if (entity.onCollision(obj) === 'levelChange') {
+                        /** A level-changing event has been triggered */
+                        levelChange = true;
+                    };
                 }
                 // Skip resolve exceptions
                 if (resolveException(obj, entity)) {
@@ -71,6 +78,10 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
                 // Compute point colliders
             }
         }
+    }
+    if (levelChange) {
+        /** Entities are changed, no point in resolving */
+        return;
     }
     if (colPointsVector.length === 0) {
         //console.log('No colliders were found, obj xVel = ', obj.xVel)
@@ -144,10 +155,10 @@ class PointsCollider {
     }
     /** Move the entity depending on the collided points */
     resolveCollisions() {
-        debug.drawPoint(this.TL, this.TL.col ? 'red' : 'yellow')
-        debug.drawPoint(this.TR, this.TR.col ? 'red' : 'yellow')
-        debug.drawPoint(this.BL, this.BL.col ? 'red' : 'yellow')
-        debug.drawPoint(this.BR, this.BR.col ? 'red' : 'yellow')
+        //debug.drawPoint(this.TL, this.TL.col ? 'red' : 'yellow')
+        //debug.drawPoint(this.TR, this.TR.col ? 'red' : 'yellow')
+        //debug.drawPoint(this.BL, this.BL.col ? 'red' : 'yellow')
+        //debug.drawPoint(this.BR, this.BR.col ? 'red' : 'yellow')
         if (this.TL.col || this.BL.col) {
             if (this.entity.xVel < 0) {
                 this.entity.xVel = 0;
@@ -232,6 +243,8 @@ function dynamicRectVsRect(rectA, rectB, xVel, yVel, deltaTime, contactPoint, co
         w: rectB.w + rectA.w,
         h: rectB.h + rectA.h
     }
+    /** debug broadHitbox*/
+    //debug.drawRect(expanded, "orange")
     let centerRectA = {
         x: rectA.x + rectA.w / 2,
         y: rectA.y + rectA.h / 2

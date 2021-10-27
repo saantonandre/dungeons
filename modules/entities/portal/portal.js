@@ -88,6 +88,7 @@ export class Portal extends Entity {
             case 'player':
                 if (!this.solid /** is open */ ) {
                     this.collidedWithPlayer = true;
+                    return 'levelChange';
                 }
                 break;
         }

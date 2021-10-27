@@ -52,6 +52,7 @@ export class Sprite {
          * 
          */
     }
+    renderHitbox() {}
     /** Renders the base sprite, not animated, as a static icon in a specific location */
     renderItem(x, y, context, tilesize, ratio, w = 1, h = 1) {
         context.drawImage(

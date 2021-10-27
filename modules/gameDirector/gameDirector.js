@@ -142,7 +142,7 @@ class GameDirector {
                 entity.hpBar.render(context, meta.tilesize, meta.ratio, this.camera);
             }
         }
-        debug.render(context, meta.tilesize, meta.ratio, this.camera);
+        //debug.render(context, meta.tilesize, meta.ratio, this.camera);
         this.player.userInterface.render(context, meta.tilesize, meta.baseRatio);
     }
 

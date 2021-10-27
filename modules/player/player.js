@@ -35,8 +35,8 @@ export class Player extends Entity {
         this.expManager = new ExpManager(this);
 
 
-        this.baseSpeed = 3;
-        //this.baseSpeed = 0.08;
+        //this.baseSpeed = 4;
+        this.baseSpeed = 0.08;
         this.speed = this.baseSpeed;
 
         this.attacking = false;
