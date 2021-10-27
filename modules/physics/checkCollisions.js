@@ -6,8 +6,8 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
         return false;
     }
     // Decides if the col should be checked normally, without vectors
+    simpleCollisionCheck(obj, entities);
     if (obj.xVel + obj.xVelExt === 0 && obj.yVel + obj.yVelExt === 0) {
-        //simpleCollisionCheck(obj, entities);
         return;
     }
 
@@ -26,7 +26,9 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
         w: velocitiesX > 0 ? objHitbox.w + velocitiesX * deltaTime : objHitbox.w - velocitiesX * deltaTime,
         h: velocitiesY > 0 ? objHitbox.h + velocitiesY * deltaTime : objHitbox.h - velocitiesY * deltaTime
     };
-    debug.drawRect(broadHitbox)
+
+    /** debug player dir*/
+    debug.drawLine({ x: obj.centerX, y: obj.centerY }, { x: obj.centerX + velocitiesX * deltaTime, y: obj.centerY + velocitiesY * deltaTime }, "white")
 
     /** Vector containing pairs of (ID, contactTime) */
     let colPointsVector = [];
@@ -36,7 +38,6 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
     const cp = { x: 0, y: 0 };
     /** Contact normal */
     const cn = { x: 0, y: 0 };
-
 
     // Step 2: 
     for (let i = 0; i < entities.length; i++) {
@@ -48,12 +49,12 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
         // BROAD
         // Checks broad hitbox collisions with entities
         if (collided(broadHitbox, entity)) {
+            /** Checks corner points collisions */
             // NARROW
             // If the entity has an hitbox, use it instead
             let entityHitbox = entity.hitbox ? entity.hitbox : entity;
             // Swept collision check
             if (dynamicRectVsRect(objHitbox, entityHitbox, velocitiesX, velocitiesY, deltaTime, cp, cn, ct)) {
-                debug.drawLine(cp, { x: cp.x + cn.x * ct.value, y: cp.y + cn.y * ct.value });
                 // Handles eventual collision events
                 if (obj.onCollision) {
                     obj.onCollision(entity);
@@ -62,10 +63,13 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
                     entity.onCollision(obj);
                 }
                 colPointsVector.push({ id: i, ct: ct.value })
+
+                // Compute point colliders
             }
         }
     }
     if (colPointsVector.length === 0) {
+        //console.log('No colliders were found, obj xVel = ', obj.xVel)
         return;
     }
     // Do the sort
@@ -73,6 +77,105 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
     // Now resolve the collision in correct order 
     for (let rect of colPointsVector) {
         resolveDynamicRectVsRect(obj, deltaTime, entities[rect.id]);
+    }
+
+    /** Fixes slide direction change in case velocities were initially diagonal */
+    // (Its' implied that at least one of the velocities isn't 0)
+    // (Its' also implied there has been a collision at this point)
+    if (velocitiesX != 0 && velocitiesY != 0) {
+        console.log("Recursion happened");
+        checkCollisions(obj, entities, deltaTime);
+    }
+}
+
+class PointsCollider {
+    constructor() {
+        this.entity;
+        this.offset = -0.01;
+        /** Top left collider */
+        this.TL = { x: 0, y: 0, col: false }
+        /** Top right collider */
+        this.TR = { x: 0, y: 0, col: false }
+        /** Bottom left collider */
+        this.BL = { x: 0, y: 0, col: false }
+        /** Bottom right collider */
+        this.BR = { x: 0, y: 0, col: false }
+
+    }
+    /** Sets the collision points on each corner of the entity */
+    setColPoints(entity) {
+        this.entity = entity;
+        let entityHitbox = entity.hitbox ? entity.hitbox : entity;
+        this.TL = {
+            x: entityHitbox.x - this.offset,
+            y: entityHitbox.y - this.offset,
+            col: false
+        };
+        this.TR = {
+            x: entityHitbox.x + entityHitbox.w + this.offset,
+            y: entityHitbox.y - this.offset,
+            col: false
+        };
+        this.BL = {
+            x: entityHitbox.x - this.offset,
+            y: entityHitbox.y + entityHitbox.h + this.offset,
+            col: false
+        };
+        this.BR = {
+            x: entityHitbox.x + entityHitbox.w + this.offset,
+            y: entityHitbox.y + entityHitbox.h + this.offset,
+            col: false
+        };
+    }
+    /** Checks Points collision */
+    checkCols(collider) {
+        if (!this.TL.col)
+            this.TL.col = pointSquareCol(this.TL, collider);
+        if (!this.TR.col)
+            this.TR.col = pointSquareCol(this.TR, collider);
+        if (!this.BL.col)
+            this.BL.col = pointSquareCol(this.BL, collider);
+        if (!this.BR.col)
+            this.BR.col = pointSquareCol(this.BR, collider);
+    }
+    /** Move the entity depending on the collided points */
+    resolveCollisions() {
+        debug.drawPoint(this.TL, this.TL.col ? 'red' : 'yellow')
+        debug.drawPoint(this.TR, this.TR.col ? 'red' : 'yellow')
+        debug.drawPoint(this.BL, this.BL.col ? 'red' : 'yellow')
+        debug.drawPoint(this.BR, this.BR.col ? 'red' : 'yellow')
+        if (this.TL.col || this.BL.col) {
+            if (this.entity.xVel < 0) {
+                this.entity.xVel = 0;
+            }
+            if (this.entity.xVelExt < 0) {
+                this.entity.xVelExt = 0;
+            }
+        }
+        if (this.TR.col || this.BR.col) {
+            if (this.entity.xVel > 0) {
+                this.entity.xVel = 0;
+            }
+            if (this.entity.xVelExt > 0) {
+                this.entity.xVelExt = 0;
+            }
+        }
+        if (this.TL.col || this.TR.col) {
+            if (this.entity.yVel < 0) {
+                this.entity.yVel = 0;
+            }
+            if (this.entity.yVelExt < 0) {
+                this.entity.yVelExt = 0;
+            }
+        }
+        if (this.BL.col || this.BR.col) {
+            if (this.entity.yVel > 0) {
+                this.entity.yVel = 0;
+            }
+            if (this.entity.yVelExt > 0) {
+                this.entity.yVelExt = 0;
+            }
+        }
     }
 }
 
@@ -92,12 +195,18 @@ function resolveDynamicRectVsRect(obj, deltaTime, rectB) {
         //if (contactNormal.y < 0) { obj.col.B = -contactNormal.y * Math.abs(velocitiesX) * (1 - contactTime.value); }
         //if (contactNormal.y > 0) { obj.col.T = contactNormal.y * Math.abs(velocitiesY) * (1 - contactTime.value); }
 
-        obj.xVel += contactNormal.x * Math.abs(obj.xVel) * (1.0 - contactTime.value);
-        obj.yVel += contactNormal.y * Math.abs(obj.yVel) * (1.0 - contactTime.value);
-        obj.xVelExt += contactNormal.x * Math.abs(obj.xVelExt) * (1.0 - contactTime.value);
-        obj.yVelExt += contactNormal.y * Math.abs(obj.yVelExt) * (1.0 - contactTime.value);
+        // console.log('resolved a collision, old xVel = ', obj.xVel)
+        // To avoid weird JS numbers behaviour
+        let overlapFixMultiplier = 1.001;
+        obj.xVel += contactNormal.x * Math.abs(obj.xVel) * (1.0 - contactTime.value) * overlapFixMultiplier;
+        obj.yVel += contactNormal.y * Math.abs(obj.yVel) * (1.0 - contactTime.value) * overlapFixMultiplier;
+        obj.xVelExt += contactNormal.x * Math.abs(obj.xVelExt) * (1.0 - contactTime.value) * overlapFixMultiplier;
+        obj.yVelExt += contactNormal.y * Math.abs(obj.yVelExt) * (1.0 - contactTime.value) * overlapFixMultiplier;
+
+
         //obj.xVel = 0;
         //obj.yVel = 0;
+        // console.log('new xVel', obj.xVel)
         return true;
     }
 
@@ -119,7 +228,6 @@ function dynamicRectVsRect(rectA, rectB, xVel, yVel, deltaTime, contactPoint, co
         w: rectB.w + rectA.w,
         h: rectB.h + rectA.h
     }
-    debug.drawRect(expanded)
     let centerRectA = {
         x: rectA.x + rectA.w / 2,
         y: rectA.y + rectA.h / 2
@@ -128,14 +236,28 @@ function dynamicRectVsRect(rectA, rectB, xVel, yVel, deltaTime, contactPoint, co
         x: xVel * deltaTime,
         y: yVel * deltaTime
     }
-    debug.drawLine(centerRectA, { x: centerRectA.x + direction.x, y: centerRectA.y + direction.y });
     if (rayVsRect(centerRectA, direction, expanded, contactPoint, contactNormal, contactTime)) {
-
-        return (contactTime.value >= 0.0 && contactTime.value < 1.0);
+        //console.log('ray v rect returned ct', contactTime.value)
+        return (contactTime.value >= 0 && contactTime.value < 1);
     } else {
+        //console.log('ray v rect returned false')
         return false;
     }
 
+}
+export function pointSquareCol(point, rectangle, forceSpriteBox = false) {
+    let rect = rectangle.hitbox && !forceSpriteBox ? rectangle.hitbox : rectangle;
+    if (point.x >= rect.x) {
+        if (point.x <= rect.x + rect.w) {
+            if (point.y >= rect.y) {
+                if (point.y <= rect.y + rect.h) {
+                    return true;
+                }
+            }
+
+        }
+    }
+    return false;
 }
 
 /**

@@ -26,8 +26,8 @@ class Game {
         gameDirector.render(c, meta);
 
         //gameDirector.consoleRender();
-        requestAnimationFrame(this.update)
-        //requestAnimationFrame(this.update);
+        //setTimeout(this.update, 1000 / 2)
+        requestAnimationFrame(this.update);
     }
 }
 

@@ -131,7 +131,7 @@ class GameDirector {
         for (let entity of this.level.entities) {
             entity.render(context, meta.tilesize, meta.ratio, this.camera);
             /** Hitbox rendering */
-            //entity.renderHitbox(context, tilesize, ratio, this.camera)
+            //entity.renderHitbox(context, meta.tilesize, meta.ratio, this.camera)
         }
         /** Needs to be a separate cycle to avoid entities overlapping the GUIs */
         for (let entity of this.level.entities) {
@@ -170,6 +170,11 @@ class GameDirector {
 
         this.loadCurrentLevel(meta.tilesWidth, meta.tilesHeight);
         this.level.entities.push(this.player);
+        /** Reset Velocities */
+        this.player.xVel = 0;
+        this.player.yVel = 0;
+        this.player.xVelExt = 0;
+        this.player.yVelExt = 0;
         if (floorChange) {
             this.player.x = this.level.levelW / 2;
             this.player.y = this.level.levelH / 2;
