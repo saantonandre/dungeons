@@ -176,7 +176,7 @@ export class Slime extends Enemy {
                 break;
         }
     }
-    onCollision(collidedEntity) {
+    onCollision(collidedEntity, environment) {
         if (collidedEntity === this.prey && this.state === "attack") {
 
             collidedEntity.onHit(this);
@@ -184,6 +184,13 @@ export class Slime extends Enemy {
             collidedEntity.yVelExt += this.yVel;
             this.fleeing = 120;
             this.state = "flee";
+
+            /** Create the damage vfx */
+            let dmgText = this.createVfx("TextVfx", collidedEntity)
+            dmgText.text.content = `${this.atk}`;
+            /** White */
+            dmgText.text.color = '#f5ffe8';
+            environment.push(dmgText)
         }
     }
 }

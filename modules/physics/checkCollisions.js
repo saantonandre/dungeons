@@ -61,10 +61,10 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
             if (dynamicRectVsRect(objHitbox, entityHitbox, velocitiesX, velocitiesY, deltaTime, cp, cn, ct)) {
                 // Handles eventual collision events
                 if (obj.onCollision) {
-                    obj.onCollision(entity);
+                    obj.onCollision(entity, entities);
                 }
                 if (entity.onCollision) {
-                    if (entity.onCollision(obj) === 'levelChange') {
+                    if (entity.onCollision(obj, entities) === 'levelChange') {
                         /** A level-changing event has been triggered */
                         levelChange = true;
                         return;

@@ -159,12 +159,18 @@ export class SwordPrototype extends Equippable {
             }
             if (this.Physics.lineSquareCol(this.lineHitbox, entity)) {
                 // Collision happened
+                /**
+                 * NOTE: Should probably standardize this behaviour into the weapon parent class
+                 */
                 if (entity.type === "enemy" && !(entity.state === 'dead')) {
                     if (entity.damaged !== this.attackID) {
                         entity.onHit(this, this.owner)
                         // Creates a vfx
                         environment.push(this.createVfx("DmgVfx", entity))
-                        environment.push(this.createVfx("TextVfx", entity, `${this.atk}`))
+                        let dmgText = this.createVfx("TextVfx", entity)
+                        dmgText.text.content = `${this.atk}`;
+                        dmgText.text.color = '#ad2f45';
+                        environment.push(dmgText)
 
                         entity.xVelExt = (this.targetX - this.offsetX) / 10;
                         entity.yVelExt = (this.targetY - this.offsetY) / 10;

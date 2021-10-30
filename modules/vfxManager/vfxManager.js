@@ -11,11 +11,11 @@ class VfxManager {
         this.vfxClasses = Vfxs;
     }
     /** Returns a recycled vfx or FALSE */
-    getRecycledVfx(vfxName, source, content = '') {
+    getRecycledVfx(vfxName, source) {
         for (let i = 0; i < this.recyclePool.length; i++) {
             if (this.recyclePool[i].name === vfxName) {
                 /** Found a matching Vfx */
-                this.recyclePool[i].reset(source, content);
+                this.recyclePool[i].reset(source);
                 return this.recyclePool.splice(i, 1)[0];
             }
         }
@@ -23,8 +23,8 @@ class VfxManager {
         return false;
     }
     /** Returns a Vfx of the requested type, this function gets imported and called by entities */
-    create = (vfxName, source, content = '') => {
-        return this.getRecycledVfx(vfxName, source, content) || new this.vfxClasses[vfxName](source, content);
+    create = (vfxName, source) => {
+        return this.getRecycledVfx(vfxName, source) || new this.vfxClasses[vfxName](source);
     }
 }
 export let vfxManager = new VfxManager();

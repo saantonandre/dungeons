@@ -87,17 +87,18 @@ export class DmgVfx extends SpriteVfx {
     }
 }
 export class TextVfx extends SpriteVfx {
-    constructor(source, content) {
+    constructor(source) {
         super(source);
         this.name = 'TextVfx';
         this.text = new Text(0, 0);
-        this.text.content = content;
+        this.text.content = '';
+        /** Red by default */
         this.text.color = '#ad2f45';
         this.text.shadow = true;
         this.text.fontSize = 10;
         this.progress = 0;
     }
-    reset(source, content) {
+    reset(source, content = '') {
         this.removed = false;
         this.progress = 0;
         this.text.content = content;
