@@ -193,7 +193,6 @@ class GameDirector {
             }
         }
 
-        console.log(this.player.x, this.player.y)
     }
     loadCurrentLevel(tilesWidth, tilesHeight) {
         this.level = this.map.levels[this.currentLevel[0]][this.currentLevel[1]];

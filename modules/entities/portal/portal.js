@@ -80,7 +80,6 @@ export class Portal extends Entity {
         if (this.collidedWithPlayer) {
             this.collidedWithPlayer = false;
             // Move player to the linked level
-            console.log(this.name, ' called a level change')
             gameDirector.changeLevel(this.dir, meta);
             return true;
         }
