@@ -8,11 +8,14 @@ import { SkillsComponent } from './interfaceComponents/skillsComponent/skillsCom
 import { InventoryComponent } from './interfaceComponents/inventoryComponent/inventoryComponent.js';
 import { SettingsComponent } from './interfaceComponents/settingsComponent/settingsComponent.js';
 
+import { MinimapComponent } from './interfaceComponents/minimapComponent/minimapComponent.js';
+
 
 
 export class UserInterface {
     constructor(source) {
         this.mouse = source.director.mouse.absolute;
+        this.controls = source.controls;
         this.fontSize = 7;
         this.source = source;
         this.mouse = this.source.director.mouse.absolute;
@@ -29,6 +32,8 @@ export class UserInterface {
 
         this.settingsComponent = new SettingsComponent(this.source, 23.5, 0.3);
 
+        this.minimapComponent = new MinimapComponent(23.5, 17);
+
 
     }
     compute(deltaTime) {
@@ -42,6 +47,7 @@ export class UserInterface {
         this.skillsComponent.compute(deltaTime)
         this.inventoryComponent.compute(deltaTime)
         this.settingsComponent.compute(deltaTime)
+        this.minimapComponent.compute(this.mouse, this.controls, deltaTime)
 
 
     }
@@ -63,12 +69,13 @@ export class UserInterface {
         this.manaComponent.render(context, tilesize, baseRatio);
         this.expComponent.render(context, tilesize, baseRatio);
         this.floorComponent.render(context, tilesize, baseRatio);
-        this.floorComponent.render(context, tilesize, baseRatio);
 
         this.skillsComponent.render(context, tilesize, baseRatio);
         this.inventoryComponent.render(context, tilesize, baseRatio);
         this.settingsComponent.render(context, tilesize, baseRatio);
+        this.minimapComponent.render(context, tilesize, baseRatio, this.source.director.map, this.source.director.currentLevel);
         this.handleDragging(context, tilesize, baseRatio)
+
     }
 
 }

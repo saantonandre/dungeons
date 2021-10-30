@@ -67,6 +67,7 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
                     if (entity.onCollision(obj) === 'levelChange') {
                         /** A level-changing event has been triggered */
                         levelChange = true;
+                        return;
                     };
                 }
                 // Skip resolve exceptions

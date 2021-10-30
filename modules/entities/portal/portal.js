@@ -5,6 +5,7 @@ export class Portal extends Entity {
         super(x, y);
         this.dir = dir;
         this.id = id;
+        this.name = (Math.random() * 100) | 0;
         this.solid = true;
         this.type = "portal";
         this.background = true;
@@ -79,9 +80,11 @@ export class Portal extends Entity {
         if (this.collidedWithPlayer) {
             this.collidedWithPlayer = false;
             // Move player to the linked level
+            console.log(this.name, ' called a level change')
             gameDirector.changeLevel(this.dir, meta);
             return true;
         }
+        return false;
     }
     onCollision(source) {
         switch (source.type) {
@@ -129,6 +132,7 @@ export class FloorPortal extends Portal {
             gameDirector.changeFloor(meta);
             return true;
         }
+        return false;
     }
     render(context, tilesize, ratio, camera) {
         this.stairs.render(context, tilesize, ratio, camera)

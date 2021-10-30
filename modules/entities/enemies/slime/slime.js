@@ -79,11 +79,6 @@ export class Slime extends Enemy {
         this.renderSprite(context, tilesize, ratio, camera)
     }
     computeState(deltaTime) {
-        if (this.xVel > 0) {
-            this.left = 0;
-        } else if (this.xVel < 0) {
-            this.left = 1;
-        }
         let rotation, xTarget, yTarget;
         switch (this.state) {
             case "idle":
@@ -165,6 +160,11 @@ export class Slime extends Enemy {
             case "dead":
                 this.loadAnimation("death");
                 break;
+        }
+        if (this.xVel > 0) {
+            this.left = 0;
+        } else if (this.xVel < 0) {
+            this.left = 1;
         }
     }
     onAnimationEnd() {

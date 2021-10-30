@@ -104,9 +104,6 @@ class GameDirector {
         // Computes the camera position
         this.camera.compute(meta, this.level);
 
-        if (loadLevelCall) {
-            this.compute(meta)
-        }
     }
 
     /** 
@@ -157,7 +154,7 @@ class GameDirector {
     }
     changeLevel(dir, meta, floorChange = false) {
         // !!! PROVISIONAL !!!
-        // Removes player from current level
+        /** Removes player from current level */
         if (this.level) {
             this.level.entities.splice(this.level.entities.indexOf(this.player), 1);
         }
@@ -178,6 +175,7 @@ class GameDirector {
         if (floorChange) {
             this.player.x = this.level.levelW / 2;
             this.player.y = this.level.levelH / 2;
+            this.player.updateHitbox();
             return;
         }
         for (let portal of this.level.portals) {
@@ -190,12 +188,16 @@ class GameDirector {
                 // Move the player to the target portal but out of it to avoid teleporting back
                 this.player.x = -this.player.w / 2 + portal.x + portal.w / 2 - (this.player.w * portal.dir[0]);
                 this.player.y = -this.player.h / 2 + portal.y + portal.h / 2 - (this.player.h * portal.dir[1]);
+                this.player.updateHitbox();
+                break;
             }
         }
 
+        console.log(this.player.x, this.player.y)
     }
     loadCurrentLevel(tilesWidth, tilesHeight) {
         this.level = this.map.levels[this.currentLevel[0]][this.currentLevel[1]];
+        this.level.revealed = true;
         this.level.levelX = (tilesWidth - this.level.levelW) / 2;
         this.level.levelY = (tilesHeight - this.level.levelH) / 2;
     }

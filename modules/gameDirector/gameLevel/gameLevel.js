@@ -32,6 +32,7 @@ export class GameLevel {
          * | 3 = boss 
          * | */
         this.type = levelType;
+        this.revealed = false;
         this.generate();
     }
     generate() {

@@ -336,7 +336,6 @@ class EquipmentSlot extends ItemSlot {
 
 }
 
-
 function pointSquareCol(point, sq) {
     var square = sq;
     if (sq.hitbox !== undefined) {
