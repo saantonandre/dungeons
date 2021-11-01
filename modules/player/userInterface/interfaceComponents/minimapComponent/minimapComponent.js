@@ -1,10 +1,13 @@
 import { Sprite } from "../../../../entity/sprite.js"
+import { IconComponent } from "../interfaceComponent.js";
 /** Renders the game map */
 export class MinimapComponent {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.icon = new Icon(this.x, this.y);
+        this.icon = new IconComponent(this.x, this.y);
+        this.icon.setAnimation("idle", [30], [21]);
+        this.icon.setAnimation("highlight", [30], [22]);
     }
     compute(mouse, controls, deltaTime) {
         this.icon.compute(mouse, controls, deltaTime);

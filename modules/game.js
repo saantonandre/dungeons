@@ -2,7 +2,7 @@
 import { meta } from "./meta/meta.js";
 import { c, canvas } from "./canvas/canvas.js";
 import { gameDirector } from "./gameDirector/gameDirector.js";
-import { debug } from "./debug/debug.js";
+// import { debug } from "./debug/debug.js";
 
 class Game {
     constructor() {}
@@ -25,10 +25,19 @@ class Game {
         gameDirector.compute(meta);
         gameDirector.render(c, meta);
 
-        //gameDirector.consoleRender();
+        /** rendering the bounding rect */
+        renderBoundingRect()
         //setTimeout(this.update, 1000 / 2)
         requestAnimationFrame(this.update);
     }
+}
+
+function renderBoundingRect() {
+    c.strokeStyle = "black";
+    c.beginPath();
+    c.rect(0, 0, canvas.width, canvas.height);
+    c.closePath();
+    c.stroke();
 }
 
 export const game = new Game();

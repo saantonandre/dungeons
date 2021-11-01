@@ -1,4 +1,4 @@
-import { TextComponent, InterfaceComponent } from "../interfaceComponent.js";
+import { TextComponent, InterfaceComponent, IconComponent } from "../interfaceComponent.js";
 import { ItemTooltip } from "./itemTooltip.js";
 import { Sprite } from "../../../../entity/sprite.js";
 export class InventoryComponent extends InterfaceComponent {
@@ -12,7 +12,11 @@ export class InventoryComponent extends InterfaceComponent {
         this.mouse = this.source.director.mouse.absolute;
         this.controls = this.source.controls;
 
-        this.icon = new Icon(this.x, this.y, this.source.inventory);
+        this.icon = new IconComponent(this.x, this.y);
+        this.icon.setAnimation("idle", [23], [26]);
+        this.icon.setAnimation("highlight", [23], [27]);
+        this.icon.setAnimation("bump", [23, 23, 23, 23], [28, 29, 30, 31]);
+
         this.inventoryGrid = new InventoryGrid(this.x, this.y + 1, this.source.inventory, this.triggerSlot);
 
         this.leftColumn = new LeftColumn(this.x - 1, this.y + 1, this.source.equipment, this.triggerSlot);
@@ -35,11 +39,11 @@ export class InventoryComponent extends InterfaceComponent {
         }
     }
     /** computes the sub-components */
-    compute(deltaTime) {
-        this.icon.compute(this.mouse, this.controls, deltaTime);
+    compute(mouse, controls, deltaTime) {
+        this.icon.compute(mouse, controls, deltaTime);
         if (this.icon.active) {
-            this.inventoryGrid.compute(this.mouse, this.controls);
-            this.leftColumn.compute(this.mouse, this.controls);
+            this.inventoryGrid.compute(mouse, controls);
+            this.leftColumn.compute(mouse, controls);
         }
     }
     /** renders the sub-components */
@@ -57,59 +61,6 @@ export class InventoryComponent extends InterfaceComponent {
     }
 }
 
-/** The bag shaped icon, handles clicks/hovering and activates the UI */
-class Icon extends Sprite {
-    constructor(x, y, manager) {
-        super(x, y);
-        this.manager = manager;
-        this.animation = 'idle';
-        this.setAnimation("idle", [23], [26]);
-        this.setAnimation("bump", [23, 23, 23, 23], [28, 29, 30, 31]);
-        this.animations['bump'].slowness = 5;
-        this.setAnimation("highlight", [23], [27]);
-        this.active = false;
-    }
-    // If mouse is hover this element
-    handleHover(controls) {
-        if (controls.lClickDown) {
-            // If left btn down
-            if (this.animation !== 'idle') {
-                // If this isn't in the 'idle' state (eg. is highlighted or bumping)
-                // - Change this animation to 'idle' and this state to 'active'
-                this.loadAnimation('idle');
-                this.active = !this.active;
-            }
-        } else {
-            // If mouse is hovering but not clicked, highlight
-            this.loadAnimation('highlight');
-        }
-    }
-    onAnimationEnd() {
-        switch (this.animation) {
-            case 'bump':
-                this.loadAnimation('idle');
-                break;
-        }
-    }
-    compute(mouse, controls, deltaTime) {
-        if (this.manager.newItemCollected) {
-            this.manager.newItemCollected = false;
-            this.loadAnimation("bump");
-        }
-        if (pointSquareCol(mouse, this)) {
-            mouse.hoverUI = true;
-            this.handleHover(controls)
-        } else {
-            if (this.animation === 'highlight') {
-                this.animation = 'idle';
-            }
-        }
-        this.updateSprite(deltaTime);
-    }
-    render(context, tilesize, baseRatio) {
-        this.renderSprite(context, tilesize, baseRatio);
-    }
-}
 
 /** The inventory grid displays inventory slots */
 class InventoryGrid {

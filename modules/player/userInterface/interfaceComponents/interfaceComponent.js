@@ -1,6 +1,7 @@
 import { spritesheet } from "../../../resourceManager.js";
-import { Text } from '../../../text/text.js'
-export { Text as TextComponent };
+import { Text as TextComponent } from '../../../text/text.js'
+export { TextComponent };
+import { Sprite } from "../../../entity/sprite.js";
 export class InterfaceComponent {
     constructor(source, x, y) {
         this.source = source;
@@ -54,4 +55,62 @@ export class ImageComponent {
 
         )
     }
+}
+
+/** A simple button which transitions to active when clicked */
+export class IconComponent extends Sprite {
+    constructor(x, y) {
+        super(x, y);
+        this.animation = 'idle';
+        this.active = false;
+        // this.icon.setAnimation("idle", [30], [21]);
+        // this.icon.setAnimation("highlight", [30], [22]);
+    }
+    // If mouse is hover this element
+    handleHover(controls) {
+        if (controls.lClickDown) {
+            // If left btn down
+            if (this.animation !== 'idle') {
+                // If this isn't in the 'idle' state (eg. is highlighted)
+                // - Change this animation to 'idle' and this state to 'active'
+                this.loadAnimation('idle');
+                this.active = !this.active;
+            }
+        } else {
+            // If mouse is hovering but not clicked, highlight
+            this.loadAnimation('highlight');
+        }
+    }
+    compute(mouse, controls, deltaTime) {
+        if (pointSquareCol(mouse, this)) {
+            mouse.hoverUI = true;
+            this.handleHover(controls)
+        } else {
+            if (this.animation === 'highlight') {
+                this.animation = 'idle';
+            }
+        }
+        this.updateSprite(deltaTime);
+    }
+    render(context, tilesize, baseRatio) {
+        this.renderSprite(context, tilesize, baseRatio);
+    }
+}
+
+function pointSquareCol(point, sq) {
+    var square = sq;
+    if (sq.hitbox !== undefined) {
+        square = sq.hitbox;
+    }
+    if (point.x >= square.x) {
+        if (point.x <= square.x + square.w) {
+            if (point.y >= square.y) {
+                if (point.y <= square.y + square.h) {
+                    return true;
+                }
+            }
+
+        }
+    }
+    return false;
 }

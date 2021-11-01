@@ -1,5 +1,5 @@
-import { ImageComponent, InterfaceComponent } from "../interfaceComponent.js";
-
+import { ImageComponent, InterfaceComponent, IconComponent } from "../interfaceComponent.js";
+import { Text } from '../../../../text/text.js';
 
 export class SettingsComponent extends InterfaceComponent {
     constructor(source, x, y) {
@@ -9,10 +9,15 @@ export class SettingsComponent extends InterfaceComponent {
         this.w = 1;
         this.h = 1;
         this.color = '#fef3c0';
-        /** Active: 7, 9 */
-        this.icon = new ImageComponent(24, 26, this.x, this.y, this.w, 1);
+
+        this.icon = new IconComponent(this.x, this.y);
+        this.icon.setAnimation('idle', [24], [26]);
+        this.icon.setAnimation('highlight', [24], [27]);
+
     }
-    compute(deltaTime) {}
+    compute(mouse, controls, deltaTime) {
+        this.icon.compute(mouse, controls, deltaTime)
+    }
     render(context, tilesize, baseRatio) {
         this.icon.render(context, tilesize, baseRatio);
     }

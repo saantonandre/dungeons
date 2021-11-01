@@ -7,7 +7,7 @@ import { Player } from "../player/player.js";
 import { Controls } from "../controls/controls.js";
 import { Mouse } from "../mouse/mouse.js";
 
-import { debug } from '../debug/debug.js';
+// import { debug } from '../debug/debug.js';
 class GameDirector {
 
     constructor() {

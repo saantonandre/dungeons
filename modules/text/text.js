@@ -3,8 +3,6 @@ export class Text {
         this.content = '';
         this.x = x;
         this.y = y;
-        this.w = 1;
-        this.h = 1;
         this.color = color;
         this.align = align;
         this.baseline = baseline;
@@ -60,14 +58,7 @@ export class Text {
             }
 
         } else {
-            if (this.stroke) {
-
-                context.strokeText(
-                    this.content,
-                    (this.x + camera.x) * tilesize * ratio,
-                    (this.y + camera.y) * tilesize * ratio
-                );
-            }
+            /** Shadow rendering */
             if (this.shadow) {
                 context.fillStyle = this.shadowColor;
                 context.fillText(
@@ -76,12 +67,21 @@ export class Text {
                     (this.y + camera.y + this.shadowOffsetY) * tilesize * ratio
                 );
             }
+            /** Fill rendering */
             context.fillStyle = this.color;
             context.fillText(
                 this.content,
                 (this.x + camera.x) * tilesize * ratio,
                 (this.y + camera.y) * tilesize * ratio
             )
+            /** Stroke rendering */
+            if (this.stroke) {
+                context.strokeText(
+                    this.content,
+                    (this.x + camera.x) * tilesize * ratio,
+                    (this.y + camera.y) * tilesize * ratio
+                );
+            }
         }
     }
 }

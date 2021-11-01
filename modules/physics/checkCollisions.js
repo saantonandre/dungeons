@@ -1,5 +1,5 @@
 /** Gets called after the velocities have been set */
-import { debug } from '../debug/debug.js'
+// import { debug } from '../debug/debug.js'
 export function checkCollisions(obj, entities, deltaTime = 1) {
     if (!obj.solid) {
         // return false if the object calling this function is not solid

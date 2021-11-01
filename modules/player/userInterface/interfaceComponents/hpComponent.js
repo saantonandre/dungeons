@@ -1,5 +1,4 @@
 import { ImageComponent, TextComponent, InterfaceComponent } from "./interfaceComponent.js";
-
 export class HpComponent extends InterfaceComponent {
     constructor(source, x, y) {
         super(source, x, y);

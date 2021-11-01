@@ -2,7 +2,7 @@ import { TextComponent, ImageComponent } from "../interfaceComponent.js";
 /** Renders the processed details of the passed item */
 export class ItemTooltip {
     constructor(x, y) {
-        this.w = 8;
+        this.w = 6;
         this.h = 6;
         this.x = x - this.w;
         this.y = y;
@@ -10,7 +10,7 @@ export class ItemTooltip {
         this.nameContent.align = 'center';
         this.nameContent.color = '#f5ffe8';
         this.nameContent.baseline = 'top';
-        this.nameContent.fontSize = 10;
+        this.nameContent.fontSize = 9;
 
         let tilesize = 16;
 

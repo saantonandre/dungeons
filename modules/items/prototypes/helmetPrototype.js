@@ -7,7 +7,7 @@ export class HelmetPrototype extends Equippable {
         this.type = "helmet";
         this.subtype = "helmet";
         this.name = "Helmet Prototype";
-        this.description = "An old reconditioned helmet found in your grandpa's house."
+        this.description = "An old reconditioned helmet."
 
         this.setAnimation("idle", [3], [6]);
         this.setAnimation("idle", [4], [6], 1);

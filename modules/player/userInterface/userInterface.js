@@ -4,7 +4,7 @@ import { ExpComponent } from './interfaceComponents/expComponent.js';
 import { FloorComponent } from './interfaceComponents/floorComponent.js';
 
 
-import { SkillsComponent } from './interfaceComponents/skillsComponent/skillsComponent.js';
+import { CharacterComponent } from './interfaceComponents/characterComponent/characterComponent.js';
 import { InventoryComponent } from './interfaceComponents/inventoryComponent/inventoryComponent.js';
 import { SettingsComponent } from './interfaceComponents/settingsComponent/settingsComponent.js';
 
@@ -27,7 +27,7 @@ export class UserInterface {
         this.floorComponent = new FloorComponent(this.source, 17, 0.5);
 
 
-        this.skillsComponent = new SkillsComponent(this.source, 20.5, 0.3);
+        this.characterComponent = new CharacterComponent(this.source, 20.5, 0.3);
         this.inventoryComponent = new InventoryComponent(this.source, 22, 0.3);
 
         this.settingsComponent = new SettingsComponent(this.source, 23.5, 0.3);
@@ -44,9 +44,9 @@ export class UserInterface {
         this.expComponent.compute(deltaTime)
         this.floorComponent.compute(deltaTime)
 
-        this.skillsComponent.compute(deltaTime)
-        this.inventoryComponent.compute(deltaTime)
-        this.settingsComponent.compute(deltaTime)
+        this.characterComponent.compute(this.mouse, this.controls, deltaTime)
+        this.inventoryComponent.compute(this.mouse, this.controls, deltaTime)
+        this.settingsComponent.compute(this.mouse, this.controls, deltaTime)
         this.minimapComponent.compute(this.mouse, this.controls, deltaTime)
 
 
@@ -70,7 +70,7 @@ export class UserInterface {
         this.expComponent.render(context, tilesize, baseRatio);
         this.floorComponent.render(context, tilesize, baseRatio);
 
-        this.skillsComponent.render(context, tilesize, baseRatio);
+        this.characterComponent.render(context, tilesize, baseRatio);
         this.inventoryComponent.render(context, tilesize, baseRatio);
         this.settingsComponent.render(context, tilesize, baseRatio);
         this.minimapComponent.render(context, tilesize, baseRatio, this.source.director.map, this.source.director.currentLevel);
