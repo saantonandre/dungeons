@@ -68,6 +68,9 @@ export class SwordPrototype extends Equippable {
         if (this.state !== 'idle') {
             return;
         }
+        /** Plays the special sound Fx */
+        this.sounds['sword-attack'].play();
+
         this.state = 'special';
         this.left = 0;
         this.attackID = Math.random();
@@ -100,6 +103,9 @@ export class SwordPrototype extends Equippable {
         if (this.state !== 'idle') {
             return;
         }
+        /** Plays the attack sound Fx */
+        this.sounds['sword-attack'].play(2);
+
         this.state = 'attack';
         this.animation = 'attack';
         this.left = 0;
@@ -162,11 +168,14 @@ export class SwordPrototype extends Equippable {
                 /**
                  * NOTE: Should probably standardize this behaviour into the weapon parent class
                  */
-                if (entity.type === "enemy" && !(entity.state === 'dead')) {
+                if (entity.type === "enemy" && entity.state !== 'dead') {
                     if (entity.damaged !== this.attackID) {
                         entity.onHit(this, this.owner)
-                        // Creates a vfx
+                        /** Creates an hit visual Fx */
                         environment.push(this.createVfx("DmgVfx", entity))
+                        /** Plays the sword hit sound Fx */
+                        this.sounds['sword-hit'].play();
+
                         let dmgText = this.createVfx("TextVfx", entity)
                         dmgText.text.content = `${this.atk}`;
                         dmgText.text.color = '#ad2f45';

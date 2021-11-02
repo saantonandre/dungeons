@@ -1,7 +1,8 @@
-import { checkCollisions } from "../physics/checkCollisions.js"
-import * as Physics from "../physics/physics.js"
-import { Sprite } from "./sprite.js"
-import { vfxManager } from "../vfxManager/vfxManager.js"
+import { checkCollisions } from "../physics/checkCollisions.js";
+import * as Physics from "../physics/physics.js";
+import { Sprite } from "./sprite.js";
+import { vfxManager } from "../vfxManager/vfxManager.js";
+import { soundManager } from "../soundManager/soundManager.js";
 export class Entity extends Sprite {
     constructor(x, y) {
         super(x, y);
@@ -18,7 +19,9 @@ export class Entity extends Sprite {
         this.friction = 0.85;
         this.type = "entity";
         this.state = "idle";
+
         this.createVfx = vfxManager.create;
+        this.sounds = soundManager.sounds;
 
         this.stats = new Stats(this);
 
