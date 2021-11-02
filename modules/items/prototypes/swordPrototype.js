@@ -104,7 +104,7 @@ export class SwordPrototype extends Equippable {
             return;
         }
         /** Plays the attack sound Fx */
-        this.sounds['sword-attack'].play(2);
+        this.sounds['sword-attack'].play(1, 2);
 
         this.state = 'attack';
         this.animation = 'attack';

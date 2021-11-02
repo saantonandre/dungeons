@@ -1,6 +1,7 @@
 import { TextComponent, InterfaceComponent, IconComponent } from "../interfaceComponent.js";
 import { ItemTooltip } from "./itemTooltip.js";
 import { Sprite } from "../../../../entity/sprite.js";
+import { soundManager } from "../../../../soundManager/soundManager.js";
 export class InventoryComponent extends InterfaceComponent {
     constructor(source, x, y) {
         super(source, x, y);
@@ -11,7 +12,7 @@ export class InventoryComponent extends InterfaceComponent {
         this.color = '#fef3c0';
         this.mouse = this.source.director.mouse.absolute;
         this.controls = this.source.controls;
-
+        this.sounds = soundManager.sounds;
         this.icon = new IconComponent(this.x, this.y);
         this.icon.setAnimation("idle", [23], [26]);
         this.icon.setAnimation("highlight", [23], [27]);
@@ -26,6 +27,7 @@ export class InventoryComponent extends InterfaceComponent {
     /** Define what happens when a slot is right-clicked, this function gets passed to the **leftColumn>slots** and **inventoryGrid>slots** */
     triggerSlot = (slot) => {
         if (slot.slotRef.item.equippable) {
+            this.sounds['click-2'].play();
             if (slot.slotType === "inventorySlot") {
                 // Equip (move to equipment)
                 this.source.equipment[`${slot.slotRef.item.type}Slot`].swap(slot.slotRef);

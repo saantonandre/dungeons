@@ -2,6 +2,7 @@ import { spritesheet } from "../../../resourceManager.js";
 import { Text as TextComponent } from '../../../text/text.js'
 export { TextComponent };
 import { Sprite } from "../../../entity/sprite.js";
+import { soundManager } from "../../../soundManager/soundManager.js";
 export class InterfaceComponent {
     constructor(source, x, y) {
         this.source = source;
@@ -10,7 +11,6 @@ export class InterfaceComponent {
         this.y = y;
         this.w = 1;
         this.h = 1;
-
         this.progressText = {
             content: '',
             x: this.x,
@@ -63,6 +63,7 @@ export class IconComponent extends Sprite {
         super(x, y);
         this.animation = 'idle';
         this.active = false;
+        this.sound = soundManager.sounds['click-1'];
         // this.icon.setAnimation("idle", [30], [21]);
         // this.icon.setAnimation("highlight", [30], [22]);
     }
@@ -75,6 +76,7 @@ export class IconComponent extends Sprite {
                 // - Change this animation to 'idle' and this state to 'active'
                 this.loadAnimation('idle');
                 this.active = !this.active;
+                this.sound.play();
             }
         } else {
             // If mouse is hovering but not clicked, highlight

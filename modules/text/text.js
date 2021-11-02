@@ -58,6 +58,14 @@ export class Text {
             }
 
         } else {
+            /** Stroke rendering */
+            if (this.stroke) {
+                context.strokeText(
+                    this.content,
+                    (this.x + camera.x) * tilesize * ratio,
+                    (this.y + camera.y) * tilesize * ratio
+                );
+            }
             /** Shadow rendering */
             if (this.shadow) {
                 context.fillStyle = this.shadowColor;
@@ -74,14 +82,6 @@ export class Text {
                 (this.x + camera.x) * tilesize * ratio,
                 (this.y + camera.y) * tilesize * ratio
             )
-            /** Stroke rendering */
-            if (this.stroke) {
-                context.strokeText(
-                    this.content,
-                    (this.x + camera.x) * tilesize * ratio,
-                    (this.y + camera.y) * tilesize * ratio
-                );
-            }
         }
     }
 }

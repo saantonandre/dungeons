@@ -113,6 +113,7 @@ export class Player extends Entity {
             this.animation = 'broke';
             this.yVel = 0;
             this.director.camera.shake = 10;
+            this.sounds['earthquake'].play();
         }
     }
     recoverState() {
@@ -176,6 +177,7 @@ export class Player extends Entity {
         if (this.damaged > 0) {
             return;
         }
+        this.sounds['damaged'].play();
         this.damaged = 10;
         this.director.camera.shake = 10;
         this.hp -= source.atk;

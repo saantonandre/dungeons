@@ -2,7 +2,9 @@
  *  Acts as intermediate between the manager and the entities,
  *  the entities have a reference to this class OBJECT 
  */
-import * as Vfxs from "./vfxs.js"
+import * as Vfxs from "./vfxs.js";
+export { vfxManager };
+/** Singleton */
 class VfxManager {
     constructor() {
         /** Instead of being deleted, removed Vfxs gets moved here to be reused later, gets populated by the gameDirector */
@@ -27,4 +29,4 @@ class VfxManager {
         return this.getRecycledVfx(vfxName, source) || new this.vfxClasses[vfxName](source);
     }
 }
-export let vfxManager = new VfxManager();
+const vfxManager = new VfxManager();

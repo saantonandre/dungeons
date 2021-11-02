@@ -62,7 +62,7 @@ export class Item extends Entity {
         this.animations['idle'].offsetY = 0;
         this.collected = true;
         this.removed = true;
-        this.sounds['crystal'].play()
+        this.sounds['pick-up'].play()
     }
     /** Makes the item appear levitating */
     levitate(deltaTime) {

@@ -7,12 +7,12 @@ class SoundManager {
         this.soundsBaseUrl = './../../assets/soundFxs/';
     }
     /** takes an argument the sound file name (without extension) from the relative path in soundsBaseUrl */
-    createSound = (relativeUrl) => {
+    createSound = (relativeUrl, loop = false, volume = 1, playbackRate = 1) => {
         let fullUrl = `${this.soundsBaseUrl}${relativeUrl}.mp3`;
         let splittedUrl = relativeUrl.split('/');
         /** Extrapolates the name from the url */
         let name = splittedUrl[splittedUrl.length - 1];
-        this.sounds[name] = new CustomAudio(fullUrl);
+        this.sounds[name] = new CustomAudio(fullUrl, loop, volume, playbackRate);
     }
 }
 class CustomAudio {
@@ -22,11 +22,11 @@ class CustomAudio {
         this.volume = volume;
         this.playbackRate = playbackRate;
     }
-    play = (customPlaybackRate = 1) => {
+    play = (customVolume = 1, customPlaybackRate = 1) => {
+        /** Sets the audio volume */
+        this.audio.volume = this.volume * customVolume;
         /** Sets the audio speed */
         this.audio.playbackRate = this.playbackRate * customPlaybackRate;
-        /** Sets the audio volume */
-        this.audio.volume = this.volume;
 
         if (this.audio.paused) {
             /** If the audio is paused, just play it */
@@ -61,6 +61,15 @@ class CustomAudio {
     }
 }
 const soundManager = new SoundManager();
-soundManager.createSound('sword-attack');
-soundManager.createSound('sword-hit');
-soundManager.createSound('crystal');
+/** Player sounds */
+soundManager.createSound('sword-attack', false, 0.5);
+soundManager.createSound('sword-hit', false, 0.5);
+soundManager.createSound('pick-up', false, 0.4, 1.5);
+soundManager.createSound('earthquake', false, 0.4);
+soundManager.createSound('damaged', false, 1);
+
+/** UI sfx */
+soundManager.createSound('ui/click-1', false, 0.1);
+soundManager.createSound('ui/click-2', false, 0.2);
+soundManager.createSound('ui/click-3', false, 0.4);
+soundManager.createSound('ui/paper', false, 0.2);
