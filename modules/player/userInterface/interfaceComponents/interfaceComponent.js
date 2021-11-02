@@ -63,7 +63,7 @@ export class IconComponent extends Sprite {
         super(x, y);
         this.animation = 'idle';
         this.active = false;
-        this.sound = soundManager.sounds['click-1'];
+        this.sound = soundManager.sounds['click-3'];
         // this.icon.setAnimation("idle", [30], [21]);
         // this.icon.setAnimation("highlight", [30], [22]);
     }

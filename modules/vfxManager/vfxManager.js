@@ -6,11 +6,15 @@ import * as Vfxs from "./vfxs.js";
 export { vfxManager };
 /** Singleton */
 class VfxManager {
-    constructor() {
+    constructor(director) {
         /** Instead of being deleted, removed Vfxs gets moved here to be reused later, gets populated by the gameDirector */
         this.recyclePool = [];
+        this.environment;
         /** Contains vfx classes declarations */
         this.vfxClasses = Vfxs;
+    }
+    setEnvironment(environment) {
+        this.environment = environment
     }
     /** Returns a recycled vfx or FALSE */
     getRecycledVfx(vfxName, source) {
@@ -24,9 +28,11 @@ class VfxManager {
         /** Matching Vfx was not found */
         return false;
     }
-    /** Returns a Vfx of the requested type, this function gets imported and called by entities */
+    /** Returns a Vfx of the requested type and pushes it into the current level entities, this function gets imported and called by entities */
     create = (vfxName, source) => {
-        return this.getRecycledVfx(vfxName, source) || new this.vfxClasses[vfxName](source);
+        let vfx = this.getRecycledVfx(vfxName, source) || new this.vfxClasses[vfxName](source);
+        this.environment.push(vfx);
+        return vfx;
     }
 }
 const vfxManager = new VfxManager();

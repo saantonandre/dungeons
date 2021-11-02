@@ -19,12 +19,14 @@ class GameDirector {
         /** Defines the current floor */
         this.floor = 0;
         /** The current level Object, contains info about the level entities and tiles */
-        this.level;
+        this.level = { entities: [] };
         this.player;
         this.mouse;
         this.camera = new Camera();
         this.camera.focus = this.player;
         this.map = gameMap;
+
+        /** Sets up the vfxManager */
         this.vfxRecyclePool = vfxManager.recyclePool;
 
         this.tabbedOut = false;
@@ -172,6 +174,8 @@ class GameDirector {
         this.player.yVel = 0;
         this.player.xVelExt = 0;
         this.player.yVelExt = 0;
+
+        vfxManager.setEnvironment(this.level.entities);
         if (floorChange) {
             this.player.x = this.level.levelW / 2;
             this.player.y = this.level.levelH / 2;

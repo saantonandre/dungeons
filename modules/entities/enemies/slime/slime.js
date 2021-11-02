@@ -125,6 +125,7 @@ export class Slime extends Enemy {
                 this.yVel = 0;
                 this.windupFrames -= deltaTime;
                 if (this.windupFrames <= 0) {
+                    this.sounds.playRandom(['bounce1', 'bounce2', 'bounce3', 'bounce4'])
                     this.state = "attack";
                     this.windupFrames = 30;
                     this.attackFrames = 30;
@@ -188,9 +189,7 @@ export class Slime extends Enemy {
             /** Create the damage vfx */
             let dmgText = this.createVfx("TextVfx", collidedEntity)
             dmgText.text.content = `${this.atk}`;
-            /** White */
-            dmgText.text.color = '#f5ffe8';
-            environment.push(dmgText)
+            dmgText.text.color = '#f5ffe8'; /** White */
         }
     }
 }

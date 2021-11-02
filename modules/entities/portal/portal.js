@@ -64,9 +64,12 @@ export class Portal extends Entity {
         }
         if (this.animation == "closed" && !enemiesAlive) {
             this.animation = "opening";
+            this.sounds['sliding-reversed'].play();
         }
         if (this.animation == "open" && enemiesAlive) {
             this.animation = "closing";
+            this.sounds['sliding'].play();
+
         }
         if (this.animation == "open" || this.animation == "opening") {
             this.solid = false;

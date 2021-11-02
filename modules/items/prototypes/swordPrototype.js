@@ -172,14 +172,13 @@ export class SwordPrototype extends Equippable {
                     if (entity.damaged !== this.attackID) {
                         entity.onHit(this, this.owner)
                         /** Creates an hit visual Fx */
-                        environment.push(this.createVfx("DmgVfx", entity))
+                        this.createVfx("DmgVfx", entity);
                         /** Plays the sword hit sound Fx */
                         this.sounds['sword-hit'].play();
 
-                        let dmgText = this.createVfx("TextVfx", entity)
+                        let dmgText = this.createVfx("TextVfx", entity);
                         dmgText.text.content = `${this.atk}`;
                         dmgText.text.color = '#ad2f45';
-                        environment.push(dmgText)
 
                         entity.xVelExt = (this.targetX - this.offsetX) / 10;
                         entity.yVelExt = (this.targetY - this.offsetY) / 10;

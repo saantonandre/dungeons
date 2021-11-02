@@ -86,6 +86,22 @@ export class DmgVfx extends SpriteVfx {
         this.rot = rotations[Math.random() * rotations.length | 0];
     }
 }
+export class ParticlesVfx extends SpriteVfx {
+    constructor(source, duration = 1) {
+        super(source, duration);
+        this.name = 'ParticlesVfx';
+        this.x = this.source.x + this.source.w / 2 + Math.random() * 1.5 - 0.75;
+        this.y = this.source.y + this.source.h / 2 + Math.random() * 1.5 - 0.75;
+        this.w = 1;
+        this.h = 1;
+        this.particles = [];
+    }
+    additionalResetOperations() {
+        this.particles = [];
+        this.x = this.source.x + this.source.w / 2 + Math.random() * 1.5 - 0.75;
+        this.y = this.source.y + this.source.h / 2 + Math.random() * 1.5 - 0.75;
+    }
+}
 export class TextVfx extends SpriteVfx {
     constructor(source) {
         super(source);
