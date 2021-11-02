@@ -30,7 +30,7 @@ class GameDirector {
         this.tabbedOut = false;
         document.addEventListener("visibilitychange", (evt) => {
             this.tabbedOut = document.visibilityState == 'hidden' ? true : false;
-            if (this.tabbedOut) {
+            if (this.tabbedOut && this.player.state === 'idle') {
                 this.player.state = 'broke';
             }
         });
