@@ -11,8 +11,10 @@ export class Bat extends Enemy {
         this.name = "bat";
 
         //Stats
-        this.atk = 3;
-        this.expValue = 3;
+        this.stats.atk = 3;
+        this.stats.expValue = 3;
+
+
         this.aggroRange = 5;
         this.dashSpeed = 4;
         this.fleeing = 0;

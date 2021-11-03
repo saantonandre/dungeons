@@ -6,6 +6,7 @@ export class ExpManager {
         /*
         player.expManager.update({expValue:100})
         */
+        this.owner.createVfx("ParticlesVfx", this.owner)
         let stats = this.owner.stats;
 
         stats.exp -= stats.maxExp;

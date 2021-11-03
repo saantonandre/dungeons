@@ -6,7 +6,7 @@ import * as Vfxs from "./vfxs.js";
 export { vfxManager };
 /** Singleton */
 class VfxManager {
-    constructor(director) {
+    constructor() {
         /** Instead of being deleted, removed Vfxs gets moved here to be reused later, gets populated by the gameDirector */
         this.recyclePool = [];
         this.environment;

@@ -7,15 +7,12 @@ class SpriteVfx extends Sprite {
      * 
      * @param {Number} x horizontal position in the canvas
      * @param {Number} y vertical position in the canvas
-     * @param {Number} duration The amount of animation cycles
      */
-    constructor(source, duration = 1) {
+    constructor(source) {
         super(source.centerX, source.centerY);
         this.source = source;
         this.type = "vfx";
         this.name = "proto";
-        this.duration = duration;
-        this.initialDuration = duration;
         this.removed = false;
         this.randomPos = false;
         this.randomAmount = 0.5;
@@ -37,7 +34,6 @@ class SpriteVfx extends Sprite {
         this.removed = false;
         this.frame = 0;
         this.frameCounter = 0;
-        this.duration = this.initialDuration;
         this.additionalResetOperations();
     }
     /** Each vfx may have different reset options */
@@ -53,20 +49,15 @@ class SpriteVfx extends Sprite {
     }
     render(context, tilesize, ratio, camera) {
         this.renderSprite(context, tilesize, ratio, camera, this.rot);
-
     }
     onAnimationEnd() {
-        this.duration--;
-        if (this.duration <= 0) {
-            /** Removes vfx at the end of the duration */
-            this.removed = true;
-        }
+        this.removed = true;
     }
 }
 /** DmgVfxs have 4 random animations and 4 random rotations */
 export class DmgVfx extends SpriteVfx {
-    constructor(source, duration = 1) {
-        super(source, duration);
+    constructor(source) {
+        super(source);
         this.name = 'DmgVfx';
         this.w = 1;
         this.h = 1;
@@ -86,20 +77,93 @@ export class DmgVfx extends SpriteVfx {
         this.rot = rotations[Math.random() * rotations.length | 0];
     }
 }
+/** Represents a single particle */
+class Particle extends Sprite {
+    constructor(source, particleDuration = 5) {
+        super(source.x, source.y);
+        this.setAnimation('idle', [19, 19, 19, 19], [0, 1, 2, 3]);
+        this.verticalSpeed = -0.03;
+        this.source = source;
+        this.x = source.x + source.w / 2 + Math.random() * 1.5 - 0.75 - this.w / 2;
+        this.y = source.y + source.h / 2 + Math.random() * 1.5 - 0.75 - this.h / 2;
+        this.x -= this.w / 2;
+        this.y -= this.h / 2;
+        this.lifeCycles = particleDuration;
+        this.remainingCycles = this.lifeCycles;
+    }
+    get randomX() {
+        return this.source.x + this.source.w / 2 + Math.random() * 1.5 - 0.75 - this.w / 2;
+    }
+    get randomY() {
+        return this.source.y + this.source.h / 2 + Math.random() * 1.5 - 0.75 - this.h / 2;
+    }
+    reset(source, lifeCycles) {
+        this.source = source;
+        this.x = this.randomX;
+        this.y = this.randomY;
+        this.removed = false;
+        this.remainingCycles = lifeCycles || this.lifeCycles;
+    }
+    onAnimationEnd() {
+        this.remainingCycles--;
+        if (this.remainingCycles <= 0) {
+            this.removed = true;
+            return;
+        }
+        this.x = this.randomX;
+        this.y = this.randomY;
+    }
+    compute(deltaTime) {
+        this.y += this.verticalSpeed * deltaTime;
+        this.updateSprite(deltaTime);
+    }
+    render(context, tilesize, ratio, camera) {
+        this.renderSprite(context, tilesize, ratio, camera, this.rot);
+    }
+}
+/** Holds multiple particle objects, which on death respawns for a said amount of times */
 export class ParticlesVfx extends SpriteVfx {
-    constructor(source, duration = 1) {
-        super(source, duration);
+    constructor(source) {
+        super(source);
         this.name = 'ParticlesVfx';
-        this.x = this.source.x + this.source.w / 2 + Math.random() * 1.5 - 0.75;
-        this.y = this.source.y + this.source.h / 2 + Math.random() * 1.5 - 0.75;
-        this.w = 1;
-        this.h = 1;
+        /** Amount of particles lifetime */
+        this.particlesDuration = 5;
+        /** The numbers of particles */
+        this.particlesAmount = 5;
         this.particles = [];
+        this.initialize();
+    }
+    initialize() {
+        /** Creates the particles */
+        for (let i = 0; i < this.particlesAmount; i++) {
+            this.particles.push(new Particle(this.source, this.particlesDuration))
+        }
     }
     additionalResetOperations() {
-        this.particles = [];
-        this.x = this.source.x + this.source.w / 2 + Math.random() * 1.5 - 0.75;
-        this.y = this.source.y + this.source.h / 2 + Math.random() * 1.5 - 0.75;
+        for (let particle of this.particles) {
+            particle.reset(this.source, this.particlesDuration);
+        }
+    }
+    compute(deltaTime) {
+        let removedCount = 0;
+        for (let particle of this.particles) {
+            if (particle.removed) {
+                removedCount++;
+                continue;
+            }
+            particle.compute(deltaTime);
+        }
+        if (removedCount === this.particles.length) {
+            this.removed = true;
+        }
+    }
+    render(context, tilesize, ratio, camera) {
+        for (let particle of this.particles) {
+            if (particle.removed) {
+                continue;
+            }
+            particle.render(context, tilesize, ratio, camera);
+        }
     }
 }
 export class TextVfx extends SpriteVfx {
