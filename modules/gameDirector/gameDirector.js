@@ -26,6 +26,7 @@ class GameDirector {
         this.camera.focus = this.player;
         this.map = gameMap;
 
+
         /** Sets up the vfxManager */
         this.vfxRecyclePool = vfxManager.recyclePool;
 
