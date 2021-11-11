@@ -14,10 +14,10 @@ export class MinimapComponent {
     compute(mouse, controls, deltaTime) {
         this.icon.compute(mouse, controls, deltaTime);
     }
-    render(context, tilesize, baseRatio, map, currentLevel) {
+    render(context, tilesize, baseRatio, gameMap, player) {
         this.icon.render(context, tilesize, baseRatio)
         if (this.icon.active) {
-            this.renderMinimap(context, tilesize, baseRatio, map, currentLevel)
+            this.renderMinimap(context, tilesize, baseRatio, gameMap, player)
         }
     }
     /**
@@ -25,136 +25,78 @@ export class MinimapComponent {
      * Integrate tilesize and baseRatio for the sizes
      * Proably needs to be reworked entirely
      */
-    renderMinimap(context, tilesize, baseRatio, map, currentLevel) {
+    renderMinimap(context, tilesize, baseRatio, gameMap, player) {
         /** Size of the room rectangles in the minimap */
         let size = (tilesize * baseRatio) / 2;
         /** The currently iterated room */
-        let room;
+        let boundingBox = gameMap.boundingBox;
+        boundingBox.x /= gameMap.roomSize;
+        boundingBox.y /= gameMap.roomSize;
+        boundingBox.w /= gameMap.roomSize;
+        boundingBox.h /= gameMap.roomSize;
         context.save();
         /** Minimap offset */
         context.translate(
-            this.x * tilesize * baseRatio - map.width * size,
-            (this.y + this.icon.h) * tilesize * baseRatio - map.height * size
+            this.x * tilesize * baseRatio - boundingBox.w * size,
+            (this.y + this.icon.h) * tilesize * baseRatio - boundingBox.h * size
         );
+        let colors = ["gray", "RoyalBlue", "Khaki", "Brown", "darkgray", "#14182e"];
         /** Drawing the background */
         context.globalAlpha = 0.2;
-        context.fillStyle = "#a3a7c2";
-        context.fillRect(0, 0, map.width * size, map.height * size);
+        context.fillStyle = colors[0];
+        context.fillRect(0, 0, boundingBox.w * size, boundingBox.h * size);
         context.globalAlpha = 1;
-        for (let i = 0; i < map.width; i++) {
-            for (let j = 0; j < map.height; j++) {
-                room = map.levels[i][j];
-                /** Skip if empty room */
-                if (room == 0) {
-                    continue;
-                }
+        for (let parsedRoom of gameMap.map) {
+            for (let room of parsedRoom.components) {
                 /** If the room hasn't been revealed, do not show it */
                 if (!room.revealed) {
                     continue;
                 }
                 // Draws rooms
-                switch (room.type) {
-                    case 0:
-                        context.fillStyle = "#14182e";
-                        break;
-                    case 1:
-                        context.fillStyle = "#686f99";
-                        break;
-                    case 2:
-                        context.fillStyle = "#f0b541";
-                        break;
-                    case 3:
-                        context.fillStyle = "#ad2f45";
-                        break;
-                }
+                context.fillStyle = colors[room.type];
+
+                // Draws room
                 context.fillRect(
-                    i * size + size / 10,
-                    j * size + size / 10,
+                    (room.x - boundingBox.x) * size + size / 10,
+                    (room.y - boundingBox.y) * size + size / 10,
                     size - size / 5,
                     size - size / 5
                 );
+
                 // Draws links
                 for (let link of room.links) {
-                    context.fillStyle = "#f5ffe8";
+                    context.fillStyle = colors[4];
                     context.fillRect(
-                        (i + link[0] / 2) * size + size / 2 - size / 10,
-                        (j + link[1] / 2) * size + size / 2 - size / 10,
+                        ((room.x + link.x) / 2 - boundingBox.x) * size + size / 2 - size / 10,
+                        ((room.y + link.y) / 2 - boundingBox.y) * size + size / 2 - size / 10,
                         size / 5,
                         size / 5
                     );
                 }
 
-                if (currentLevel[0] === i && currentLevel[1] === j) {
-                    context.globalAlpha = 0.8;
-                    context.fillStyle = "#ffee83";
+                // Draws Joints
+                for (let joint of room.joints) {
+                    context.fillStyle = colors[room.type];
                     context.fillRect(
-                        i * size + size / 3,
-                        j * size + size / 3,
-                        size - size / 1.5,
-                        size - size / 1.5
+                        ((room.x + joint.x) / 2 - boundingBox.x) * size + size / 10,
+                        ((room.y + joint.y) / 2 - boundingBox.y) * size + size / 10,
+                        size - size / 5,
+                        size - size / 5
                     );
                 }
             }
         }
+        // Draws player
+        context.fillStyle = colors[5];
+        let px = player.x / gameMap.roomSize | 0;
+        let py = player.y / gameMap.roomSize | 0;
+        context.fillRect(
+            (px - boundingBox.x) * size + size / 3,
+            (py - boundingBox.y) * size + size / 3,
+            size / 3,
+            size / 3
+        );
         context.globalAlpha = 1;
         context.restore();
     }
-}
-
-/** The bag shaped icon, handles clicks/hovering and activates the UI */
-class Icon extends Sprite {
-    constructor(x, y) {
-        super(x, y);
-        this.animation = 'idle';
-        this.setAnimation("idle", [30], [21]);
-        this.setAnimation("highlight", [30], [22]);
-        this.active = false;
-    }
-    // If mouse is hover this element
-    handleHover(controls) {
-        if (controls.lClickDown) {
-            // If left btn down
-            if (this.animation !== 'idle') {
-                // If this isn't in the 'idle' state (eg. is highlighted)
-                // - Change this animation to 'idle' and this state to 'active'
-                this.loadAnimation('idle');
-                this.active = !this.active;
-            }
-        } else {
-            // If mouse is hovering but not clicked, highlight
-            this.loadAnimation('highlight');
-        }
-    }
-    compute(mouse, controls, deltaTime) {
-        if (pointSquareCol(mouse, this)) {
-            mouse.hoverUI = true;
-            this.handleHover(controls)
-        } else {
-            if (this.animation === 'highlight') {
-                this.animation = 'idle';
-            }
-        }
-        this.updateSprite(deltaTime);
-    }
-    render(context, tilesize, baseRatio) {
-        this.renderSprite(context, tilesize, baseRatio);
-    }
-}
-
-function pointSquareCol(point, sq) {
-    var square = sq;
-    if (sq.hitbox !== undefined) {
-        square = sq.hitbox;
-    }
-    if (point.x >= square.x) {
-        if (point.x <= square.x + square.w) {
-            if (point.y >= square.y) {
-                if (point.y <= square.y + square.h) {
-                    return true;
-                }
-            }
-
-        }
-    }
-    return false;
 }

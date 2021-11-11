@@ -73,7 +73,7 @@ export class UserInterface {
         this.characterComponent.render(context, tilesize, baseRatio);
         this.inventoryComponent.render(context, tilesize, baseRatio);
         this.settingsComponent.render(context, tilesize, baseRatio);
-        this.minimapComponent.render(context, tilesize, baseRatio, this.source.director.map, this.source.director.currentLevel);
+        this.minimapComponent.render(context, tilesize, baseRatio, this.source.director.gameMap, this.source);
         this.handleDragging(context, tilesize, baseRatio)
 
     }

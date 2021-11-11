@@ -131,8 +131,8 @@ export function assembleChunk(chunk, obj) {
 }
 
 export function collided(a, b, forceSpriteBox = false) {
-    let rect1 = a.hitbox && !forceSpriteBox ? a.hitbox : a;
-    let rect2 = b.hitbox && !forceSpriteBox ? b.hitbox : b;
+    let rect1 = typeof a.hitbox !== 'undefined' && !forceSpriteBox ? a.hitbox : a;
+    let rect2 = typeof b.hitbox !== 'undefined' && !forceSpriteBox ? b.hitbox : b;
     if (rect1.x < rect2.x + rect2.w) {
         if (rect1.x + rect1.w > rect2.x) {
             if (rect1.y < rect2.y + rect2.h) {

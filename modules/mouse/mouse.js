@@ -13,9 +13,13 @@ export class Mouse {
             dragging: false,
             slot: {}
         }
+        this.lastMouseX = 0;
+        this.lastMouseY = 0;
         document.addEventListener("mousemove", this.updatePos)
     }
-    updatePos = (evt) => {
+    updatePos = (evt = { clientX: this.lastMouseX, clientY: this.lastMouseY }) => {
+        this.lastMouseX = evt.clientX;
+        this.lastMouseY = evt.clientY;
         this.x = -this.camera.x + (evt.clientX - this.canvas.offsetLeft) / this.meta.tilesize / this.meta.ratio;
         this.y = -this.camera.y + (evt.clientY - this.canvas.offsetTop) / this.meta.tilesize / this.meta.ratio;
 

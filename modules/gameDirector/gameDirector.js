@@ -18,17 +18,22 @@ class GameDirector {
         this.controls = new Controls();
         /** Defines the current floor */
         this.floor = 0;
-        /** The current level Object, contains info about the level entities and tiles */
-        this.level = { entities: [] };
+        /** The current level Object, contains info about the level entities and tiles 
+         * @type {Entity[]}
+         */
+        this.entities = [];
+        this.portals = [];
+        this.tiles = [];
         this.player;
         this.mouse;
         this.camera = new Camera();
         this.camera.focus = this.player;
-        this.map = gameMap;
+        this.gameMap = gameMap;
 
         /** Sets up the vfxManager */
         this.vfxRecyclePool = vfxManager.recyclePool;
 
+        /* 
         this.tabbedOut = false;
         document.addEventListener("visibilitychange", (evt) => {
             this.tabbedOut = document.visibilityState == 'hidden' ? true : false;
@@ -36,30 +41,63 @@ class GameDirector {
                 this.player.state = 'broke';
             }
         });
+         */
     }
-    /** !!! PROVISIONAL !!!
+    /** 
+     * - Generates the player
      * - Generates the map
-     * - Sets the current level
      * - Loads the entities of the level
      * - Places the this.player at the center of the map
      */
     initialize(meta, canvas) {
+        this.gameMap.generate();
         this.mouse = new Mouse(canvas, meta, this.camera);
-        let player = new Player(0, 0, this);
-        this.player = player;
-        this.changeFloor(meta)
+
+        let start = gameMap.findStart();
+        this.player = new Player(start.x + start.w / 2, start.y + start.h / 2, this);
+        start.entities.push(this.player);
+        this.camera.changeFocus(this.player);
     }
     /** Deletes removed entities */
     garbageCleaner(garbage) {
         for (let i = garbage.length - 1; i >= 0; i--) {
-            if (this.level.entities[garbage[i]].type === 'vfx') {
-                this.vfxRecyclePool.push(this.level.entities.splice(garbage[i], 1)[0]);
+            if (this.entities[garbage[i]].type === 'vfx') {
+                this.vfxRecyclePool.push(this.entities.splice(garbage[i], 1)[0]);
                 continue;
             }
-            for (let drop of this.level.entities[garbage[i]].drops) {
-                drop.dispatch(this.level.entities);
+            for (let drop of this.entities[garbage[i]].drops) {
+                drop.dispatch(this.entities);
             }
-            this.level.entities.splice(garbage[i], 1);
+            this.entities.splice(garbage[i], 1);
+        }
+    }
+    /** Populates the entities,floor and portal arrays with just the
+     *  eligible entities
+     */
+    findIterableEntities(meta) {
+        this.entities.length = 0;
+        this.tiles.length = 0;
+        for (let room of this.gameMap.map) {
+            if (!room.revealed) {
+                for (let comp of room.components) {
+                    let compBox = { x: comp.x * gameMap.roomSize, y: comp.y * gameMap.roomSize, w: gameMap.roomSize, h: gameMap.roomSize }
+                    if (this.player.Physics.collided(this.player, compBox)) {
+                        room.reveal();
+                    }
+                }
+                if (!room.revealed) { continue }
+            }
+            for (let entity of room.entities) {
+                if (!isOutOfScreen(entity, this.camera, meta)) {
+                    this.entities.push(entity)
+                }
+            }
+            for (let tile of room.floor) {
+                if (!isOutOfScreen(tile, this.camera, meta)) {
+                    this.tiles.push(tile)
+                }
+            }
+
         }
     }
     /** 
@@ -71,6 +109,8 @@ class GameDirector {
      * - Computes the UI
      */
     compute = (meta) => {
+        this.mouse.updatePos();
+        this.findIterableEntities(meta);
         /** Where dead entities ends up */
         let garbage = [];
         /** Reiterates the computation if the level is recreated */
@@ -78,12 +118,12 @@ class GameDirector {
         // Computes the interface
         this.player.userInterface.compute(meta.deltaTime);
         // Calls the compute function on every entities
-        for (let entity of this.level.entities) {
-            entity.resolveCollisions(meta.deltaTime, this.level.entities);
-            entity.compute(meta.deltaTime, this.level.entities);
+        for (let entity of this.entities) {
+            entity.resolveCollisions(meta.deltaTime, this.entities);
+            entity.compute(meta.deltaTime, this.entities);
             if (entity.removed) {
                 // Pushes the entities to the garbage
-                garbage.push(this.level.entities.indexOf(entity));
+                garbage.push(this.entities.indexOf(entity));
                 continue;
             }
             if (entity.hasDisplayName) {
@@ -93,10 +133,10 @@ class GameDirector {
                 entity.hpBar.compute(meta.deltaTime);
             }
         }
-        // Detaches the removed entities from this.level.entities
+        // Detaches the removed entities from this.entities
         this.garbageCleaner(garbage);
         // Portal specific computing, need comms with this, the map and the player
-        for (let portal of this.level.portals) {
+        for (let portal of this.portals) {
             loadLevelCall = portal.computePortal(meta, this);
             if (loadLevelCall) {
                 // Stop computing other portals since they are now next level's portal
@@ -104,7 +144,7 @@ class GameDirector {
             }
         }
         // Computes the camera position
-        this.camera.compute(meta, this.level);
+        this.camera.compute(meta, gameMap.boundingBox);
 
     }
 
@@ -119,21 +159,21 @@ class GameDirector {
     render = (context, meta) => {
         this.sortEntities();
         /** Renders the floor (ground level) tiles */
-        for (let tile of this.level.floor) {
+        for (let tile of this.tiles) {
             tile.render(context, meta.tilesize, meta.ratio, this.camera);
         }
         /** Needs to be a separate cycle to avoid shadow overlapping to entities */
-        for (let entity of this.level.entities) {
+        for (let entity of this.entities) {
             entity.renderShadow(context, meta.tilesize, meta.ratio, this.camera);
         }
         /** Entities basic rendering */
-        for (let entity of this.level.entities) {
+        for (let entity of this.entities) {
             entity.render(context, meta.tilesize, meta.ratio, this.camera);
             /** Hitbox rendering */
             //entity.renderHitbox(context, meta.tilesize, meta.ratio, this.camera)
         }
         /** Needs to be a separate cycle to avoid entities overlapping the GUIs */
-        for (let entity of this.level.entities) {
+        for (let entity of this.entities) {
             if (entity.hasDisplayName) {
                 entity.displayName.render(context, meta.tilesize, meta.ratio, this.camera);
             }
@@ -145,71 +185,12 @@ class GameDirector {
         this.player.userInterface.render(context, meta.tilesize, meta.baseRatio);
     }
 
-    changeFloor(meta) {
-        this.floor += 1;
-        this.map.generate();
-        this.currentLevel = this.map.findStart();
-
-        this.changeLevel([0, 0], meta, true)
-
-        this.player.fall();
-    }
-    changeLevel(dir, meta, floorChange = false) {
-        // !!! PROVISIONAL !!!
-        /** Removes player from current level */
-        if (this.level) {
-            this.level.entities.splice(this.level.entities.indexOf(this.player), 1);
-        }
-
-        this.currentLevel[0] += dir[0];
-        this.currentLevel[1] += dir[1];
-
-
-
-
-        this.loadCurrentLevel(meta.tilesWidth, meta.tilesHeight);
-        this.level.entities.push(this.player);
-        /** Reset Velocities */
-        this.player.xVel = 0;
-        this.player.yVel = 0;
-        this.player.xVelExt = 0;
-        this.player.yVelExt = 0;
-
-        vfxManager.setEnvironment(this.level.entities);
-        if (floorChange) {
-            this.player.x = this.level.levelW / 2;
-            this.player.y = this.level.levelH / 2;
-            this.player.updateHitbox();
-            return;
-        }
-        for (let portal of this.level.portals) {
-            /* If the portal matches the opposite of the entered portal, 
-            teleport the player here. 
-            Example: if portal taken goes to "left" (-1, 0)
-            then take the one that goes to "right" (1 , 0)
-            */
-            if (portal.dir[0] == dir[0] * -1 && portal.dir[1] == dir[1] * -1) {
-                // Move the player to the target portal but out of it to avoid teleporting back
-                this.player.x = -this.player.w / 2 + portal.x + portal.w / 2 - (this.player.w * portal.dir[0]);
-                this.player.y = -this.player.h / 2 + portal.y + portal.h / 2 - (this.player.h * portal.dir[1]);
-                this.player.updateHitbox();
-                break;
-            }
-        }
-
-    }
-    loadCurrentLevel(tilesWidth, tilesHeight) {
-        this.level = this.map.levels[this.currentLevel[0]][this.currentLevel[1]];
-        this.level.revealed = true;
-        this.level.levelX = (tilesWidth - this.level.levelW) / 2;
-        this.level.levelY = (tilesHeight - this.level.levelH) / 2;
-    }
     /** Sorts the entities by type (.background goes first) and vertical position (lower -> higher) */
     sortEntities() {
-        this.level.entities.sort(function(a, b) {
+        this.entities.sort(function(a, b) {
             return (a.y + a.h) - (b.y + b.h);
         })
-        this.level.entities.sort(function(a, b) {
+        this.entities.sort(function(a, b) {
             if (!a.background && b.background || a.type == 'vfx') {
                 return 1;
             } else {
@@ -220,3 +201,22 @@ class GameDirector {
 
 }
 export const gameDirector = new GameDirector();
+
+function isOutOfScreen(entity, camera, meta, margin = 1) {
+    if (entity == null) {
+        return true;
+    }
+    if (entity.x > meta.tilesWidth - camera.x + margin) {
+        return true;
+    }
+    if (entity.x + margin + entity.w < -camera.x) {
+        return true;
+    }
+    if (entity.y > meta.tilesHeight - camera.y + margin) {
+        return true;
+    }
+    if (entity.y + margin + entity.h < -camera.y) {
+        return true;
+    }
+    return false;
+}

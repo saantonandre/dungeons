@@ -1,46 +1,81 @@
-import { MapGenerator } from "./mapGenerator/mapGenerator.js";
-import { GameLevel } from "./../gameLevel/gameLevel.js";
+import { MapGenerator } from "./mapGen/mapGen.js";
+import { MapParser } from "./mapParser/mapParser.js";
+import { GameRoom } from "./gameRoom/gameRoom.js";
 
 class GameMap {
     constructor() {
-        this.mapGenerator = new MapGenerator();
+
+        /** @type {MapGenerator} */
+        this.mapGen = new MapGenerator();
+
+        /** @type {MapParser} */
+        this.mapParser = new MapParser();
+
+        /** @type {Number} */
         this.width = 10;
+        /** @type {Number} */
         this.height = 10;
-        this.levelsAmount = 4;
-        this.rawLevels = []; // Levels provided by the generator
-        this.levels = []; // Levels parsed
+        /** @type {Number} */
+        this.roomAmount = 20;
+        /** @type {Number} */
+        this.roomSize = 16;
+
+        /** @type {Room[][]} */
+        this.rawMap = []; // Map provided by the generator
+        /** @type {ParsedRoom[]} */
+        this.parsedMap = []; // Map provided by the parser
+
+        /** @type {GameRoom[]} */
+        this.map = []; // Map generated
     }
-    initEmptyLevels = () => {
-        this.levels = [];
-        for (let y = 0; y < this.height; y++) {
-            this.levels.push([]);
-            for (let x = 0; x < this.width; x++) {
-                this.levels[y].push([]);
+    /**
+     * Returns a square based on revealed rooms positions and sizes
+     */
+    get boundingBox() {
+        let box = { x: undefined, y: undefined, w: undefined, h: undefined }
+        for (let room of this.map) {
+            if (!room.revealed) {
+                continue;
             }
+            if (typeof box.x == 'undefined') {
+                box.x = room.x;
+                box.y = room.y;
+                box.w = room.w;
+                box.h = room.h;
+                continue;
+            }
+            if (room.x < box.x) {
+                box.w += box.x - room.x
+                box.x = room.x;
+            }
+            if (room.y < box.y) {
+                box.h += box.y - room.y
+                box.y = room.y;
+            }
+            if (room.x + room.w > box.x + box.w) {
+                box.w = room.x + room.w - box.x;
+            }
+            if (room.y + room.h > box.y + box.h) {
+                box.h = room.y + room.h - box.y;
+            }
+
         }
+        return box;
     }
     /** Creates both raw and soft parsed levels */
     generate = () => {
-        this.rawLevels = this.mapGenerator.generate(this.width, this.height, this.levelsAmount);
-        this.initEmptyLevels();
-        for (let y = 0; y < this.rawLevels.length; y++) {
-            for (let x = 0; x < this.rawLevels[y].length; x++) {
+        this.rawMap = this.mapGen.generate(this.width, this.height, this.roomAmount, true, true)
+        this.parsedMap = this.mapParser.parseChunks(this.rawMap, this.roomSize);
 
-                if (this.rawLevels[y][x] === 0) {
-                    this.levels[y][x] = 0;
-                } else {
-                    this.levels[y][x] = new GameLevel(this.rawLevels[y][x].links, this.rawLevels[y][x].type);
-                }
-            }
+        for (let parsedRoom of this.parsedMap) {
+            this.map.push(new GameRoom(parsedRoom));
         }
     }
     /** Returns the starting level of the current map */
     findStart = () => {
-        for (let y = 0; y < this.rawLevels.length; y++) {
-            for (let x = 0; x < this.rawLevels[y].length; x++) {
-                if (this.rawLevels[y][x].type == 1) {
-                    return [y, x];
-                }
+        for (let room of this.map) {
+            if (room.type == 1) {
+                return room;
             }
         }
         throw new Error("The map is missing the starting level (a level of type:1)");

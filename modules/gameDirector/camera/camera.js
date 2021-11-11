@@ -1,18 +1,34 @@
 export class Camera {
-    constructor() {
-        this.focus = {
-            x: 0,
-            y: 0,
-            w: 0,
-            h: 0
-        };
+    constructor(focus = { x: 0, y: 0, w: 0, h: 0 }) {
+        this.focus = focus;
         this.lockedAngles = true;
         this.zoom = false;
-        this.x = 0;
-        this.y = 0;
+        this.x = focus.x;
+        this.y = focus.y;
         this.shake = 0;
     }
-    compute(meta, level) {
+    changeFocus(actor, smoothly = false) {
+        this.focus = actor;
+        if (!smoothly) {
+            this.x = -this.focus.x;
+            this.y = -this.focus.y;
+        }
+    }
+    /**
+     * 
+     * @param {Meta} meta 
+     * @param {*} boundingSq A square defining the game boundaries
+     */
+    compute(meta, boundingSq) {
+        let boundingBox = boundingSq;
+        if (boundingBox.w < meta.tilesWidth) {
+            boundingBox.x -= (meta.tilesWidth - boundingBox.w) / 2;
+            boundingBox.w = meta.tilesWidth
+        }
+        if (boundingBox.h < meta.tilesHeight) {
+            boundingBox.y -= (meta.tilesHeight - boundingBox.h) / 2;
+            boundingBox.h = meta.tilesHeight
+        }
         // Compute the ratio
         if (this.zoom) {
             if (meta.ratio < meta.baseRatio * 2) {
@@ -35,33 +51,50 @@ export class Camera {
         }
         // Updates meta pos
 
+        /** Target new x position */
+        let xx = 0;
+        /** Target new y position */
+        let yy = 0;
         if (this.focus) {
-            let xx = -(this.focus.x + this.focus.w / 2 - (meta.tilesWidth) / 2)
-            let yy = -(this.focus.y + this.focus.h / 2 - (meta.tilesHeight) / 2)
+            xx = -(this.focus.x + this.focus.w / 2 - (meta.tilesWidth) / 2)
+            yy = -(this.focus.y + this.focus.h / 2 - (meta.tilesHeight) / 2)
             this.x += (xx - this.x) / 15 * meta.deltaTime;
             this.y += (yy - this.y) / 15 * meta.deltaTime;
         }
         if (this.lockedAngles) {
             // left boundary
-
-            if (-this.x < -level.levelX) {
-                this.x = level.levelX;
+            let xChanged = false;
+            let yChanged = false;
+            if (-this.x < boundingBox.x) {
+                xx = -boundingBox.x;
+                xChanged = true;
             }
             // top boundary
             // +0.5 to counterweight the top UI 
-            if (-this.y < -level.levelY + 0.5) {
-                this.y = level.levelY + 0.5;
+            if (-this.y < boundingBox.y) {
+                yy = -boundingBox.y;
+                yChanged = true;
             }
 
             // Right boundary
-            if (-this.x > level.levelX + level.levelW - meta.tilesWidth) {
-                this.x = -(level.levelX + level.levelW - meta.tilesWidth);
+            if (-this.x > boundingBox.x + boundingBox.w - meta.tilesWidth) {
+                xx = -(boundingBox.x + boundingBox.w - meta.tilesWidth);
+                xChanged = true;
             }
             // Down boundary
-            if (-this.y > level.levelY + level.levelH - meta.tilesHeight) {
-                this.y = -(level.levelY + level.levelH - meta.tilesHeight);
+            if (-this.y > boundingBox.y + boundingBox.h - meta.tilesHeight) {
+                yy = -(boundingBox.y + boundingBox.h - meta.tilesHeight);
+                yChanged = true;
+            }
+            if (xChanged) {
+                this.x += (xx - this.x) / 6 * meta.deltaTime;
+            }
+            if (yChanged) {
+                this.y += (yy - this.y) / 6 * meta.deltaTime;
             }
         }
+
+
         if (this.shake > 0) {
             this.x += Math.random() / 2 - 0.25;
             this.y += Math.random() / 2 - 0.25;

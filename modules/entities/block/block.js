@@ -6,7 +6,7 @@ export class Block extends Entity {
         this.type = type;
         this.immovable = false;
         this.rawLevel = rawLevel;
-        this.tile = tileSetter(rawLevel, x, y);
+        this.tile = tileSetter(rawLevel.tilesMap, x - rawLevel.x, y - rawLevel.y);
         this.background = true;
         this.solid = true;
         switch (type) {
@@ -38,27 +38,6 @@ export class Block extends Entity {
  * - 9--10-11--15
  */
 const tiles = {};
-/* 
-tiles['wall'] = [
-    [1, 1], // 0 - tile
-    [0, 0],
-    [1, 0],
-    [2, 0], // 1 - 2 - 3 upper walls
-    [0, 1],
-    [2, 1], // 4 - 5 side walls
-    [0, 2],
-    [1, 2],
-    [2, 2], // 6 - 7 - 8 down walls
-    [3, 0],
-    [4, 0], // 9 - 10 right/left breaks (up)
-    [3, 1],
-    [4, 1], // 11 - 12  right/left breaks (down)
-    [3, 2],
-    [3, 3], // 13 - 14  up/down breaks (left)
-    [4, 2],
-    [4, 3], // 15 - 16  up/down breaks (right)
-]
- */
 
 tiles['hole'] = [
     [5, 0],
@@ -98,7 +77,7 @@ tiles['wall'] = [
 ]
 
 function tileSetter(array, xIndex, yIndex) {
-    let sameType = array[xIndex][yIndex].type;
+    let sameType = array[xIndex][yIndex];
 
     let left = 0;
     let right = 0;
@@ -107,25 +86,25 @@ function tileSetter(array, xIndex, yIndex) {
 
     if (xIndex - 1 < 0) {
         left = 1;
-    } else if (array[xIndex - 1][yIndex].type) {
-        left = +(array[xIndex - 1][yIndex].type === sameType)
+    } else if (array[xIndex - 1][yIndex]) {
+        left = +(array[xIndex - 1][yIndex] === sameType)
     }
     if (xIndex + 1 >= array.length) {
         right = 1;
-    } else if (array[xIndex + 1][yIndex].type) {
-        right = +(array[xIndex + 1][yIndex].type === sameType)
+    } else if (array[xIndex + 1][yIndex]) {
+        right = +(array[xIndex + 1][yIndex] === sameType)
     }
 
     if (yIndex - 1 < 0) {
         up = 1;
-    } else if (array[xIndex][yIndex - 1].type) {
-        up = +(array[xIndex][yIndex - 1].type === sameType)
+    } else if (array[xIndex][yIndex - 1]) {
+        up = +(array[xIndex][yIndex - 1] === sameType)
     }
 
     if (yIndex + 1 >= array[xIndex].length) {
         down = 1;
-    } else if (array[xIndex][yIndex + 1].type) {
-        down = +(array[xIndex][yIndex + 1].type === sameType)
+    } else if (array[xIndex][yIndex + 1]) {
+        down = +(array[xIndex][yIndex + 1] === sameType)
     }
 
     let binary = "" + left + up + right + down;

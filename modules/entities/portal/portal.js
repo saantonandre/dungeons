@@ -79,7 +79,7 @@ export class Portal extends Entity {
     }
     /** Portal computing, returns true if changeLevel is called */
     computePortal(meta, gameDirector) {
-        this.computeAction(gameDirector.level.entities);
+        this.computeAction(gameDirector.entities);
         if (this.collidedWithPlayer) {
             this.collidedWithPlayer = false;
             // Move player to the linked level
@@ -127,7 +127,7 @@ export class FloorPortal extends Portal {
     /** Portal computing, returns true if changeLevel is called */
     computePortal(meta, gameDirector) {
         //
-        this.computeAction(gameDirector.level.entities);
+        this.computeAction(gameDirector.entities);
         if (this.collidedWithPlayer) {
             this.collidedWithPlayer = false;
             // Move player to the linked level
