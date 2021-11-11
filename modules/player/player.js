@@ -6,7 +6,7 @@ import { EquipmentManager } from "./equipmentManager/equipmentManager.js";
 import { InventoryManager } from "./inventoryManager/inventoryManager.js";
 import { UserInterface } from "./userInterface/userInterface.js";
 
-import { MemeSword } from "../items/items.js"
+import { MemeSword, LeatherShoes } from "../items/items.js"
 export class Player extends Entity {
     constructor(x = 7.5, y = 7.5, director) {
         super(x, y);
@@ -71,6 +71,7 @@ export class Player extends Entity {
 
         // Change
         this.inventory.pickUp(new MemeSword());
+        this.inventory.pickUp(new LeatherShoes());
 
     }
     get atk() { return this.stats.atk + this.equipment.atk }

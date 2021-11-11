@@ -16,7 +16,7 @@ class GameMap {
         /** @type {Number} */
         this.height = 10;
         /** @type {Number} */
-        this.roomAmount = 20;
+        this.roomAmount = 40;
         /** @type {Number} */
         this.roomSize = 16;
 

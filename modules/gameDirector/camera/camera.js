@@ -21,13 +21,13 @@ export class Camera {
      */
     compute(meta, boundingSq) {
         let boundingBox = boundingSq;
-        if (boundingBox.w < meta.tilesWidth) {
-            boundingBox.x -= (meta.tilesWidth - boundingBox.w) / 2;
-            boundingBox.w = meta.tilesWidth
+        if (boundingBox.w < meta.tilesWidth + 1) {
+            boundingBox.x -= (meta.tilesWidth + 1 - boundingBox.w) / 2;
+            boundingBox.w = meta.tilesWidth + 1
         }
-        if (boundingBox.h < meta.tilesHeight) {
-            boundingBox.y -= (meta.tilesHeight - boundingBox.h) / 2;
-            boundingBox.h = meta.tilesHeight
+        if (boundingBox.h < meta.tilesHeight + 1) {
+            boundingBox.y -= (meta.tilesHeight + 1 - boundingBox.h) / 2;
+            boundingBox.h = meta.tilesHeight + 1
         }
         // Compute the ratio
         if (this.zoom) {
@@ -70,7 +70,7 @@ export class Camera {
                 xChanged = true;
             }
             // top boundary
-            // +0.5 to counterweight the top UI 
+
             if (-this.y < boundingBox.y) {
                 yy = -boundingBox.y;
                 yChanged = true;
@@ -93,7 +93,6 @@ export class Camera {
                 this.y += (yy - this.y) / 6 * meta.deltaTime;
             }
         }
-
 
         if (this.shake > 0) {
             this.x += Math.random() / 2 - 0.25;

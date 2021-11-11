@@ -38,7 +38,7 @@ export class EquipmentManager {
         let weaponSlot = this.weaponSlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
         let helmetSlot = this.helmetSlot.isEmpty ? 0 : this.helmetSlot.item.stats[stat];
         let armorSlot = this.armorSlot.isEmpty ? 0 : this.armorSlot.item.stats[stat];
-        let accessorySlot = this.accessorySlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
+        let accessorySlot = this.accessorySlot.isEmpty ? 0 : this.accessorySlot.item.stats[stat];
 
         return weaponSlot + helmetSlot + armorSlot + accessorySlot;
     }
@@ -49,7 +49,7 @@ export class EquipmentManager {
         let weaponSlot = this.weaponSlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
         let helmetSlot = this.helmetSlot.isEmpty ? 0 : this.helmetSlot.item.stats[stat];
         let armorSlot = this.armorSlot.isEmpty ? 0 : this.armorSlot.item.stats[stat];
-        let accessorySlot = this.accessorySlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
+        let accessorySlot = this.accessorySlot.isEmpty ? 0 : this.accessorySlot.item.stats[stat];
 
         return weaponSlot + helmetSlot + armorSlot + accessorySlot;
     }
@@ -60,7 +60,7 @@ export class EquipmentManager {
         let weaponSlot = this.weaponSlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
         let helmetSlot = this.helmetSlot.isEmpty ? 0 : this.helmetSlot.item.stats[stat];
         let armorSlot = this.armorSlot.isEmpty ? 0 : this.armorSlot.item.stats[stat];
-        let accessorySlot = this.accessorySlot.isEmpty ? 0 : this.weaponSlot.item.stats[stat];
+        let accessorySlot = this.accessorySlot.isEmpty ? 0 : this.accessorySlot.item.stats[stat];
 
         return weaponSlot + helmetSlot + armorSlot + accessorySlot;
     }

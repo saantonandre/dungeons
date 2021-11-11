@@ -1,4 +1,4 @@
-import { Item } from "./item/item.js";
+import { Item, Equippable } from "./item/item.js";
 import { SwordPrototype } from "./prototypes/swordPrototype.js";
 export class Goo extends Item {
     constructor(source) {
@@ -15,6 +15,23 @@ export class Bone extends Item {
         this.rarity = "rare";
         this.description = "While invertabrates, some slimes do have bones. Just not properly -theirs-."
         this.setAnimation("idle", [1], [22])
+    }
+}
+export class LeatherShoes extends Equippable {
+    constructor(source) {
+        super(source);
+        this.name = "Leather Shoes";
+        this.rarity = "rare";
+        this.type = "accessory";
+        this.description = "Light and comfortable shoes."
+        this.setAnimation("idle", [15], [1])
+    }
+    compute() {
+        this.owner.xVel *= 3;
+        this.owner.yVel *= 3;
+    }
+    render() {
+
     }
 }
 export class MemeSword extends SwordPrototype {
