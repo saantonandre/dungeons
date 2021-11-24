@@ -1,4 +1,5 @@
 export const spritesheet = new Image();
-spritesheet.src = "./../assets/sheet.png";
+console.log(spritesheet)
+spritesheet.src = "assets/sheet.png";
 
 /** Sound fxs */

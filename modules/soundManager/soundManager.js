@@ -8,7 +8,7 @@ class SoundManager {
                 this.sounds[soundsArray[(Math.random() * soundsArray.length | 0)]].play()
             }
         };
-        this.soundsBaseUrl = './../../assets/soundFxs/';
+        this.soundsBaseUrl = 'assets/soundFxs/';
     }
     /** takes an argument the sound file name (without extension) from the relative path in soundsBaseUrl */
     createSound = (relativeUrl, loop = false, volume = 1, playbackRate = 1) => {
