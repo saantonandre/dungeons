@@ -14,11 +14,11 @@ class VfxManager {
         this.vfxClasses = Vfxs;
     }
     setEnvironment(environment) {
-        this.environment = environment
+        this.environment = environment;
     }
     /** Returns a recycled vfx or FALSE */
     getRecycledVfx(vfxName, source) {
-        for (let i = 0; i < this.recyclePool.length; i++) {
+        for (let i = this.recyclePool.length - 1; i >= 0; i--) {
             if (this.recyclePool[i].name === vfxName) {
                 /** Found a matching Vfx */
                 this.recyclePool[i].reset(source);

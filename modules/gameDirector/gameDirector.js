@@ -24,11 +24,13 @@ class GameDirector {
         this.entities = [];
         this.portals = [];
         this.tiles = [];
+        this.vfxs = [];
         this.player;
         this.mouse;
         this.camera = new Camera();
         this.camera.focus = this.player;
         this.gameMap = gameMap;
+        vfxManager.setEnvironment(this.vfxs)
 
         /** Sets up the vfxManager */
         this.vfxRecyclePool = vfxManager.recyclePool;
@@ -41,7 +43,7 @@ class GameDirector {
                 this.player.state = 'broke';
             }
         });
-         */
+        */
     }
     /** 
      * - Generates the player
@@ -58,17 +60,22 @@ class GameDirector {
         start.entities.push(this.player);
         this.camera.changeFocus(this.player);
     }
-    /** Deletes removed entities */
-    garbageCleaner(garbage) {
+    /** Deletes removed vfxs */
+    garbageCleaner(garbage, type = 'entity') {
         for (let i = garbage.length - 1; i >= 0; i--) {
-            if (this.entities[garbage[i]].type === 'vfx') {
-                this.vfxRecyclePool.push(this.entities.splice(garbage[i], 1)[0]);
-                continue;
+            switch (type) {
+                case 'vfx':
+                    this.vfxRecyclePool.push(this.vfxs.splice(garbage[i], 1)[0]);
+                    break;
+                case 'entity':
+                    let entity = this.entities[garbage[i]];
+                    for (let drop of entity.drops) {
+                        drop.dispatch(this.gameMap.findRoom(entity).entities);
+                    }
+                    let entityRoom = this.gameMap.findRoom(entity);
+                    entityRoom.entities.splice(entityRoom.entities.indexOf(entity), 1);
+                    break;
             }
-            for (let drop of this.entities[garbage[i]].drops) {
-                drop.dispatch(this.entities);
-            }
-            this.entities.splice(garbage[i], 1);
         }
     }
     /** Populates the entities,floor and portal arrays with just the
@@ -113,6 +120,8 @@ class GameDirector {
         this.findIterableEntities(meta);
         /** Where dead entities ends up */
         let garbage = [];
+        /** Where dead vfxs ends up */
+        let vfxGarbage = [];
         /** Reiterates the computation if the level is recreated */
         let loadLevelCall = false;
         // Computes the interface
@@ -143,6 +152,19 @@ class GameDirector {
                 break;
             }
         }
+        for (let i = this.vfxs.length - 1; i >= 0; i--) {
+            let vfx = this.vfxs[i];
+            vfx.compute(meta.deltaTime);
+            if (vfx.removed) {
+                // Pushes the entities to the garbage
+                let index = this.vfxs.indexOf(vfx);
+                vfxGarbage.push(index);
+                continue;
+            }
+        }
+
+        // Detaches the removed vfxs from this.vfxs
+        this.garbageCleaner(vfxGarbage, 'vfx');
         // Computes the camera position
         this.camera.compute(meta, gameMap.boundingBox);
 
@@ -180,6 +202,10 @@ class GameDirector {
             if (entity.hasHpBar) {
                 entity.hpBar.render(context, meta.tilesize, meta.ratio, this.camera);
             }
+        }
+        // Renders Vfxs (provisional)
+        for (let vfx of this.vfxs) {
+            vfx.render(context, meta.tilesize, meta.ratio, this.camera);
         }
         //debug.render(context, meta.tilesize, meta.ratio, this.camera);
         this.player.userInterface.render(context, meta.tilesize, meta.baseRatio);

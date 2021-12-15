@@ -1,6 +1,7 @@
 import { MapGenerator } from "./mapGen/mapGen.js";
 import { MapParser } from "./mapParser/mapParser.js";
 import { GameRoom } from "./gameRoom/gameRoom.js";
+import { pointSquareCol } from "../../physics/physics.js";
 
 class GameMap {
     constructor() {
@@ -80,6 +81,21 @@ class GameMap {
         }
         throw new Error("The map is missing the starting level (a level of type:1)");
     }
+    /** Returns the room containing the given coordinates */
+    findRoom = (point, revealed = false) => {
+        for (let room of this.map) {
+            if (!revealed && !room.revealed) {
+                continue;
+            }
+            for (let comp of room.components) {
+                let compBox = { x: comp.x * this.roomSize, y: comp.y * this.roomSize, w: this.roomSize, h: this.roomSize };
+                if (pointSquareCol(point, compBox)) {
+                    return room;
+                }
+            }
+        }
+        // If the room was not found, returns the first room
+        return this.map[0];
+    }
 }
-
 export const gameMap = new GameMap();

@@ -11,11 +11,11 @@ export class Sprite {
         this.animation = "idle";
         this.animations = {};
 
-        /** The animation currently rendering (defaults to 'idle') */
         this.display = true;
         this.frame = 0;
         this.left = 0;
         this.frameCounter = 0;
+
         //this.setAnimation("idle", [0], [0]);
 
 
