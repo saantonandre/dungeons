@@ -1,8 +1,3 @@
-/**
- *  The 'game director' holds information about the
- */
-
-
 import { gameMap } from "./gameMap/gameMap.js";
 import { vfxManager } from "../vfxManager/vfxManager.js";
 import { Camera } from "./camera/camera.js";
@@ -56,6 +51,9 @@ class GameDirector {
      * - Generates the map
      * - Loads the entities of the level
      * - Places the this.player at the center of the map
+     * 
+     * @param {Meta} meta
+     * @param {HTMLCanvasElement} canvas 
      */
     initialize(meta, canvas) {
         this.gameMap.generate();
@@ -263,21 +261,7 @@ class GameDirector {
         this.player.userInterface.render(context, meta.tilesize, meta.baseRatio);
     }
 
-    /** Sorts the entities by type (.background goes first) and vertical position (lower -> higher) */
-    sortEntities() {
-        this.entities.sort(function(a, b) {
-            return (a.y + a.h) - (b.y + b.h);
-        })
-        this.entities.sort(function(a, b) {
-            if (!a.background && b.background || a.type == 'vfx') {
-                return 1;
-            } else {
-                return -1;
-            }
-        })
-    }
-
-    /** Sorts the entities by type (.background goes first) and vertical position (lower -> higher) */
+    /** Sorts the entities by type (.background = true goes first) and vertical position (lower -> higher) */
     sortEntities() {
         this.entities.sort(function(a, b) {
             return (a.y + a.h) - (b.y + b.h);

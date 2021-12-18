@@ -1,4 +1,10 @@
 import { Room, RoomsMap, resetRoomID } from './components/room.js';
+/**
+ * Procedural map generator
+ * 
+ * Demonstration link:
+ * @link https://saantonandre.github.io/projects/MapGen/
+ */
 export class MapGenerator {
     constructor() {
         this.w = 0;
