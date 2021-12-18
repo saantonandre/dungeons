@@ -17,6 +17,7 @@ export class InventoryManager {
             this.slots.push(new ItemSlot(i >= this.slotsUnlocked));
         }
     }
+    /** TODO: Sorts/orders the inventory content */
     sortSlots() {
         // this.slots.sort((a, b) => { return a.id - b.id })
     }
@@ -62,7 +63,6 @@ export class InventoryManager {
         }
         return false;
     }
-    /**  */
     compute() {
 
     }

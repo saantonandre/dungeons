@@ -31,7 +31,7 @@ export class DisplayName {
         this.text2 = `${this.source.name}`
     }
     compute(mouse) {
-        if (this.source.Physics.pointSquareCol(mouse, this.source, true)) {
+        if (this.source.Physics.pointRectCol(mouse, this.source, true)) {
             this.display = true;
             this.getInfo();
             this.x = this.source.x + this.source.w / 2;

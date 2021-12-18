@@ -19,7 +19,7 @@ export class Bat extends Enemy {
         this.dashSpeed = 4;
         this.fleeing = 0;
 
-        this.flying = true;
+        this.grounded = false;
 
         this.rotX = 0;
         this.rotY = 0;

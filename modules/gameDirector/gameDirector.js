@@ -1,3 +1,8 @@
+/**
+ *  The 'game director' holds information about the
+ */
+
+
 import { gameMap } from "./gameMap/gameMap.js";
 import { vfxManager } from "../vfxManager/vfxManager.js";
 import { Camera } from "./camera/camera.js";
@@ -36,6 +41,7 @@ class GameDirector {
         this.vfxRecyclePool = vfxManager.recyclePool;
 
         /* 
+        // Easter egg (makes the player appear sleeping when the tab is not visible)
         this.tabbedOut = false;
         document.addEventListener("visibilitychange", (evt) => {
             this.tabbedOut = document.visibilityState == 'hidden' ? true : false;
@@ -57,10 +63,14 @@ class GameDirector {
 
         let start = gameMap.findStart();
         this.player = new Player(start.x + start.w / 2, start.y + start.h / 2, this);
+        this.player.currentRoom = start.id;
         start.entities.push(this.player);
         this.camera.changeFocus(this.player);
     }
-    /** Deletes removed vfxs */
+    /** Deletes removed entities and moves the vfxs to the recycle pool 
+     * @param {Entity[] | Vfx[]} garbage Array with references of the removed entities
+     *  @param {'entity' | 'vfx'} type Defines which is the type of the passed array ('entity' || 'vfx')
+     */
     garbageCleaner(garbage, type = 'entity') {
         for (let i = garbage.length - 1; i >= 0; i--) {
             switch (type) {
@@ -69,17 +79,28 @@ class GameDirector {
                     break;
                 case 'entity':
                     let entity = this.entities[garbage[i]];
+                    // Dispatches the entity's drops
                     for (let drop of entity.drops) {
                         drop.dispatch(this.gameMap.findRoom(entity).entities);
                     }
                     let entityRoom = this.gameMap.findRoom(entity);
+                    // Removes the entity from its current room
                     entityRoom.entities.splice(entityRoom.entities.indexOf(entity), 1);
+
+                    // Removes the entity from the current entities array
+                    this.entities.splice(this.entities.indexOf(entity), 1);
                     break;
+                    d
             }
         }
     }
-    /** Populates the entities,floor and portal arrays with just the
-     *  eligible entities
+    /** 
+     * Populates the entities/tiles arrays with references of 
+     * eligible entities.
+     * Entities are 'eligible' only if the room has been revealed, 
+     * and if they are within the screen boundaries.
+     * 
+     * @param {Meta} meta 
      */
     findIterableEntities(meta) {
         this.entities.length = 0;
@@ -114,18 +135,26 @@ class GameDirector {
      * - Computes portals 
      * - Updates the camera
      * - Computes the UI
+     * @param {Meta} meta
      */
     compute = (meta) => {
         this.mouse.updatePos();
         this.findIterableEntities(meta);
-        /** Where dead entities ends up */
-        let garbage = [];
-        /** Where dead vfxs ends up */
-        let vfxGarbage = [];
+
         /** Reiterates the computation if the level is recreated */
         let loadLevelCall = false;
-        // Computes the interface
+        /** Where removed entities ends up 
+         * @type {Entity[]}
+         */
+        let garbage = [];
+        /** Where removed vfxs ends up 
+         * @type {Vfx[]}
+         */
+        let vfxGarbage = [];
+
+        // Computes the UI
         this.player.userInterface.compute(meta.deltaTime);
+
         // Calls the compute function on every entities
         for (let entity of this.entities) {
             entity.resolveCollisions(meta.deltaTime, this.entities);
@@ -142,8 +171,7 @@ class GameDirector {
                 entity.hpBar.compute(meta.deltaTime);
             }
         }
-        // Detaches the removed entities from this.entities
-        this.garbageCleaner(garbage);
+
         // Portal specific computing, need comms with this, the map and the player
         for (let portal of this.portals) {
             loadLevelCall = portal.computePortal(meta, this);
@@ -163,11 +191,32 @@ class GameDirector {
             }
         }
 
-        // Detaches the removed vfxs from this.vfxs
+        this.updateEntitiesRoom(this.entities);
+
+        this.garbageCleaner(garbage);
         this.garbageCleaner(vfxGarbage, 'vfx');
-        // Computes the camera position
+
         this.camera.compute(meta, gameMap.boundingBox);
 
+    }
+    /** Updates the location of the entities in the gameMap */
+    updateEntitiesRoom(entities) {
+        entities.forEach(entity => {
+            if (entity.currentRoom !== -1) {
+                let parentRoom = this.gameMap.map.find(room => entity.currentRoom == room.id);
+                let currentRoom = gameMap.findRoom(entity, false);
+                if (parentRoom !== currentRoom) {
+                    if (entity == this.player && !currentRoom.revealed) {
+                        currentRoom.reveal();
+                    }
+                    entity.currentRoom = currentRoom.id;
+                    currentRoom.entities.push(
+                        parentRoom.entities.splice(
+                            parentRoom.entities.indexOf(entity), 1)[0]
+                    )
+                }
+            }
+        })
     }
 
     /** 
@@ -177,24 +226,27 @@ class GameDirector {
      * - Renders the entities
      * - Renders the hp bars
      * - Renders the UI
+     * 
+     * @param {CanvasRenderingContext2D} context The drawing context
+     * @param {Meta} meta Meta object containing info about tilesize, pixel ratio, delta time
      */
     render = (context, meta) => {
         this.sortEntities();
-        /** Renders the floor (ground level) tiles */
+        // Renders the floor (ground level) tiles
         for (let tile of this.tiles) {
             tile.render(context, meta.tilesize, meta.ratio, this.camera);
         }
-        /** Needs to be a separate cycle to avoid shadow overlapping to entities */
+        // Needs to be a separate cycle to avoid shadow overlapping to entities
         for (let entity of this.entities) {
             entity.renderShadow(context, meta.tilesize, meta.ratio, this.camera);
         }
-        /** Entities basic rendering */
+        // Entities basic rendering
         for (let entity of this.entities) {
             entity.render(context, meta.tilesize, meta.ratio, this.camera);
-            /** Hitbox rendering */
+            // Hitbox rendering
             //entity.renderHitbox(context, meta.tilesize, meta.ratio, this.camera)
         }
-        /** Needs to be a separate cycle to avoid entities overlapping the GUIs */
+        // Needs to be a separate cycle to avoid entities overlapping the GUIs
         for (let entity of this.entities) {
             if (entity.hasDisplayName) {
                 entity.displayName.render(context, meta.tilesize, meta.ratio, this.camera);
@@ -225,9 +277,32 @@ class GameDirector {
         })
     }
 
+    /** Sorts the entities by type (.background goes first) and vertical position (lower -> higher) */
+    sortEntities() {
+        this.entities.sort(function(a, b) {
+            return (a.y + a.h) - (b.y + b.h);
+        })
+        this.entities.sort(function(a, b) {
+            if (!a.background && b.background || a.type == 'vfx') {
+                return 1;
+            } else {
+                return -1;
+            }
+        })
+    }
+
+
 }
 export const gameDirector = new GameDirector();
 
+/**
+ * Checks whether an entity is outside of the screen boundaries
+ * @param {Entity} entity 
+ * @param {Camera} camera 
+ * @param {Meta} meta 
+ * @param {Number} margin 
+ * @returns {Boolean} True if it's outside the boundaries / if the entity is null
+ */
 function isOutOfScreen(entity, camera, meta, margin = 1) {
     if (entity == null) {
         return true;

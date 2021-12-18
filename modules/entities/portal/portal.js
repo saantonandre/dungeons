@@ -98,8 +98,6 @@ export class Portal extends Entity {
                 break;
         }
     }
-    /** Entity computing */
-
     compute(deltaTime) {
         this.updateHitbox();
         this.updateSprite(deltaTime);

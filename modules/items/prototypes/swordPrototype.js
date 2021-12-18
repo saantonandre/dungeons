@@ -163,7 +163,7 @@ export class SwordPrototype extends Equippable {
             if (entity === this.owner) {
                 continue;
             }
-            if (this.Physics.lineSquareCol(this.lineHitbox, entity)) {
+            if (this.Physics.lineRectCol(this.lineHitbox, entity)) {
                 // Collision happened
                 /**
                  * NOTE: Should probably standardize this behaviour into the weapon parent class

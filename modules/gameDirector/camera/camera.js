@@ -15,9 +15,10 @@ export class Camera {
         }
     }
     /**
+     * Updates the camera position
      * 
      * @param {Meta} meta 
-     * @param {*} boundingSq A square defining the game boundaries
+     * @param {Object} boundingSq A square defining the map boundaries
      */
     compute(meta, boundingSq) {
         let boundingBox = boundingSq;

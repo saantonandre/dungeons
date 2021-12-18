@@ -16,7 +16,7 @@ export class GameRoom {
         this.w = parsedRoom.w;
         this.h = parsedRoom.h;
         this.type = parsedRoom.type;
-        this.id = parsedRoom.jointID;
+        this.id = parsedRoom.id;
         //this.revealed = parsedRoom.revealed;
         this.revealed = false;
         /** Component rooms @type {Room[]} */
@@ -26,7 +26,13 @@ export class GameRoom {
         this.entities = parsed.entities;
         this.floor = parsed.floor;
         this.portals = parsed.portals;
-
+        this.assignIDs();
+    }
+    /** Assigns this.id to every entity in this.entities */
+    assignIDs() {
+        this.entities.forEach(entity => {
+            entity.currentRoom = this.id;
+        })
     }
     /** Reveals the room and its component rooms */
     reveal() {

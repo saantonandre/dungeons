@@ -11,7 +11,6 @@ export class Item extends Entity {
         this.sourceName = this.source.name;
         this.type = "item";
         this.rarity = "common";
-        this.flying = false;
 
         // Stats resetting
         this.stats = new ItemStats();
@@ -75,6 +74,7 @@ export class Item extends Entity {
         this.updateHitbox();
     }
 }
+/** Class representing an item's stats */
 class ItemStats {
     constructor() {
         this.atk = 0;
@@ -83,6 +83,9 @@ class ItemStats {
         this.maxMana = 0;
     }
 }
+
+
+/** Class representing an Equippable item */
 export class Equippable extends Item {
     constructor(source) {
         super(source);

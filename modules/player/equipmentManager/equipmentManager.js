@@ -1,4 +1,4 @@
-// FOR TESTING
+// These import are for testing purposes only
 import { SwordPrototype } from "../../items/prototypes/swordPrototype.js"
 import { HelmetPrototype } from "../../items/prototypes/helmetPrototype.js"
 import { ArmorPrototype } from "../../items/prototypes/armorPrototype.js"
@@ -105,11 +105,13 @@ class EquipmentSlot {
         };
 
     }
+    /** Assigns the passed item onto the equipment slot, also equipping it to this.owner */
     assign(item) {
         item.equip(this.owner);
         this.item = item;
         this.amount = 1;
     }
+    /** Swaps this slot's item to another slot's item. */
     swap(recipientSlot) {
         if (this.locked || recipientSlot.locked) {
             throw new Error("Cant place to a locked slot")
@@ -127,6 +129,9 @@ class EquipmentSlot {
         }
         return true;
     }
+    /** 
+     * @returns {Boolean} True if this slot is empty, false otherwise
+     */
     get isEmpty() {
         // Check if there is an item in this slot
         return this.item.name == 'empty';

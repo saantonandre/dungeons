@@ -4,13 +4,13 @@ class Meta {
         this.tilesize = 16;
         this.baseRatio = 2;
 
-        /** Act on the size of each pixel */
+        /** Acts on the size of each pixel */
         this.ratio = this.baseRatio;
 
         /** Frames per second */
         this.fps = 0;
 
-        /** Setting to true dispays the fps on screen */
+        /** Defines whether the fps span will be initialized/displayed */
         this.displayFps = true;
 
         /** Game time multiplier */
@@ -21,9 +21,11 @@ class Meta {
 
         /** Target frame time */
         this.perfectFrameTime = 1000 / this.targetFrames;
+
         this.lastTimestamp = Date.now();
         this.timestamp = Date.now();
 
+        /** Defines the type of the game's loop, A.K.A. 'scene' */
         this.loopType = 0;
 
         this.baseTilesWidth = 25;
@@ -38,14 +40,16 @@ class Meta {
     /** Initializes the fps counter if displayFps == true */
     init = () => {
         if (this.displayFps) {
-            // Set fps timer
+            // Creates and styles the html element where the fps will be displayed
             let fpsSpan = document.createElement("span");
-
             fpsSpan.style.position = "absolute";
             fpsSpan.style.color = "white";
             fpsSpan.style.left = "5px";
             fpsSpan.style.top = "5px";
+            // Places it as a child of the html body
             document.body.appendChild(fpsSpan);
+
+            // Calls the fpsCounter function once every second
             setInterval(() => {
                 this.fpsCounter(fpsSpan);
             }, 1000);
@@ -63,13 +67,15 @@ class Meta {
         this.deltaTime =
             (this.timestamp - this.lastTimestamp) / this.perfectFrameTime;
 
-        // Forces the max slowness as half the fps target
+        // Forces the time multiplication to be at max two times the norm
         if (this.deltaTime > 2) {
             this.deltaTime = 2;
         }
     }
 
-    /** Keeps count of the fps, called in a setInterval. */
+    /** Keeps count of the fps, called in a setInterval. 
+     * @param {HTMLSpanElement} span The html element where to display the fps variable
+     */
     fpsCounter = (span) => {
         span.innerHTML = this.fps;
         this.fps = 0;

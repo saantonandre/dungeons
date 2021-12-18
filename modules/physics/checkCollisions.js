@@ -1,4 +1,10 @@
-/** Gets called after the velocities have been set */
+/** Gets called after the velocities have been set 
+ * 
+ * Contains my own javascript implementation of the SWEPT AABB algorithm, after taking to account many resources on the matter:
+ * @link https://www.youtube.com/watch?v=8JJ-4JgR7Dg
+ * @link https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
+ * @link https://blog.hamaluik.ca/posts/swept-aabb-collision-using-minkowski-difference/
+ */
 // import { debug } from '../debug/debug.js'
 export function checkCollisions(obj, entities, deltaTime = 1) {
     if (!obj.solid) {
@@ -19,7 +25,7 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
     /** If the object has an hitbox property, check collision with that */
     let objHitbox = obj.hitbox ? obj.hitbox : obj;
 
-    // Make a bigger hitbox for the broad phase
+    /** Bigger hitbox for the broad phase */
     let broadHitbox = {
         x: velocitiesX > 0 ? objHitbox.x : objHitbox.x + velocitiesX * deltaTime,
         y: velocitiesY > 0 ? objHitbox.y : objHitbox.y + velocitiesY * deltaTime,
@@ -53,7 +59,8 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
         // BROAD
         // Checks broad hitbox collisions with entities
         if (collided(broadHitbox, entity)) {
-            /** Checks corner points collisions */
+            // Checks corner points collisions
+
             // NARROW
             // If the entity has an hitbox, use it instead
             let entityHitbox = entity.hitbox ? entity.hitbox : entity;
@@ -81,7 +88,7 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
         }
     }
     if (levelChange) {
-        /** Entities are changed, no point in resolving */
+        // Entities are changed, no point in resolving 
         return;
     }
     if (colPointsVector.length === 0) {
@@ -95,9 +102,12 @@ export function checkCollisions(obj, entities, deltaTime = 1) {
         resolveDynamicRectVsRect(obj, deltaTime, entities[rect.id]);
     }
 
-    /** Fixes slide direction change in case velocities were initially diagonal */
-    // (Its' implied that at least one of the velocities isn't 0)
-    // (Its' also implied there has been a collision at this point)
+    /** 
+     * Fixes slide direction change in case velocities were initially diagonal 
+     * (Its' implied that at least one of the velocities isn't 0)
+     * (Its' also implied there has been a collision at this point)
+     * 
+     */
     if (velocitiesX != 0 && velocitiesY != 0) {
         //console.log("Recursion happened");
         checkCollisions(obj, entities, deltaTime);
@@ -146,13 +156,13 @@ class PointsCollider {
     /** Checks Points collision */
     checkCols(collider) {
         if (!this.TL.col)
-            this.TL.col = pointSquareCol(this.TL, collider);
+            this.TL.col = pointRectCol(this.TL, collider);
         if (!this.TR.col)
-            this.TR.col = pointSquareCol(this.TR, collider);
+            this.TR.col = pointRectCol(this.TR, collider);
         if (!this.BL.col)
-            this.BL.col = pointSquareCol(this.BL, collider);
+            this.BL.col = pointRectCol(this.BL, collider);
         if (!this.BR.col)
-            this.BR.col = pointSquareCol(this.BR, collider);
+            this.BR.col = pointRectCol(this.BR, collider);
     }
     /** Move the entity depending on the collided points */
     resolveCollisions() {
@@ -263,7 +273,7 @@ function dynamicRectVsRect(rectA, rectB, xVel, yVel, deltaTime, contactPoint, co
     }
 
 }
-export function pointSquareCol(point, rectangle, forceSpriteBox = false) {
+export function pointRectCol(point, rectangle, forceSpriteBox = false) {
     let rect = rectangle.hitbox && !forceSpriteBox ? rectangle.hitbox : rectangle;
     if (point.x >= rect.x) {
         if (point.x <= rect.x + rect.w) {
@@ -372,8 +382,7 @@ function resolveException(obj, entity) {
     if (!entity.solid ||
         entity.removed ||
         entity == obj ||
-        entity.grounded && obj.flying ||
-        entity.flying && obj.grounded) {
+        entity.grounded && !obj.grounded) {
         return true;
     }
     return false;

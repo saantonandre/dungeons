@@ -15,11 +15,6 @@ export class FloorComponent extends InterfaceComponent {
     compute(deltaTime) {
         this.text.content = `${this.source.director.floor}`;
     }
-    /** 
-     * - Render the contour
-     * - Render the damaged bar according to prevRatio
-     * - Render the actual bar according to the ratio
-     */
     render(context, tilesize, baseRatio) {
         this.icon.render(context, tilesize, baseRatio);
         this.text.render(context, tilesize, baseRatio);

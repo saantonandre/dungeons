@@ -229,7 +229,7 @@ class ItemSlot extends Sprite {
             this.slotRef.item.y = this.y;
         }
 
-        if (pointSquareCol(mouse, this)) {
+        if (pointRectCol(mouse, this)) {
             this.handleHover(mouse, controls);
             mouse.hoverUI = true;
         } else {
@@ -289,7 +289,7 @@ class EquipmentSlot extends ItemSlot {
 
 }
 
-function pointSquareCol(point, sq) {
+function pointRectCol(point, sq) {
     var square = sq;
     if (sq.hitbox !== undefined) {
         square = sq.hitbox;

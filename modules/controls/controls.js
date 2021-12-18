@@ -1,4 +1,6 @@
-// Controls class
+/**
+ * The Controls class initializes the input listeners and tracks changes.
+ */
 export class Controls {
     constructor() {
         this.up = false;
@@ -51,7 +53,6 @@ export class Controls {
             x.mouseY = evt.clientY;
         });
         document.addEventListener('keydown', function(evt) {
-            // 38, 40, 37, 39
             switch (evt.keyCode) {
                 case 87: //up
                     if (!x.up) {

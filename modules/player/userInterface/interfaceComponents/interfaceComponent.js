@@ -22,16 +22,17 @@ export class InterfaceComponent {
         }
     }
 }
-/**
- * - **SpriteX**: X position in the spritesheet
- * - **SpriteY**: Y position in the spritesheet
- * - **x**: X position on the canvas
- * - **y**: Y position on the canvas
- * - **w**: width on the canvas
- * - **h**: height  on the canvas
- */
-
+/** Class representing an image component of the user interface */
 export class ImageComponent {
+    /**
+     * 
+     * @param {*} spriteX X position in the spritesheet
+     * @param {*} spriteY Y position in the spritesheet
+     * @param {*} x X position on the canvas
+     * @param {*} y Y position on the canvas
+     * @param {*} w width on the canvas
+     * @param {*} h height on the canvas
+     */
     constructor(spriteX = 0, spriteY = 0, x = 0, y = 0, w = 1, h = 1) {
         this.sheet = spritesheet;
         this.spriteX = spriteX;
@@ -84,7 +85,7 @@ export class IconComponent extends Sprite {
         }
     }
     compute(mouse, controls, deltaTime) {
-        if (pointSquareCol(mouse, this)) {
+        if (pointRectCol(mouse, this)) {
             mouse.hoverUI = true;
             this.handleHover(controls)
         } else {
@@ -99,7 +100,7 @@ export class IconComponent extends Sprite {
     }
 }
 
-function pointSquareCol(point, sq) {
+function pointRectCol(point, sq) {
     var square = sq;
     if (sq.hitbox !== undefined) {
         square = sq.hitbox;

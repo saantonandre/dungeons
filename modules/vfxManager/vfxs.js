@@ -1,12 +1,13 @@
 import { Sprite } from "../entity/sprite.js";
 import { Text } from "../text/text.js";
 
-/** Prototype Vfx */
+/** 
+ * Basic vfx class
+ */
 class SpriteVfx extends Sprite {
     /**
      * 
-     * @param {Number} x horizontal position in the canvas
-     * @param {Number} y vertical position in the canvas
+     * @param {Entity} source The entity to which this vfx is attached
      */
     constructor(source) {
         super(source.centerX, source.centerY);
@@ -19,12 +20,16 @@ class SpriteVfx extends Sprite {
     }
     resolveCollisions() {}
     renderShadow() {}
+    /** Moves this vfx coordinates in a random direction within a range defined by this.randomAmount */
     randomizePos() {
         this.x += Math.random() * this.randomAmount - this.randomAmount / 2;
         this.y += Math.random() * this.randomAmount - this.randomAmount / 2;
     }
+    /** Returns the vfx to its original state 
+     * 
+     * @param {Entity} source Defines the entity to which this vfx is related to
+     */
     reset(source) {
-        /** Returns to the original state */
         this.source = source;
         this.moveAtSource()
 
@@ -121,7 +126,7 @@ class Particle extends Sprite {
         this.renderSprite(context, tilesize, ratio, camera, this.rot);
     }
 }
-/** Holds multiple particle objects, which on death respawns for a said amount of times */
+/** Holds multiple Particle objects, which on death respawns for a said amount of times */
 export class ParticlesVfx extends SpriteVfx {
     constructor(source) {
         super(source);
@@ -166,13 +171,19 @@ export class ParticlesVfx extends SpriteVfx {
         }
     }
 }
+/**
+ * Displays text in the form of a vfx
+ */
 export class TextVfx extends SpriteVfx {
+    /**
+     * @param {Entity} source The entity to which this vfx attaches 
+     */
     constructor(source) {
         super(source);
         this.name = 'TextVfx';
         this.text = new Text(0, 0);
         this.text.content = '';
-        /** Red by default */
+        // Red by default
         this.text.color = '#ad2f45';
         this.text.shadow = true;
         this.text.fontSize = 10;

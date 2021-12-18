@@ -3,9 +3,7 @@ export class ExpManager {
         this.owner = entity;
     }
     levelUp() {
-        /*
-        player.expManager.update({expValue:100})
-        */
+        // player.expManager.update({expValue:100})
         this.owner.createVfx("ParticlesVfx", this.owner)
         let stats = this.owner.stats;
 

@@ -25,13 +25,14 @@ class Game {
         gameDirector.compute(meta);
         gameDirector.render(c, meta);
 
-        /** rendering the bounding rect */
         renderBoundingRect()
-        //setTimeout(this.update, 1000 / 2)
+
+        // Calls the function again for the next rendering cycle (depending on the monitor update frequency)
         requestAnimationFrame(this.update);
     }
 }
 
+/** Renders a square around the canvas (provisional) */
 function renderBoundingRect() {
     c.strokeStyle = "black";
     c.beginPath();

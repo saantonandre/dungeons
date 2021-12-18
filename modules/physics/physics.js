@@ -1,69 +1,12 @@
-/*
-    Requires the map to have the following properties:
-    
-    map.tilesWidth = the width of the canvas in terms of tiles
-    map.tilesHeight = the height of the canvas in terms of tiles
-
-export function isOutOfScreen(entity, optionalMargin) {
-    let margin = optionalMargin == undefined ? 1 : optionalMargin;
-    if (entity == null) {
-        return true;
-    }
-    if (entity.x > map.tilesWidth - map.x + margin) {
-        return true;
-    }
-    if (entity.x + margin + entity.w < -map.x) {
-        return true;
-    }
-    if (entity.y > map.tilesHeight - map.y + margin) {
-        return true;
-    }
-    if (entity.y + margin + entity.h < -map.y) {
-        return true;
-    }
-    return false;
-}
-*/
-
-
-/*
-    Requires the map to have the following properties:
-    
-    map.levelX = the x position of the level on the map
-    map.levelY = the y position of the level on the map
-    map.levelWidth = the width of the level
-    map.levelHeight = the height of the level
-export function isOutOfBounds(entity, optionalMargin) {
-    let margin = optionalMargin == undefined ? 1 : optionalMargin;
-    if (entity == null) {
-        return true;
-    }
-    if (entity.x + entity.w > map.levelWidth + map.levelX + margin) {
-        return true;
-    }
-    if (entity.x < map.levelX - margin) {
-        return true;
-    }
-    if (entity.y + entity.h > map.levelHeight + map.levelY + margin) {
-        return true;
-    }
-    if (entity.y < map.levelY - margin) {
-        return true;
-    }
-    return false;
-}
-*/
-
-
-
-/*
-    To use this:
-    -Check for all the simple collisions
-    -Send the collided entities' array and the colliding object
-    Returns:
-    An array of the merged colliders.
-*/
-// Merges the colliders(asks for a list of colliders and return another one)
+/**
+ *  To use this:
+ *  - Check for all the simple collisions
+ *  - Send the collided entities' array and the colliding object
+ * 
+ * @param {Entity[]} chunk Broadly collided entities
+ * @param {Entity} obj Object to check against other entities
+ * @returns {any[]} An array of the merged colliders.
+ */
 export function assembleChunk(chunk, obj) {
     let assembledChunks = [];
     let brokenChunk = [];
@@ -129,7 +72,14 @@ export function assembleChunk(chunk, obj) {
     }
     return assembledChunks;
 }
-
+/**
+ *  Checks whether two rect-shaped objects are colliding
+ * @param {Object} a 
+ * @param {Object} b 
+ * @param {Boolean} forceSpriteBox Defines whether the computation has to ignore the rectange hitbox and use it's absolute sizes
+ * 
+ * @returns {Boolean} True if the rects are colliding, false otherwise
+ */
 export function collided(a, b, forceSpriteBox = false) {
     let rect1 = typeof a.hitbox !== 'undefined' && !forceSpriteBox ? a.hitbox : a;
     let rect2 = typeof b.hitbox !== 'undefined' && !forceSpriteBox ? b.hitbox : b;
@@ -145,7 +95,15 @@ export function collided(a, b, forceSpriteBox = false) {
     return false;
 }
 
-export function pointSquareCol(point, rectangle, forceSpriteBox = false) {
+/**
+ * Checks if a point is contained withing a rectangle shaped object
+ * @param {Object} point 
+ * @param {Object} rectangle 
+ * @param {Boolean} forceSpriteBox Defines whether the computation has to ignore the rectange hitbox and use it's absolute sizes
+ * 
+ * @returns {Boolean} True if contained, false otherwise
+ */
+export function pointRectCol(point, rectangle, forceSpriteBox = false) {
     let rect = rectangle.hitbox && !forceSpriteBox ? rectangle.hitbox : rectangle;
     if (point.x >= rect.x) {
         if (point.x <= rect.x + rect.w) {
@@ -159,8 +117,13 @@ export function pointSquareCol(point, rectangle, forceSpriteBox = false) {
     }
     return false;
 }
-
-export function lineSquareCol(line, sq) {
+/**
+ * Checks for intersections between a line and a rect shaped object
+ * @param {Object} line 
+ * @param {Object} sq 
+ * @returns {Boolean} True if there's an intersection, false otherwise
+ */
+export function lineRectCol(line, sq) {
     let squareLines = getRectSides(sq);
     for (let i = 0; i < squareLines.length; i++) {
         if (intersect(
@@ -179,7 +142,19 @@ export function lineSquareCol(line, sq) {
 
     return false;
 }
-
+/**
+ * Given two lines(expressed in 8 coordinates of 4 points), checks whether there's an intersection between them
+ * 
+ * @param {Number} x1 
+ * @param {Number} y1 
+ * @param {Number} x2 
+ * @param {Number} y2 
+ * @param {Number} x3 
+ * @param {Number} y3 
+ * @param {Number} x4 
+ * @param {Number} y4 
+ * @returns {Number[] | false} The coords of the intersection or false if there's no contact
+ */
 export function intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
 
     // Check if none of the lines are of length 0
@@ -208,7 +183,11 @@ export function intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
         y
     }
 }
-
+/**
+ * 
+ * @param {Any} rect A Rectangular object
+ * @returns {Any[]} Array containing each line of the rect as 2 points coordinates
+ */
 export function getRectSides(rect) {
     let sides = [];
     let sq = rect;
@@ -243,44 +222,58 @@ export function getRectSides(rect) {
 
     return sides;
 }
-export function returnCosine(x1, y1, x2, y2) {
-    let cosine = {
-        cos: 0,
-        sin: 0
-    };
-    let deltaX = x1 - x2;
-    let deltaY = y1 - y2;
-    let rotation = Math.atan2(deltaY, deltaX);
-    cosine.cos = Math.cos(rotation);
-    cosine.sin = Math.sin(rotation);
-    return cosine;
-}
 
-// returns [cos,sin]
-export function cosSin(x1, y1, x2, y2) {
-    let deltaX = x2 - x1;
-    let deltaY = y2 - y1;
-    let rotation = Math.atan2(deltaY, deltaX);
-    let xTarget = Math.cos(rotation);
-    let yTarget = Math.sin(rotation);
-    return [xTarget, yTarget];
-}
+/**
+ * Computes the angle between the given points coordinates
+ * 
+ * @param {Number} x1  
+ * @param {Number} y1 
+ * @param {Number} x2 
+ * @param {Number} y2 
+ * @returns {Number} Rotation expressed in radians
+ */
 export function getAngle(x1, y1, x2, y2) {
     let deltaX = x2 - x1;
     let deltaY = y2 - y1;
-    let rotation = Math.atan2(deltaY, deltaX);
-    return rotation;
-}
-export function getRotation(obj1, obj2) {
-    let x = obj1.x + obj1.w / 2;
-    let y = obj1.y + obj1.h / 2;
-    let x2 = obj2.x + obj2.w / 2;
-    let y2 = obj2.y + obj2.h / 2;
-    let deltaX = x2 - x;
-    let deltaY = y2 - y;
     return Math.atan2(deltaY, deltaX);
 }
+/**
+ * Computes the Cosine and Sine between 2 points
+ * 
+ * @param {Number} x1  
+ * @param {Number} y1 
+ * @param {Number} x2 
+ * @param {Number} y2 
+ * @returns {Number[]} Array containing the cosine and sine values, respectively.
+ */
+export function cosSin(x1, y1, x2, y2) {
+    let rotation = getAngle(x1, y1, x2, y2);
+    let cosine = Math.cos(rotation);
+    let sine = Math.sin(rotation);
+    return [cosine, sine];
+}
+/**
+ * Given two rectangles, returns the angle between their center point
+ * 
+ * @param {Any} obj1 A rect-shaped object
+ * @param {Any} obj2 A rect-shaped object
+ * @returns {Number} Rotation expressed in radians
+ */
+export function getRotation(obj1, obj2) {
+    let x1 = obj1.x + obj1.w / 2;
+    let y1 = obj1.y + obj1.h / 2;
+    let x2 = obj2.x + obj2.w / 2;
+    let y2 = obj2.y + obj2.h / 2;
+    return getAngle(x1, y1, x2, y2);
+}
 
+/**
+ * Returns the distance between the center of two rect shaped objects
+ * 
+ * @param {Any} obj1 A rect-shaped object
+ * @param {Any} obj2 A rect-shaped object
+ * @returns {Number} Distance between the rectangles centers.
+ */
 export function distance(obj1, obj2) {
     let x1 = obj1.w ? obj1.x + obj1.w / 2 : obj1.x;
     let y1 = obj1.h ? obj1.y + obj1.h / 2 : obj1.y;
